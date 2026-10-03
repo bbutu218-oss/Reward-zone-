@@ -32,7 +32,7 @@
         .square-title { font-size: 13px; font-weight: 600; color: #f8fafc; }
         
         .deposit-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; }
-        .qr-placeholder { width: 180px; height: 180px; background: #ffffff; margin: 15px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 4px solid #38bdf8; overflow: hidden; }
+        .qr-placeholder { width: 240px; height: 240px; background: #ffffff; margin: 15px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 4px solid #38bdf8; overflow: hidden; }
         .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
         .deposit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
         .deposit-amt-btn { background: #121824; border: 1px solid #334155; color: white; padding: 10px 0; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
@@ -48,7 +48,6 @@
         .method-btn { flex: 1; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
         .method-btn.active { background: #6366f1; border-color: #6366f1; }
         
-        /* Toast Notification Styling */
         #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #334155; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #475569; }
         #toastNotification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
@@ -161,11 +160,10 @@
         </div>
 
         <div class="notice-box">
-            <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay, or upload a new QR code image directly so you don't need to update code manually. Then enter your 12-digit UTR/Txn ID.
+            <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay, or upload a new QR code image directly. Then enter your 12-digit UTR/Txn ID.
         </div>
 
-        <!-- Admin / User QR Code Upload Section -->
-        <div class="card" style="margin-bottom: 15px; text-align: center;">
+        <div class="card" style="margin-bottom: 15px; text-align: center;" id="qrUploadSection">
             <h4 style="margin-bottom: 8px;">Upload / Update QR Code</h4>
             <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #cbd5e1;" onchange="handleQrUpload(event)">
         </div>
@@ -228,7 +226,6 @@
         <button class="action-btn" style="background: #2ecc71;" onclick="openPasswordConfirmModal()">Submit Withdrawal</button>
     </div>
 
-    <!-- History Page with Top Deposit/Withdrawal Buttons & Game Activity Area -->
     <div id="historyPage" class="page">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
@@ -261,13 +258,12 @@
     </div>
 </div>
 
-<!-- Modal Popups converted or handled as Auto-Notifications -->
 <div class="modal-overlay" id="termsModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeTermsModal()">×</button>
         <h3 style="margin-bottom: 10px; color: #38bdf8;">📜 Terms & Conditions</h3>
         <div style="max-height: 250px; overflow-y: auto; font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left; margin-bottom: 15px;">
-            <p><b>1. User Responsibility:</b> Users must be 18 years or older to use this platform.</p>
+            <p><b>1. User Responsibility:</b> Users must be 18 years or older.</p>
             <p><b>2. Fair Play:</b> Any system exploitation or illegal activity will result in an immediate account ban.</p>
             <p><b>3. Withdrawal Rules:</b> Minimum withdrawal limit is ₹110. Only game winnings are eligible for withdrawal.</p>
             <p><b>4. Deposit Policy:</b> Always submit a valid 12-digit UTR/Txn ID for deposit verification.</p>
@@ -335,7 +331,12 @@
     let selectedDepositAmount = 100;
     let selectedMethod = 'BANK';
 
-    const baseBanks = ["State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", "Federal Bank", "IndusInd Bank", "IDFC First Bank"];
+    const baseBanks = [
+        "State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", 
+        "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", 
+        "Federal Bank", "IndusInd Bank", "IDFC First Bank", "Bank of India", "Central Bank of India", 
+        "Indian Bank", "Indian Overseas Bank", "UCO Bank", "Bank of Maharashtra", "Punjab & Sind Bank"
+    ];
     
     window.addEventListener('DOMContentLoaded', async () => {
         let listEl = document.getElementById('banksList');
@@ -362,7 +363,6 @@
         }
     });
 
-    // Auto Notification Toast Function (3 to 5 seconds auto-hide)
     function showToast(msg) {
         let toast = document.getElementById('toastNotification');
         toast.innerText = msg;
@@ -391,6 +391,9 @@
 
         if (currentUser.phone === "8093361993") {
             document.getElementById('adminControlBtn').style.display = 'flex';
+            document.getElementById('qrUploadSection').style.display = 'block';
+        } else {
+            document.getElementById('qrUploadSection').style.display = 'none';
         }
     }
 
@@ -456,7 +459,6 @@
         switchPage('depositPage');
     }
 
-    // Direct QR Code Image Upload Handler
     function handleQrUpload(event) {
         let file = event.target.files[0];
         if (file) {
@@ -545,7 +547,7 @@
         let res = await fetch(`/api/transactions/${currentUser._id}`).then(r => r.json());
         if(res.success) {
             globalHistoryData = res;
-            loadGameActivityView(); // Default main area view
+            loadGameActivityView();
         }
     }
 
@@ -596,50 +598,33 @@
 
     async function loadAdminPanelData() {
         let res = await fetch('/api/admin/requests').then(r => r.json());
-        let betsSumRes = await fetch('/api/admin/bets-summary').then(r => r.json());
-        
         if(res.success) {
             let html = '<h4 style="color:#facc15; margin-bottom:5px;">Deposit Requests</h4>';
             res.deposits.forEach(d => {
-                html += `<div class="card" style="padding:8px; margin-bottom:5px;">
-                    Amt: ₹${d.amount} | TXN: ${d.transactionId} | Status: <b>${d.status}</b>
-                    ${d.status === 'pending' ? `<button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">
+                    <b>User UID:</b> ${d.userId ? d.userId.uid : 'N/A'}<br>
+                    <b>Amount:</b> ₹${d.amount} | <b>UTR/TXN:</b> ${d.transactionId}<br>
+                    <b>Status:</b> <span style="color:${d.status==='approved'?'#22c55e':(d.status==='rejected'?'#ef4444':'#eab308')}">${d.status.toUpperCase()}</span>
+                    ${d.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
+                        <button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Approve</button>
+                        <button onclick="adminAction('deposit', '${d._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
+                    </div>` : ''}
                 </div>`;
             });
 
             html += '<h4 style="color:#facc15; margin:15px 0 5px 0;">Withdrawal Requests</h4>';
             res.withdrawals.forEach(w => {
-                html += `<div class="card" style="padding:8px; margin-bottom:5px;">
-                    Amt: ₹${w.amount} | Mobile: ${w.mobile} | Status: <b>${w.status}</b>
-                    ${w.status === 'pending' ? `<button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">
+                    <b>User UID:</b> ${w.userId ? w.userId.uid : 'N/A'}<br>
+                    <b>Amount:</b> ₹${w.amount} | <b>Mobile:</b> ${w.mobile}<br>
+                    <b>Details:</b> ${w.bankName || 'UPI'} (${w.accountNumber || w.upiId || 'N/A'}) - IFSC: ${w.ifsc || 'N/A'}<br>
+                    <b>Status:</b> <span style="color:${w.status==='approved'?'#22c55e':(w.status==='rejected'?'#ef4444':'#eab308')}">${w.status.toUpperCase()}</span>
+                    ${w.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
+                        <button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Approve</button>
+                        <button onclick="adminAction('withdrawal', '${w._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
+                    </div>` : ''}
                 </div>`;
             });
-
-            if (betsSumRes.success) {
-                html += '<h4 style="color:#38bdf8; margin:20px 0 8px 0;">🛡️ Admin Winnings Control Panel (Total Bets Sum)</h4>';
-                betsSumRes.summaries.forEach(s => {
-                    html += `<div class="card" style="padding:10px; margin-bottom:10px; background:#1e293b;">
-                        <div style="font-weight:bold; color:#facc15; margin-bottom:4px;">Period: ${s.period} (${s.timerType})</div>
-                        <div style="font-size:12px; margin-bottom:6px;">Size Bets: Big(₹${s.bigSum}) | Small(₹${s.smallSum})</div>
-                        <div style="font-size:12px; margin-bottom:6px;">Color Bets: Green(₹${s.greenSum}) | Red(₹${s.redSum}) | Violet(₹${s.violetSum})</div>
-                        <div style="display:flex; gap:5px; align-items:center; margin-top:8px;">
-                            <select id="controlNum_${s.period}" style="background:#121824; color:#fff; padding:6px; border-radius:4px; border:1px solid #334155;">
-                                <option value="0">Force Number 0 (Violet)</option>
-                                <option value="1">Force Number 1 (Green)</option>
-                                <option value="2">Force Number 2 (Red)</option>
-                                <option value="3">Force Number 3 (Green)</option>
-                                <option value="4">Force Number 4 (Red)</option>
-                                <option value="5">Force Number 5 (Violet)</option>
-                                <option value="6">Force Number 6 (Red)</option>
-                                <option value="7">Force Number 7 (Green)</option>
-                                <option value="8">Force Number 8 (Red)</option>
-                                <option value="9">Force Number 9 (Green)</option>
-                            </select>
-                            <button onclick="adminForceOutcome('${s.period}')" style="background:#6366f1; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Set Result</button>
-                        </div>
-                    </div>`;
-                });
-            }
 
             document.getElementById('adminRequestsContainer').innerHTML = html;
         }
@@ -650,17 +635,6 @@
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, id, action })
-        }).then(r => r.json());
-        showToast(res.message);
-        loadAdminPanelData();
-    }
-
-    async function adminForceOutcome(period) {
-        let selectedNum = document.getElementById(`controlNum_${period}`).value;
-        let res = await fetch('/api/admin/set-result', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ period, number: selectedNum })
         }).then(r => r.json());
         showToast(res.message);
         loadAdminPanelData();
