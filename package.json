@@ -1,0 +1,15 @@
+{
+  "name": "pro-color-game",
+  "version": "1.0.0",
+  "description": "Pro Color and Number Trading Game Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.0",
+    "socket.io": "^4.7.2"
+  }
+}
