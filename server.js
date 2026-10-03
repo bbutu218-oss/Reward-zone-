@@ -20,7 +20,9 @@ const io = new Server(server, {
 
 app.use(express.json());
 app.use(cors());
-app.use(express.static('public'));
+
+// Yahan public folder ki jagah __dirname kar diya hai taaki root folder ki files direct serve hon
+app.use(express.static(__dirname));
 
 // MongoDB Connection (Updated for rewardzone)
 const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
