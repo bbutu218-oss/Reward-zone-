@@ -25,15 +25,6 @@ app.use(express.static('public'));
 // MongoDB Connection (Updated for rewardzone)
 const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
 
-mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
-    console.log("Connected to MongoDB successfully for rewardzone!");
-}).catch(err => {
-    console.error("MongoDB connection error:", err);
-});
-
 // Helper function to generate unique UID
 function generateUID() {
     return 'UID-' + Math.floor(100000 + Math.random() * 900000);
@@ -137,9 +128,6 @@ async function setupAdminAccount() {
         console.error("Admin setup error:", err.message);
     }
 }
-mongoose.connection.once('open', () => {
-    setupAdminAccount();
-});
 
 // Period Code Generator Setup
 const periodCounters = { '30s': 1000, '60s': 2000, '3m': 3000, '5m': 5000 };
@@ -529,10 +517,23 @@ function startTimerLoop(timerType, intervalSeconds) {
     }, 1000);
 }
 
-startTimerLoop('30s', 30);
-startTimerLoop('60s', 60);
-startTimerLoop('3m', 180);
-startTimerLoop('5m', 300);
+// Connect to MongoDB and then start server & timers
+mongoose.connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log("Connected to MongoDB successfully for rewardzone!");
+    setupAdminAccount();
+
+    // Start timer loops AFTER successful connection
+    startTimerLoop('30s', 30);
+    startTimerLoop('60s', 60);
+    startTimerLoop('3m', 180);
+    startTimerLoop('5m', 300);
+
+}).catch(err => {
+    console.error("MongoDB connection error:", err);
+});
 
 io.on('connection', (socket) => {
     ['30s', '60s', '3m', '5m'].forEach(type => {
