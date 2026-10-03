@@ -3,74 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinGo 3D Trading - YaarWin Style</title>
+    <title>Reward Zone - WinGo 3D Trading</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
         body { background: #0c101c; color: #fff; padding: 10px; display: flex; justify-content: center; }
-        
         .app-container { width: 100%; max-width: 450px; background: #121929; border-radius: 20px; padding: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
-        
         .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #1e293b; }
-        .logo { font-size: 20px; font-weight: 800; color: #00e676; text-transform: uppercase; font-style: italic; text-shadow: 0 0 10px rgba(0,230,118,0.4); }
-        .wallet-badge { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #00e676; padding: 6px 14px; border-radius: 25px; font-weight: bold; color: #00e676; font-size: 13px; text-shadow: 0 0 5px rgba(0,230,118,0.3); }
-
+        .back-btn { background: #1e293b; border: 1px solid #2a3756; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .logo { font-size: 18px; font-weight: 800; color: #00e676; text-transform: uppercase; font-style: italic; text-shadow: 0 0 10px rgba(0,230,118,0.4); }
+        .wallet-badge { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #00e676; padding: 6px 14px; border-radius: 25px; font-weight: bold; color: #00e676; font-size: 13px; }
         .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
-        .tab-btn { flex: 1; background: #1a233a; border: 1px solid #2a3756; color: #94a3b8; padding: 10px 5px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; transition: all 0.2s; }
-        .tab-btn.active { background: linear-gradient(135deg, #00c853, #00e676); color: #fff; border-color: #00e676; box-shadow: 0 4px 15px rgba(0,230,118,0.3); }
-
-        .timer-board { background: linear-gradient(135deg, #00c853, #009624); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: inset 0 2px 5px rgba(255,255,255,0.3), 0 8px 20px rgba(0,200,83,0.3); position: relative; margin-bottom: 15px; }
+        .tab-btn { flex: 1; background: #1a233a; border: 1px solid #2a3756; color: #94a3b8; padding: 10px 5px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: linear-gradient(135deg, #00c853, #00e676); color: #fff; border-color: #00e676; }
+        .timer-board { background: linear-gradient(135deg, #00c853, #009624); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .board-left p { font-size: 11px; opacity: 0.9; text-transform: uppercase; font-weight: bold; }
         .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; }
-        
-        .timer-clock { background: #fff; color: #00c853; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; box-shadow: 0 4px 10px rgba(0,0,0,0.2); letter-spacing: 2px; }
-
+        .timer-clock { background: #fff; color: #00c853; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; }
         .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); transition: transform 0.1s; }
-        .btn-3d:active { transform: scale(0.96); }
-        .btn-green { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); box-shadow: 0 6px 0 #145a32, 0 8px 15px rgba(0,0,0,0.4); }
-        .btn-violet { background: linear-gradient(180deg, #a569bd 0%, #6c3483 100%); box-shadow: 0 6px 0 #4a235a, 0 8px 15px rgba(0,0,0,0.4); }
-        .btn-red { background: linear-gradient(180deg, #e74c3c 0%, #922b21 100%); box-shadow: 0 6px 0 #641e16, 0 8px 15px rgba(0,0,0,0.4); }
-
+        .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .btn-green { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); box-shadow: 0 6px 0 #145a32; }
+        .btn-violet { background: linear-gradient(180deg, #a569bd 0%, #6c3483 100%); box-shadow: 0 6px 0 #4a235a; }
+        .btn-red { background: linear-gradient(180deg, #e74c3c 0%, #922b21 100%); box-shadow: 0 6px 0 #641e16; }
         .ball-container { background: #1a233a; padding: 15px; border-radius: 16px; border: 1px solid #2a3756; margin-bottom: 15px; }
         .ball-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; justify-items: center; }
-        
-        .ball-3d { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff; cursor: pointer; position: relative; border: none; outline: none; transition: transform 0.15s; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
-        .ball-3d:active { transform: scale(0.9); }
-        
-        .ball-green { background: radial-gradient(circle at 30% 30%, #58d68d, #1e8449 60%, #114b29 100%); box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.6); }
-        .ball-red { background: radial-gradient(circle at 30% 30%, #ec7063, #b03a2e 60%, #641e16 100%); box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.6); }
-        .ball-half { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #1e8449 55%, #114b29 100%); box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.6); }
-        .ball-half-red { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #b03a2e 55%, #641e16 100%); box-shadow: 0 6px 12px rgba(0,0,0,0.5), inset -3px -3px 6px rgba(0,0,0,0.4), inset 3px 3px 6px rgba(255,255,255,0.6); }
-
+        .ball-3d { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff; cursor: pointer; border: none; }
+        .ball-green { background: radial-gradient(circle at 30% 30%, #58d68d, #1e8449 60%, #114b29 100%); }
+        .ball-red { background: radial-gradient(circle at 30% 30%, #ec7063, #b03a2e 60%, #641e16 100%); }
+        .ball-half { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #1e8449 55%, #114b29 100%); }
+        .ball-half-red { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #b03a2e 55%, #641e16 100%); }
         .size-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-big { background: linear-gradient(180deg, #f39c12 0%, #b9770e 100%); box-shadow: 0 6px 0 #7e5109, 0 8px 15px rgba(0,0,0,0.4); }
-        .btn-small { background: linear-gradient(180deg, #3498db 0%, #21618c 100%); box-shadow: 0 6px 0 #154360, 0 8px 15px rgba(0,0,0,0.4); }
-
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.92); backdrop-filter: blur(4px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; }
-        .count-card { font-size: 110px; font-weight: 900; color: #00e676; text-shadow: 0 0 30px rgba(0,230,118,0.8); background: rgba(255,255,255,0.05); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid rgba(0,230,118,0.3); }
-
-        .bet-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a233a; border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); border-top: 2px solid #00e676; box-shadow: 0 -10px 30px rgba(0,0,0,0.8); }
+        .btn-big { background: linear-gradient(180deg, #f39c12 0%, #b9770e 100%); box-shadow: 0 6px 0 #7e5109; }
+        .btn-small { background: linear-gradient(180deg, #3498db 0%, #21618c 100%); box-shadow: 0 6px 0 #154360; }
+        .admin-panel-btn { background: #dc2626; color: #fff; border: none; padding: 10px; border-radius: 12px; width: 100%; font-weight: bold; margin-bottom: 15px; cursor: pointer; display: none; }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; }
+        .count-card { font-size: 110px; font-weight: 900; color: #00e676; background: rgba(255,255,255,0.05); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid rgba(0,230,118,0.3); }
+        .bet-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a233a; border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; transition: bottom 0.3s; border-top: 2px solid #00e676; }
         .bet-modal.active { bottom: 0; }
         .modal-header { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 15px; color: #00e676; text-transform: uppercase; }
-        
         .chip-selector, .multiplier-selector { display: flex; gap: 8px; margin-bottom: 12px; }
         .chip-btn, .mult-btn { flex: 1; background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; }
-        .chip-btn.active, .mult-btn.active { background: #00e676; color: #000; border-color: #00e676; }
-
+        .chip-btn.active, .mult-btn.active { background: #00e676; color: #000; }
         .qty-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; }
         .qty-btn { background: #2a3756; color: #fff; border: none; width: 35px; height: 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
         .qty-input { width: 60px; text-align: center; background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 6px; border-radius: 8px; font-weight: bold; }
-
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-confirm { flex: 2; background: linear-gradient(135deg, #00c853, #00e676); border: none; padding: 12px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; }
         .btn-cancel { flex: 1; background: #2a3756; border: none; padding: 12px; border-radius: 10px; color: #aaa; font-weight: bold; cursor: pointer; }
-
         .history-card { background: #1a233a; border-radius: 16px; padding: 12px; border: 1px solid #2a3756; margin-top: 15px; }
         .history-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
         .history-table th { color: #64748b; padding: 8px; border-bottom: 1px solid #2a3756; }
         .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+        .admin-content { background: #1a233a; width: 100%; max-width: 400px; padding: 20px; border-radius: 15px; border: 1px solid #dc2626; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -81,9 +67,12 @@
     </div>
 
     <div class="header">
-        <div class="logo">YaarWin 3D</div>
+        <button class="back-btn" onclick="window.location.href='index_3.html'">← Back</button>
+        <div class="logo">RewardZone</div>
         <div class="wallet-badge" id="userWallet">₹ 0.00</div>
     </div>
+
+    <button class="admin-panel-btn" id="adminControlBtn" onclick="openAdminControl()">🛡️ Admin Winnings Control Panel</button>
 
     <div class="timer-tabs">
         <div class="tab-btn active" id="tab-30s" onclick="switchTimer('30s', 30)">WinGo 30s</div>
@@ -143,7 +132,6 @@
 
 <div id="betModal" class="bet-modal">
     <div class="modal-header" id="modalTitle">Select Bet</div>
-    
     <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Base Amount</p>
     <div class="chip-selector">
         <div class="chip-btn active" onclick="selectBase(1)">₹1</div>
@@ -151,7 +139,6 @@
         <div class="chip-btn" onclick="selectBase(100)">₹100</div>
         <div class="chip-btn" onclick="selectBase(1000)">₹1000</div>
     </div>
-
     <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Multiplier</p>
     <div class="multiplier-selector">
         <div class="mult-btn active" onclick="selectMult(1)">X1</div>
@@ -160,23 +147,37 @@
         <div class="mult-btn" onclick="selectMult(20)">X20</div>
         <div class="mult-btn" onclick="selectMult(50)">X50</div>
     </div>
-
     <div class="qty-control">
         <button class="qty-btn" onclick="changeQty(-1)">-</button>
         <input type="number" class="qty-input" id="betQty" value="1" readonly>
         <button class="qty-btn" onclick="changeQty(1)">+</button>
     </div>
-
     <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
         Total Amount: <span id="totalBetCalc" style="color: #00e676;">₹ 1.00</span>
     </div>
-
     <div class="modal-actions">
         <button class="btn-cancel" onclick="closeBetModal()">Cancel</button>
         <button class="btn-confirm" onclick="submitBet()">Confirm Bet</button>
     </div>
 </div>
 
+<div id="adminModal" class="admin-modal">
+    <div class="admin-content">
+        <h3 style="color: #00e676; margin-bottom: 10px;">Admin Winnings Control</h3>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Monitor total bets and control period outcomes.</p>
+        <div id="adminBetsOverview" style="font-size: 12px; margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 12px; display: block; margin-bottom: 5px;">Rig Winning Number (0-9):</label>
+            <input type="number" id="rigNumberInput" min="0" max="9" style="width: 100%; padding: 8px; background: #0c101c; border: 1px solid #2a3756; color: #fff; border-radius: 6px;">
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <button onclick="submitRiggedResult()" style="flex:1; background:#00e676; border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer;">Set Result</button>
+            <button onclick="closeAdminControl()" style="flex:1; background:#2a3756; border:none; color:#fff; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer;">Close</button>
+        </div>
+    </div>
+</div>
+
+<audio id="beepAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
@@ -185,10 +186,12 @@
     let balance = user ? (user.balance !== undefined ? user.balance : user.points) : 0;
 
     if (user) document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
+    if (user && (user.phone === "8093361993" || user.isAdmin)) {
+        document.getElementById('adminControlBtn').style.display = 'block';
+    }
 
     let currentTimerType = '30s';
     let timeLeft = 30;
-    
     let activeBetType = '';
     let activeBetValue = '';
     let baseAmount = 1;
@@ -217,6 +220,9 @@
                     lockOverlay.style.display = 'flex';
                     document.getElementById('lockNum').innerText = timeLeft;
                     closeBetModal();
+                    if (timeLeft > 0) {
+                        document.getElementById('beepAudio').play().catch(e => {});
+                    }
                 } else {
                     lockOverlay.style.display = 'none';
                 }
@@ -240,55 +246,27 @@
         calcTotal();
     }
 
-    function closeBetModal() {
-        document.getElementById('betModal').classList.remove('active');
-    }
-
-    function selectBase(amt) {
-        baseAmount = amt;
-        document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        calcTotal();
-    }
-
-    function selectMult(m) {
-        multiplier = m;
-        document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active'));
-        event.target.classList.add('active');
-        calcTotal();
-    }
-
-    function changeQty(val) {
-        quantity = Math.max(1, quantity + val);
-        document.getElementById('betQty').value = quantity;
-        calcTotal();
-    }
-
-    function calcTotal() {
-        let total = baseAmount * multiplier * quantity;
-        document.getElementById('totalBetCalc').innerText = `₹ ${total.toFixed(2)}`;
-    }
+    function closeBetModal() { document.getElementById('betModal').classList.remove('active'); }
+    function selectBase(amt) { baseAmount = amt; document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
+    function selectMult(m) { multiplier = m; document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
+    function changeQty(val) { quantity = Math.max(1, quantity + val); document.getElementById('betQty').value = quantity; calcTotal(); }
+    function calcTotal() { let total = baseAmount * multiplier * quantity; document.getElementById('totalBetCalc').innerText = `₹ ${total.toFixed(2)}`; }
 
     async function submitBet() {
         let finalAmount = baseAmount * multiplier * quantity;
         if (finalAmount > balance) return alert('Insufficient Balance!');
-
         const period = document.getElementById('periodId').innerText;
-
         const response = await fetch('/api/bet', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userId, timerType: currentTimerType, period, betType: activeBetType, betValue: activeBetValue, amount: finalAmount })
         });
-
         const data = await response.json();
         if (data.success) {
             balance = data.newBalance;
             document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
             closeBetModal();
-        } else {
-            alert(data.message);
-        }
+        } else { alert(data.message); }
     }
 
     async function updateUserBalance() {
@@ -320,6 +298,36 @@
                 }
             });
     }
+
+    async function openAdminControl() {
+        document.getElementById('adminModal').style.display = 'flex';
+        let period = document.getElementById('periodId').innerText;
+        let res = await fetch(`/api/admin/bets-summary/${period}`).then(r => r.json());
+        if(res.success) {
+            let html = `<b>Period:</b> ${period}<br><b>Total Bets Amount:</b> ₹${res.totalAmount}<br><br>`;
+            html += `<b>Breakdown:</b><br>`;
+            for(let key in res.breakdown) {
+                html += `- ${key}: ₹${res.breakdown[key]}<br>`;
+            }
+            document.getElementById('adminBetsOverview').innerHTML = html;
+        }
+    }
+
+    function closeAdminControl() { document.getElementById('adminModal').style.display = 'none'; }
+
+    async function submitRiggedResult() {
+        let period = document.getElementById('periodId').innerText;
+        let number = document.getElementById('rigNumberInput').value;
+        if(number === '' || number < 0 || number > 9) return alert('Enter valid number 0-9');
+        let res = await fetch('/api/admin/set-result', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ period, number })
+        }).then(r => r.json());
+        alert(res.message);
+        closeAdminControl();
+    }
+
     fetchHistory();
 </script>
 </body>
