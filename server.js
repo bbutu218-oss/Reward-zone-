@@ -20,19 +20,14 @@ const io = new Server(server, {
 
 app.use(express.json());
 app.use(cors());
-
-// Static files serving root folder
 app.use(express.static(__dirname));
 
-// MongoDB Connection
 const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
 
-// Helper function to generate unique UID
 function generateUID() {
     return 'UID-' + Math.floor(100000 + Math.random() * 900000);
 }
 
-// User Schema
 const userSchema = new mongoose.Schema({
     uid: { type: String, unique: true, default: generateUID },
     phone: { type: String, required: true, unique: true },
@@ -44,7 +39,6 @@ const userSchema = new mongoose.Schema({
 });
 const User = mongoose.model('User', userSchema);
 
-// Game Result Schema
 const gameResultSchema = new mongoose.Schema({
     timerType: { type: String, default: '30s' }, 
     period: { type: String, required: true, unique: true },
@@ -55,7 +49,6 @@ const gameResultSchema = new mongoose.Schema({
 });
 const GameResult = mongoose.model('GameResult', gameResultSchema);
 
-// Bet Schema
 const betSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     timerType: { type: String, default: '30s' },
@@ -69,7 +62,6 @@ const betSchema = new mongoose.Schema({
 });
 const Bet = mongoose.model('Bet', betSchema);
 
-// Manual Override Schema
 const manualOverrideSchema = new mongoose.Schema({
     period: { type: String, required: true, unique: true },
     number: { type: Number, required: true },
@@ -77,7 +69,6 @@ const manualOverrideSchema = new mongoose.Schema({
 });
 const ManualOverride = mongoose.model('ManualOverride', manualOverrideSchema);
 
-// Deposit Schema
 const depositSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     amount: Number,
@@ -87,7 +78,6 @@ const depositSchema = new mongoose.Schema({
 });
 const Deposit = mongoose.model('Deposit', depositSchema);
 
-// Withdrawal Schema
 const withdrawalSchema = new mongoose.Schema({
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     amount: Number,
@@ -102,7 +92,6 @@ const withdrawalSchema = new mongoose.Schema({
 });
 const Withdrawal = mongoose.model('Withdrawal', withdrawalSchema);
 
-// --- ADMIN CONFIGURATION ---
 const ADMIN_NUMBERS = ["8093361993", "+918093361993", "918093361993"];
 
 async function setupAdminAccount() {
@@ -119,18 +108,15 @@ async function setupAdminAccount() {
                 rewardCoins: 50000
             });
             await adminUser.save();
-            console.log(`Admin account auto-created for rewardzone (${adminPhone})`);
         } else {
             adminUser.password = adminPassword;
             await adminUser.save();
-            console.log(`Admin password updated for rewardzone (${adminPhone})`);
         }
     } catch (err) {
         console.error("Admin setup error:", err.message);
     }
 }
 
-// Period Code Generator Setup
 const periodCounters = { '30s': 1000, '60s': 2000, '3m': 3000, '5m': 5000 };
 
 function generatePeriodCode(timerType) {
@@ -157,8 +143,6 @@ const gameStates = {
     '3m':  { countdown: 180, isBettingOpen: true, period: generatePeriodCode('3m') },
     '5m':  { countdown: 300, isBettingOpen: true, period: generatePeriodCode('5m') }
 };
-
-// --- AUTH & USER ROUTES ---
 
 app.post('/api/register', async (req, res) => {
     try {
@@ -251,8 +235,6 @@ app.get('/api/user/mobile/:mobile', async (req, res) => {
     }
 });
 
-// --- COIN CONVERSION & REWARDS ---
-
 app.post('/api/convert-coins', async (req, res) => {
     try {
         const { userId, coins } = req.body;
@@ -276,14 +258,12 @@ app.post('/api/convert-coins', async (req, res) => {
     }
 });
 
-// --- DEPOSIT & WITHDRAWAL ---
-
 app.post('/api/deposit', async (req, res) => {
     try {
         const { userId, amount, transactionId } = req.body;
         const deposit = new Deposit({ userId, amount, transactionId });
         await deposit.save();
-        res.json({ success: true, message: "Deposit request submitted successfully! Manual review pending." });
+        res.json({ success: true, message: "Deposit request submitted successfully!" });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -322,65 +302,11 @@ app.get('/api/transactions/:userId', async (req, res) => {
     }
 });
 
-// --- ADMIN PANEL ---
-
 app.get('/api/admin/requests', async (req, res) => {
     try {
-        const deposits = await Deposit.find().populate('userId', 'phone').sort({ createdAt: -1 });
-        const withdrawals = await Withdrawal.find().populate('userId', 'phone').sort({ createdAt: -1 });
+        const deposits = await Deposit.find().populate('userId', 'uid phone').sort({ createdAt: -1 });
+        const withdrawals = await Withdrawal.find().populate('userId', 'uid phone').sort({ createdAt: -1 });
         res.json({ success: true, deposits, withdrawals });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-});
-
-// Added bets-summary endpoint without period parameter to support index_5.html admin panel view
-app.get('/api/admin/bets-summary', async (req, res) => {
-    try {
-        let summaries = [];
-        for (let timerType of ['30s', '60s', '3m', '5m']) {
-            let period = gameStates[timerType].period;
-            let bets = await Bet.find({ period, timerType });
-            let bigSum = 0, smallSum = 0, greenSum = 0, redSum = 0, violetSum = 0;
-            bets.forEach(b => {
-                if (b.betType === 'size') {
-                    if (b.betValue === 'big') bigSum += b.amount;
-                    if (b.betValue === 'small') smallSum += b.amount;
-                } else if (b.betType === 'color') {
-                    if (b.betValue === 'green') greenSum += b.amount;
-                    if (b.betValue === 'red') redSum += b.amount;
-                    if (b.betValue === 'violet') violetSum += b.amount;
-                }
-            });
-            summaries.push({
-                period,
-                timerType,
-                bigSum,
-                smallSum,
-                greenSum,
-                redSum,
-                violetSum
-            });
-        }
-        res.json({ success: true, summaries });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-});
-
-// Existing bets-summary endpoint with period parameter for color-game modal
-app.get('/api/admin/bets-summary/:period', async (req, res) => {
-    try {
-        const { period } = req.params;
-        const bets = await Bet.find({ period });
-        let totalAmount = 0;
-        let breakdown = {};
-        bets.forEach(b => {
-            totalAmount += b.amount;
-            let key = `${b.betType}_${b.betValue}`;
-            breakdown[key] = (breakdown[key] || 0) + b.amount;
-        });
-        res.json({ success: true, period, totalAmount, breakdown });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -396,6 +322,9 @@ app.post('/api/admin/action', async (req, res) => {
                 dep.status = 'approved';
                 await dep.save();
                 await User.findByIdAndUpdate(dep.userId, { $inc: { balance: dep.amount } });
+            } else if (action === 'reject' && dep.status === 'pending') {
+                dep.status = 'rejected';
+                await dep.save();
             } else {
                 dep.status = action;
                 await dep.save();
@@ -432,7 +361,28 @@ app.post('/api/admin/set-result', async (req, res) => {
     }
 });
 
-// --- GAME LOGIC & BETTING ---
+app.get('/api/admin/bets-summary/:period', async (req, res) => {
+    try {
+        const { period } = req.params;
+        const bets = await Bet.find({ period });
+        let totalAmount = 0;
+        let breakdown = { big: 0, small: 0, green: 0, red: 0, violet: 0 };
+
+        bets.forEach(b => {
+            totalAmount += b.amount;
+            if (b.betType === 'size' || b.betType === 'color') {
+                breakdown[b.betValue] = (breakdown[b.betValue] || 0) + b.amount;
+            } else if (b.betType === 'number') {
+                let key = 'num_' + b.betValue;
+                breakdown[key] = (breakdown[key] || 0) + b.amount;
+            }
+        });
+
+        res.json({ success: true, totalAmount, breakdown });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
 
 app.get('/api/game-history/:timerType', async (req, res) => {
     try {
@@ -570,7 +520,6 @@ function startTimerLoop(timerType, intervalSeconds) {
     }, 1000);
 }
 
-// Connect to MongoDB and start server
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
