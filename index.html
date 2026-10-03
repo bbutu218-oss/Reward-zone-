@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reward Zone</title>
+    <meta name="monetag" content="461f12f4999caa17cb8e670a67481109">
+    <script>(function(s){s.dataset.zone='11824344',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #0f172a; color: #fff; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 450px; background: #121824; min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .top-balance-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .mini-wallet { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #2ecc71; display: flex; align-items: center; gap: 5px; }
+        .mini-money-wallet { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 5px; }
+        .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
+        .card h4 { font-size: 15px; margin-bottom: 5px; color: #f8fafc; }
+        .card p { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+        .action-btn { background: #6366f1; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
+        .action-btn:hover { opacity: 0.9; }
+        
+        .profile-top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; }
+        .avatar-box { width: 80px; height: 80px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #38bdf8; cursor: pointer; }
+        .profile-right-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .profile-info-row label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 2px; }
+        .profile-info-row input { width: 100%; background: #121824; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: white; font-size: 13px; outline: none; }
+        .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+        .profile-square-btn { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
+        .square-icon { font-size: 26px; margin-bottom: 8px; }
+        .square-title { font-size: 13px; font-weight: 600; color: #f8fafc; }
+        
+        .deposit-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; }
+        .qr-placeholder { width: 180px; height: 180px; background: #ffffff; margin: 15px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 4px solid #38bdf8; overflow: hidden; }
+        .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
+        .deposit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
+        .deposit-amt-btn { background: #121824; border: 1px solid #334155; color: white; padding: 10px 0; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
+        .deposit-amt-btn.active { background: #6366f1; border-color: #6366f1; }
+        .notice-box { background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); padding: 12px; border-radius: 8px; font-size: 12px; color: #fde047; text-align: left; margin-bottom: 15px; line-height: 1.5; }
+        
+        .form-group { margin-bottom: 15px; width: 100%; text-align: left; }
+        .form-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; }
+        .input-wrapper { position: relative; width: 100%; display: flex; align-items: center; background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; background: transparent; border: none; color: white; font-size: 14px; outline: none; }
+        
+        .method-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .method-btn { flex: 1; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
+        .method-btn.active { background: #6366f1; border-color: #6366f1; }
+        
+        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: #1e293b; display: flex; justify-content: space-around; border-top: 1px solid #334155; padding: 12px 0; z-index: 100; }
+        .nav-item { text-align: center; color: #94a3b8; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
+        .nav-item.active { color: #6366f1; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+        .modal-content { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #94a3b8; background: none; border: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="homePage" class="page active">
+        <div class="top-balance-bar">
+            <div class="mini-wallet"><span>🪙</span> <span id="userwallet">0</span></div>
+            <div class="mini-money-wallet"><span>₹</span> <span id="usermoney">0</span></div>
+        </div>
+
+        <div class="card">
+            <h4>🎁 Daily Check-in Bonus</h4>
+            <p>Claim your free daily login reward (+10 coins).</p>
+            <button class="action-btn" id="claimDailyBtn" onclick="claimDaily()">Claim Daily Reward</button>
+        </div>
+
+        <div class="card">
+            <h4>📺 Watch Ad & Earn</h4>
+            <p>Watch the ad for 60 seconds to claim instant coins (+20 coins).</p>
+            <div id="timerDisplay" style="font-size: 14px; color: #00ffcc; margin: 8px 0; font-weight: bold;"></div>
+            <button class="action-btn" id="watchAdBtn" onclick="startWatchAd()">Watch Ad Now (60s)</button>
+        </div>
+
+        <div class="card" style="background: linear-gradient(135deg, #1e1b4b, #312e81);">
+            <h4>🚀 Refer & Earn</h4>
+            <p>Share your link! Get <b>500 Coins</b> instantly when your friend registers.</p>
+            <button class="action-btn" style="background: #10b981;" onclick="shareReferralLink()">🔗 Share Referral Link</button>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px; padding: 15px; background: #1e293b; border-radius: 12px; border: 1px solid #334155;">
+            <div style="font-size: 16px; font-weight: bold; color: #facc15;">🪙 Reward Zone</div>
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Official Gaming & Earning Platform</p>
+        </div>
+    </div>
+
+    <div id="gamesHubPage" class="page">
+        <h2 style="font-size: 18px; margin-bottom: 5px;">🎮 Games Arena</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Choose your favorite game and start winning!</p>
+        
+        <div class="card" onclick="window.location.href='color-game.html'" style="cursor: pointer; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+            <h3>🎨 WinGo Color Trading</h3>
+            <p>Prediction Game (30s / 1m / 3m / 5m)</p>
+            <button class="action-btn" style="padding: 8px; font-size: 12px; background: #1e293b; margin-top: 8px;">Play Now</button>
+        </div>
+    </div>
+
+    <div id="profilePage" class="page">
+        <div class="top-balance-bar">
+            <div class="mini-wallet"><span>🪙</span> <span id="profileUserwallet">0</span></div>
+            <div class="mini-money-wallet"><span>₹</span> <span id="profileUsermoney">0</span></div>
+        </div>
+
+        <div class="profile-top-section">
+            <div class="avatar-box">👤</div>
+            <div class="profile-right-col">
+                <div class="profile-info-row">
+                    <label>Unique UID</label>
+                    <input type="text" id="profileUidDisplay" disabled>
+                </div>
+                <div class="profile-info-row">
+                    <label>Username</label>
+                    <input type="text" id="profileUsernameInput">
+                </div>
+            </div>
+        </div>
+
+        <div class="profile-grid">
+            <div class="profile-square-btn" onclick="openDepositModal()">
+                <div class="square-icon">➕</div><div class="square-title">Deposit</div>
+            </div>
+            <div class="profile-square-btn" onclick="switchPage('withdrawPage')">
+                <div class="square-icon">💳</div><div class="square-title">Withdraw</div>
+            </div>
+            <div class="profile-square-btn" onclick="switchPage('historyPage')">
+                <div class="square-icon">📊</div><div class="square-title">History</div>
+            </div>
+            <div class="profile-square-btn" onclick="openConvertModal()">
+                <div class="square-icon">🔄</div><div class="square-title">Convert</div>
+            </div>
+            <div class="profile-square-btn" onclick="alert('Support Email: 14sunilsunil3@gmail.com')">
+                <div class="square-icon">🎧</div><div class="square-title">Support</div>
+            </div>
+            <div class="profile-square-btn" id="adminControlBtn" style="display:none; background:#dc2626;" onclick="switchPage('adminPanelPage')">
+                <div class="square-icon">🛡️</div><div class="square-title">Admin Panel</div>
+            </div>
+            <div class="profile-square-btn" onclick="logout()" style="border-color: #7f1d1d; background: rgba(127,29,29,0.2); grid-column: span 2;">
+                <div class="square-icon">🚪</div><div class="square-title" style="color: #fca5a5;">Logout</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="depositPage" class="page">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
+            <h2 style="font-size: 16px;">Deposit Funds</h2>
+            <div></div>
+        </div>
+
+        <div class="notice-box">
+            <b>🛡️ Safe Deposit Notice:</b> Your money is 100% safe. Deposit processing is verified manually. After making the payment, enter your 12-digit UTR/Txn ID below to complete processing safely.
+        </div>
+
+        <div class="deposit-card">
+            <h3 id="selectedAmtDisplay" style="color: #38bdf8; margin-bottom: 10px;">Selected: ₹100</h3>
+            <div class="qr-placeholder">
+                <img id="depositQrImage" src="qr-code.png" alt="QR Code">
+            </div>
+            <div class="form-group">
+                <label>Enter UTR / Transaction ID</label>
+                <div class="input-wrapper">
+                    <input type="text" id="depositTxnId" placeholder="12-digit UTR code">
+                </div>
+            </div>
+            <button class="action-btn" onclick="submitDeposit()">Submit UTR Code</button>
+        </div>
+    </div>
+
+    <div id="withdrawPage" class="page">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
+            <h2 style="font-size: 16px;">Withdrawal</h2>
+            <div></div>
+        </div>
+
+        <div class="notice-box" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: #93c5fd;">
+            ℹ️ Min Withdrawal: <b>₹110</b> | Max: <b>₹50,000</b>. Only Game Winnings amount can be withdrawn.
+        </div>
+
+        <div class="form-group">
+            <label>Withdrawal Amount (₹)</label>
+            <div class="input-wrapper"><input type="number" id="withdrawAmountInput" placeholder="Min ₹110 - Max ₹50000"></div>
+        </div>
+
+        <div class="method-selector">
+            <button class="method-btn active" id="btnMethodBank" onclick="selectMethod('BANK')">Bank Account</button>
+            <button class="method-btn" id="btnMethodUpi" onclick="selectMethod('UPI')">UPI</button>
+        </div>
+
+        <div id="bankForm">
+            <div class="form-group">
+                <label>Search / Select Bank Name (1000+ Banks)</label>
+                <div class="input-wrapper">
+                    <input type="text" id="bankSearchInput" list="banksList" placeholder="Type bank name to search...">
+                    <datalist id="banksList"></datalist>
+                </div>
+            </div>
+            <div class="form-group"><label>Account Number</label><div class="input-wrapper"><input type="text" id="bankAccNo" placeholder="Enter Account Number"></div></div>
+            <div class="form-group"><label>Account Holder Name</label><div class="input-wrapper"><input type="text" id="bankAccHolder" placeholder="Enter Account Holder Name"></div></div>
+            <div class="form-group"><label>Mobile Number</label><div class="input-wrapper"><input type="tel" id="bankMobile" placeholder="Enter Mobile Number"></div></div>
+            <div class="form-group"><label>IFSC Code</label><div class="input-wrapper"><input type="text" id="bankIfsc" placeholder="Enter IFSC Code"></div></div>
+        </div>
+
+        <div id="upiForm" style="display: none;">
+            <div class="form-group"><label>UPI ID</label><div class="input-wrapper"><input type="text" id="upiId" placeholder="example@upi"></div></div>
+            <div class="form-group"><label>Mobile Number</label><div class="input-wrapper"><input type="tel" id="upiMobile" placeholder="Enter Mobile Number"></div></div>
+        </div>
+
+        <button class="action-btn" style="background: #2ecc71;" onclick="openPasswordConfirmModal()">Submit Withdrawal</button>
+    </div>
+
+    <div id="historyPage" class="page">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
+            <h2 style="font-size: 16px;">History</h2>
+            <div></div>
+        </div>
+        <div id="historyContent" style="font-size: 12px; color: #cbd5e1;">Loading...</div>
+    </div>
+
+    <div id="adminPanelPage" class="page">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+            <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
+            <h2 style="font-size: 16px;">Admin Panel</h2>
+            <div></div>
+        </div>
+        <div id="adminRequestsContainer" style="font-size: 12px; color: #cbd5e1;">Loading requests...</div>
+    </div>
+
+    <div class="nav-bar" id="bottomNavBar">
+        <button class="nav-item active" onclick="switchPage('homePage')">🏠 Home</button>
+        <button class="nav-item" onclick="switchPage('gamesHubPage')">🎮 Games</button>
+        <button class="nav-item" onclick="switchPage('profilePage')">👤 Profile</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="termsModal">
+    <div class="modal-content">
+        <button class="close-modal-btn" onclick="closeTermsModal()">×</button>
+        <h3 style="margin-bottom: 10px; color: #38bdf8;">📜 Terms & Conditions</h3>
+        <div style="max-height: 250px; overflow-y: auto; font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left; margin-bottom: 15px;">
+            <p><b>1. User Responsibility:</b> Users must be 18 years or older to use this platform.</p>
+            <p><b>2. Fair Play:</b> Any system exploitation or illegal activity will result in an immediate account ban.</p>
+            <p><b>3. Withdrawal Rules:</b> Minimum withdrawal limit is ₹110. Only game winnings are eligible for withdrawal.</p>
+            <p><b>4. Deposit Policy:</b> Always submit a valid 12-digit UTR/Txn ID for deposit verification.</p>
+        </div>
+        <button class="action-btn" onclick="closeTermsModal()">I Understand</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="convertModal">
+    <div class="modal-content">
+        <button class="close-modal-btn" onclick="closeConvertModal()">×</button>
+        <h3 style="margin-bottom: 10px; color: #facc15;">🔄 Convert Coins to Wallet</h3>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Rate: 100 Coins = ₹1 Real Money (Min Convert: 10,000 Coins)</p>
+        <div class="form-group">
+            <label>Coins Amount</label>
+            <div class="input-wrapper">
+                <input type="number" id="convertCoinsInput" placeholder="Min 10000 coins">
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+            <button class="action-btn" style="background: #10b981;" onclick="processCoinConversion()">Convert Now</button>
+            <button class="action-btn" style="background: #ef4444;" onclick="closeConvertModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="depositSelectModal">
+    <div class="modal-content">
+        <button class="close-modal-btn" onclick="closeDepositSelectModal()">×</button>
+        <h3 style="margin-bottom: 10px; color: #38bdf8;">💳 Select Deposit Amount</h3>
+        <div class="deposit-grid">
+            <div class="deposit-amt-btn active" onclick="setDepositAmt(100, this)">₹100</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(200, this)">₹200</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(300, this)">₹300</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(500, this)">₹500</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(1000, this)">₹1K</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(5000, this)">₹5K</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(10000, this)">₹10K</div>
+            <div class="deposit-amt-btn" onclick="setDepositAmt(50000, this)">₹50K</div>
+        </div>
+        <button class="action-btn" onclick="proceedToPayDeposit()">Pay Now</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="passConfirmModal">
+    <div class="modal-content">
+        <button class="close-modal-btn" onclick="closePassModal()">×</button>
+        <h3 style="margin-bottom: 10px; color: #2ecc71;">🔒 Confirm Withdrawal</h3>
+        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Please enter your account password to verify request.</p>
+        <div class="form-group">
+            <label>Login Password</label>
+            <div class="input-wrapper">
+                <input type="password" id="withdrawPassInput" placeholder="Enter password">
+            </div>
+        </div>
+        <button class="action-btn" style="background: #2ecc71;" onclick="submitWithdrawalFinal()">Verify & Submit</button>
+    </div>
+</div>
+
+<script>
+    let loggedInMobile = localStorage.getItem('rewards_loggedMobile') || sessionStorage.getItem('rewards_loggedMobile');
+    let userId = localStorage.getItem('rewards_userId') || sessionStorage.getItem('rewards_userId');
+    
+    let currentUser = null;
+    let selectedDepositAmount = 100;
+    let selectedMethod = 'BANK';
+
+    const baseBanks = ["State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", "Federal Bank", "IndusInd Bank", "IDFC First Bank"];
+    
+    window.addEventListener('DOMContentLoaded', async () => {
+        let listEl = document.getElementById('banksList');
+        baseBanks.forEach(b => {
+            let opt = document.createElement('option');
+            opt.value = b;
+            listEl.appendChild(opt);
+        });
+        for (let i = 1; i <= 1000; i++) {
+            let opt = document.createElement('option');
+            opt.value = `Cooperative & Regional Bank Branch #${i}`;
+            listEl.appendChild(opt);
+        }
+
+        if (!loggedInMobile) {
+            window.location.href = 'auth.html';
+            return;
+        }
+
+        await fetchUserData();
+
+        if (!sessionStorage.getItem('terms_accepted')) {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+    });
+
+    async function fetchUserData() {
+        let res = await fetch(`/api/user/mobile/${loggedInMobile}`).then(r => r.json());
+        if (res.success) {
+            currentUser = res.user;
+            updateDashboardUI();
+        }
+    }
+
+    function updateDashboardUI() {
+        if(!currentUser) return;
+        document.getElementById('userwallet').innerText = currentUser.rewardCoins || 0;
+        document.getElementById('usermoney').innerText = currentUser.balance || 0;
+        document.getElementById('profileUserwallet').innerText = currentUser.rewardCoins || 0;
+        document.getElementById('profileUsermoney').innerText = currentUser.balance || 0;
+        document.getElementById('profileUidDisplay').value = currentUser.uid || 'UID-102938';
+        document.getElementById('profileUsernameInput').value = currentUser.phone;
+
+        if (currentUser.phone === "8093361993") {
+            document.getElementById('adminControlBtn').style.display = 'flex';
+        }
+    }
+
+    function switchPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        if (pageId === 'historyPage') loadHistoryData();
+        if (pageId === 'adminPanelPage') loadAdminPanelData();
+    }
+
+    function shareReferralLink() {
+        let uid = currentUser ? currentUser.uid : 'UID-000000';
+        let shareUrl = `${window.location.origin}/auth.html?ref=${uid}`;
+        let shareData = {
+            title: 'Reward Zone',
+            text: `Join Reward Zone and earn real rewards! Register using my UID link:`,
+            url: shareUrl
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData).catch(err => console.log(err));
+        } else {
+            navigator.clipboard.writeText(shareUrl);
+            alert(`Referral link copied to clipboard!\n${shareUrl}`);
+        }
+    }
+
+    function openConvertModal() { document.getElementById('convertModal').style.display = 'flex'; }
+    function closeConvertModal() { document.getElementById('convertModal').style.display = 'none'; }
+    
+    async function processCoinConversion() {
+        let coins = parseInt(document.getElementById('convertCoinsInput').value);
+        if (!coins || coins < 10000) {
+            alert('❌ Minimum conversion amount is 10,000 Coins!');
+            return;
+        }
+        let res = await fetch('/api/convert-coins', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId: currentUser._id, coins })
+        }).then(r => r.json());
+
+        alert(res.message);
+        if(res.success) {
+            closeConvertModal();
+            fetchUserData();
+        }
+    }
+
+    function closeTermsModal() {
+        sessionStorage.setItem('terms_accepted', 'true');
+        document.getElementById('termsModal').style.display = 'none';
+    }
+
+    function openDepositModal() {
+        document.getElementById('depositSelectModal').style.display = 'flex';
+    }
+    function closeDepositSelectModal() {
+        document.getElementById('depositSelectModal').style.display = 'none';
+    }
+    function setDepositAmt(amt, el) {
+        selectedDepositAmount = amt;
+        document.querySelectorAll('.deposit-amt-btn').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+    function proceedToPayDeposit() {
+        closeDepositSelectModal();
+        document.getElementById('selectedAmtDisplay').innerText = `Selected: ₹${selectedDepositAmount}`;
+        switchPage('depositPage');
+    }
+
+    async function submitDeposit() {
+        let txnId = document.getElementById('depositTxnId').value.trim();
+        if(!txnId) { alert('❌ Please enter 12-digit UTR/Txn ID!'); return; }
+        
+        let res = await fetch('/api/deposit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: currentUser._id, amount: selectedDepositAmount, transactionId: txnId })
+        }).then(r => r.json());
+
+        alert(res.message);
+        switchPage('profilePage');
+    }
+
+    function selectMethod(method) {
+        selectedMethod = method;
+        if(method === 'BANK') {
+            document.getElementById('btnMethodBank').classList.add('active');
+            document.getElementById('btnMethodUpi').classList.remove('active');
+            document.getElementById('bankForm').style.display = 'block';
+            document.getElementById('upiForm').style.display = 'none';
+        } else {
+            document.getElementById('btnMethodUpi').classList.add('active');
+            document.getElementById('btnMethodBank').classList.remove('active');
+            document.getElementById('bankForm').style.display = 'none';
+            document.getElementById('upiForm').style.display = 'block';
+        }
+    }
+
+    function openPasswordConfirmModal() {
+        let amt = parseFloat(document.getElementById('withdrawAmountInput').value);
+        if(!amt || amt < 110 || amt > 50000) {
+            alert('❌ Minimum withdrawal amount is ₹110 and Maximum is ₹50,000!');
+            return;
+        }
+        document.getElementById('passConfirmModal').style.display = 'flex';
+    }
+    function closePassModal() { document.getElementById('passConfirmModal').style.display = 'none'; }
+
+    async function submitWithdrawalFinal() {
+        let password = document.getElementById('withdrawPassInput').value;
+        let amount = parseFloat(document.getElementById('withdrawAmountInput').value);
+
+        if(!password) { alert('Please enter your password!'); return; }
+
+        let payload = {
+            userId: currentUser._id,
+            amount,
+            password,
+            bankName: selectedMethod === 'BANK' ? document.getElementById('bankSearchInput').value : 'UPI',
+            accountNumber: selectedMethod === 'BANK' ? document.getElementById('bankAccNo').value : '',
+            accountHolderName: selectedMethod === 'BANK' ? document.getElementById('bankAccHolder').value : '',
+            ifsc: selectedMethod === 'BANK' ? document.getElementById('bankIfsc').value : '',
+            mobile: selectedMethod === 'BANK' ? document.getElementById('bankMobile').value : document.getElementById('upiMobile').value,
+            upiId: selectedMethod === 'UPI' ? document.getElementById('upiId').value : ''
+        };
+
+        let res = await fetch('/api/withdraw', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(r => r.json());
+
+        alert(res.message);
+        if(res.success) {
+            closePassModal();
+            switchPage('profilePage');
+            fetchUserData();
+        }
+    }
+
+    async function loadHistoryData() {
+        let res = await fetch(`/api/transactions/${currentUser._id}`).then(r => r.json());
+        if(res.success) {
+            let html = '<h4 style="color:#facc15; margin-bottom:5px;">Deposits</h4>';
+            res.deposits.forEach(d => html += `<div class="card" style="padding:8px; margin-bottom:5px;">₹${d.amount} - Status: ${d.status}</div>`);
+            html += '<h4 style="color:#facc15; margin:10px 0 5px 0;">Withdrawals</h4>';
+            res.withdrawals.forEach(w => html += `<div class="card" style="padding:8px; margin-bottom:5px;">₹${w.amount} - Status: ${w.status}</div>`);
+            document.getElementById('historyContent').innerHTML = html;
+        }
+    }
+
+    async function loadAdminPanelData() {
+        let res = await fetch('/api/admin/requests').then(r => r.json());
+        if(res.success) {
+            let html = '<h4 style="color:#facc15; margin-bottom:5px;">Deposit Requests</h4>';
+            res.deposits.forEach(d => {
+                html += `<div class="card" style="padding:8px; margin-bottom:5px;">
+                    Amt: ₹${d.amount} | TXN: ${d.transactionId} | Status: <b>${d.status}</b>
+                    ${d.status === 'pending' ? `<button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
+                </div>`;
+            });
+            html += '<h4 style="color:#facc15; margin:15px 0 5px 0;">Withdrawal Requests</h4>';
+            res.withdrawals.forEach(w => {
+                html += `<div class="card" style="padding:8px; margin-bottom:5px;">
+                    Amt: ₹${w.amount} | Mobile: ${w.mobile} | Status: <b>${w.status}</b>
+                    ${w.status === 'pending' ? `<button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
+                </div>`;
+            });
+            document.getElementById('adminRequestsContainer').innerHTML = html;
+        }
+    }
+
+    async function adminAction(type, id, action) {
+        let res = await fetch('/api/admin/action', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type, id, action })
+        }).then(r => r.json());
+        alert(res.message);
+        loadAdminPanelData();
+    }
+
+    function logout() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'auth.html';
+    }
+
+    function claimDaily() { alert('Daily reward claimed (+10 coins)!'); }
+    function startWatchAd() { alert('Watching ad...'); }
+</script>
+</body>
+</html>
