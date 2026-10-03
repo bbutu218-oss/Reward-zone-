@@ -9,42 +9,6 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background: #0f172a; color: #fff; display: flex; justify-content: center; }
-        
-        /* Splash Screen Styling */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: #0f172a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 99999;
-            transition: opacity 0.5s ease;
-        }
-        .splash-logo {
-            width: 90px;
-            height: 90px;
-            border-radius: 22px;
-            object-fit: contain;
-            margin-bottom: 15px;
-            animation: pulse 1.5s infinite;
-        }
-        .splash-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #f8fafc;
-            letter-spacing: 0.5px;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.9; }
-        }
-
         .container { width: 100%; max-width: 450px; background: #121824; min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; }
         .page { display: none; }
         .page.active { display: block; }
@@ -84,6 +48,10 @@
         .method-btn { flex: 1; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
         .method-btn.active { background: #6366f1; border-color: #6366f1; }
         
+        /* Toast Notification Styling */
+        #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #334155; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #475569; }
+        #toastNotification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
         .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: #1e293b; display: flex; justify-content: space-around; border-top: 1px solid #334155; padding: 12px 0; z-index: 100; }
         .nav-item { text-align: center; color: #94a3b8; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
         .nav-item.active { color: #6366f1; }
@@ -95,11 +63,7 @@
 </head>
 <body>
 
-<!-- Splash Screen with Logo -->
-<div id="splash-screen">
-    <img src="logo.svg" alt="Logo" class="splash-logo">
-    <div class="splash-title">Reward Zone</div>
-</div>
+<div id="toastNotification">Notification message</div>
 
 <div class="container">
     <div id="homePage" class="page active">
@@ -177,7 +141,7 @@
             <div class="profile-square-btn" onclick="openConvertModal()">
                 <div class="square-icon">🔄</div><div class="square-title">Convert</div>
             </div>
-            <div class="profile-square-btn" onclick="alert('Support Email: 14sunilsunil3@gmail.com')">
+            <div class="profile-square-btn" onclick="showToast('Support Email: 14sunilsunil3@gmail.com')">
                 <div class="square-icon">🎧</div><div class="square-title">Support</div>
             </div>
             <div class="profile-square-btn" id="adminControlBtn" style="display:none; background:#dc2626;" onclick="switchPage('adminPanelPage')">
@@ -197,7 +161,13 @@
         </div>
 
         <div class="notice-box">
-            <b>🛡️ Safe Deposit Notice:</b> Your money is 100% safe. Deposit processing is verified manually. After making the payment, enter your 12-digit UTR/Txn ID below to complete processing safely.
+            <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay, or upload a new QR code image directly so you don't need to update code manually. Then enter your 12-digit UTR/Txn ID.
+        </div>
+
+        <!-- Admin / User QR Code Upload Section -->
+        <div class="card" style="margin-bottom: 15px; text-align: center;">
+            <h4 style="margin-bottom: 8px;">Upload / Update QR Code</h4>
+            <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #cbd5e1;" onchange="handleQrUpload(event)">
         </div>
 
         <div class="deposit-card">
@@ -258,13 +228,21 @@
         <button class="action-btn" style="background: #2ecc71;" onclick="openPasswordConfirmModal()">Submit Withdrawal</button>
     </div>
 
+    <!-- History Page with Top Deposit/Withdrawal Buttons & Game Activity Area -->
     <div id="historyPage" class="page">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
-            <h2 style="font-size: 16px;">History</h2>
+            <h2 style="font-size: 16px;">History & Activities</h2>
             <div></div>
         </div>
-        <div id="historyContent" style="font-size: 12px; color: #cbd5e1;">Loading...</div>
+
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="action-btn" style="background: #3b82f6; flex:1;" onclick="loadDepositHistoryView()">Deposit History</button>
+            <button class="action-btn" style="background: #8b5cf6; flex:1;" onclick="loadWithdrawalHistoryView()">Withdrawal History</button>
+        </div>
+
+        <div style="font-size: 13px; font-weight: bold; color: #facc15; margin-bottom: 8px;">Game Betting Winnings, Losses & Coin Conversions</div>
+        <div id="historyContent" style="font-size: 12px; color: #cbd5e1; max-height: 60vh; overflow-y: auto;">Loading activity details...</div>
     </div>
 
     <div id="adminPanelPage" class="page">
@@ -283,6 +261,7 @@
     </div>
 </div>
 
+<!-- Modal Popups converted or handled as Auto-Notifications -->
 <div class="modal-overlay" id="termsModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeTermsModal()">×</button>
@@ -358,7 +337,7 @@
 
     const baseBanks = ["State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", "Federal Bank", "IndusInd Bank", "IDFC First Bank"];
     
-    window.addEventListener('load', async () => {
+    window.addEventListener('DOMContentLoaded', async () => {
         let listEl = document.getElementById('banksList');
         baseBanks.forEach(b => {
             let opt = document.createElement('option');
@@ -371,26 +350,27 @@
             listEl.appendChild(opt);
         }
 
-        // 1.5 Seconds Splash Screen Delay before auth check & rendering dashboard
-        setTimeout(async () => {
-            let splashScreen = document.getElementById('splash-screen');
-            if (splashScreen) {
-                splashScreen.style.opacity = '0';
-                setTimeout(() => splashScreen.style.display = 'none', 500);
-            }
+        if (!loggedInMobile) {
+            window.location.href = 'auth.html';
+            return;
+        }
 
-            if (!loggedInMobile) {
-                window.location.href = 'auth.html';
-                return;
-            }
+        await fetchUserData();
 
-            await fetchUserData();
-
-            if (!sessionStorage.getItem('terms_accepted')) {
-                document.getElementById('termsModal').style.display = 'flex';
-            }
-        }, 1600);
+        if (!sessionStorage.getItem('terms_accepted')) {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
     });
+
+    // Auto Notification Toast Function (3 to 5 seconds auto-hide)
+    function showToast(msg) {
+        let toast = document.getElementById('toastNotification');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 4000);
+    }
 
     async function fetchUserData() {
         let res = await fetch(`/api/user/mobile/${loggedInMobile}`).then(r => r.json());
@@ -424,17 +404,11 @@
     function shareReferralLink() {
         let uid = currentUser ? currentUser.uid : 'UID-000000';
         let shareUrl = `${window.location.origin}/auth.html?ref=${uid}`;
-        let shareData = {
-            title: 'Reward Zone',
-            text: `Join Reward Zone and earn real rewards! Register using my UID link:`,
-            url: shareUrl
-        };
-
         if (navigator.share) {
-            navigator.share(shareData).catch(err => console.log(err));
+            navigator.share({ title: 'Reward Zone', text: 'Join Reward Zone and earn real rewards!', url: shareUrl }).catch(err => console.log(err));
         } else {
             navigator.clipboard.writeText(shareUrl);
-            alert(`Referral link copied to clipboard!\n${shareUrl}`);
+            showToast('Referral link copied to clipboard!');
         }
     }
 
@@ -444,7 +418,7 @@
     async function processCoinConversion() {
         let coins = parseInt(document.getElementById('convertCoinsInput').value);
         if (!coins || coins < 10000) {
-            alert('❌ Minimum conversion amount is 10,000 Coins!');
+            showToast('❌ Minimum conversion amount is 10,000 Coins!');
             return;
         }
         let res = await fetch('/api/convert-coins', {
@@ -453,7 +427,7 @@
             body: JSON.stringify({ userId: currentUser._id, coins })
         }).then(r => r.json());
 
-        alert(res.message);
+        showToast(res.message);
         if(res.success) {
             closeConvertModal();
             fetchUserData();
@@ -482,9 +456,22 @@
         switchPage('depositPage');
     }
 
+    // Direct QR Code Image Upload Handler
+    function handleQrUpload(event) {
+        let file = event.target.files[0];
+        if (file) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('depositQrImage').src = e.target.result;
+                showToast('✅ QR Code updated successfully!');
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
     async function submitDeposit() {
         let txnId = document.getElementById('depositTxnId').value.trim();
-        if(!txnId) { alert('❌ Please enter 12-digit UTR/Txn ID!'); return; }
+        if(!txnId) { showToast('❌ Please enter 12-digit UTR/Txn ID!'); return; }
         
         let res = await fetch('/api/deposit', {
             method: 'POST',
@@ -492,7 +479,7 @@
             body: JSON.stringify({ userId: currentUser._id, amount: selectedDepositAmount, transactionId: txnId })
         }).then(r => r.json());
 
-        alert(res.message);
+        showToast(res.message);
         switchPage('profilePage');
     }
 
@@ -514,7 +501,7 @@
     function openPasswordConfirmModal() {
         let amt = parseFloat(document.getElementById('withdrawAmountInput').value);
         if(!amt || amt < 110 || amt > 50000) {
-            alert('❌ Minimum withdrawal amount is ₹110 and Maximum is ₹50,000!');
+            showToast('❌ Min withdrawal ₹110 & Max ₹50,000!');
             return;
         }
         document.getElementById('passConfirmModal').style.display = 'flex';
@@ -525,7 +512,7 @@
         let password = document.getElementById('withdrawPassInput').value;
         let amount = parseFloat(document.getElementById('withdrawAmountInput').value);
 
-        if(!password) { alert('Please enter your password!'); return; }
+        if(!password) { showToast('Please enter your password!'); return; }
 
         let payload = {
             userId: currentUser._id,
@@ -545,7 +532,7 @@
             body: JSON.stringify(payload)
         }).then(r => r.json());
 
-        alert(res.message);
+        showToast(res.message);
         if(res.success) {
             closePassModal();
             switchPage('profilePage');
@@ -553,19 +540,64 @@
         }
     }
 
+    let globalHistoryData = null;
     async function loadHistoryData() {
         let res = await fetch(`/api/transactions/${currentUser._id}`).then(r => r.json());
         if(res.success) {
-            let html = '<h4 style="color:#facc15; margin-bottom:5px;">Deposits</h4>';
-            res.deposits.forEach(d => html += `<div class="card" style="padding:8px; margin-bottom:5px;">₹${d.amount} - Status: ${d.status}</div>`);
-            html += '<h4 style="color:#facc15; margin:10px 0 5px 0;">Withdrawals</h4>';
-            res.withdrawals.forEach(w => html += `<div class="card" style="padding:8px; margin-bottom:5px;">₹${w.amount} - Status: ${w.status}</div>`);
-            document.getElementById('historyContent').innerHTML = html;
+            globalHistoryData = res;
+            loadGameActivityView(); // Default main area view
         }
+    }
+
+    function loadGameActivityView() {
+        if(!globalHistoryData) return;
+        let html = '<h4 style="color:#facc15; margin-bottom:8px;">Game Winnings, Losses & Conversions</h4>';
+        if (globalHistoryData.bets && globalHistoryData.bets.length > 0) {
+            globalHistoryData.bets.forEach(b => {
+                let badgeColor = b.status === 'win' ? '#22c55e' : (b.status === 'loss' ? '#ef4444' : '#eab308');
+                html += `<div class="card" style="padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:bold; color:#f8fafc;">Period: ${b.period} (${b.timerType})</div>
+                        <div style="font-size:11px; color:#94a3b8;">Type: ${b.betType} | Val: <b>${b.betValue}</b> | Bet: ₹${b.amount}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="background:${badgeColor}; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;">${b.status.toUpperCase()}</span>
+                        ${b.payout ? `<div style="font-size:11px; color:#22c55e; margin-top:2px;">+₹${b.payout}</div>` : ''}
+                    </div>
+                </div>`;
+            });
+        } else {
+            html += '<p style="color:#94a3b8;">No game betting activities found yet.</p>';
+        }
+        document.getElementById('historyContent').innerHTML = html;
+    }
+
+    function loadDepositHistoryView() {
+        if(!globalHistoryData) return;
+        let html = '<h4 style="color:#38bdf8; margin-bottom:8px;">Deposit Records</h4>';
+        if(globalHistoryData.deposits.length > 0) {
+            globalHistoryData.deposits.forEach(d => {
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${d.amount}</b> | TXN: ${d.transactionId} | Status: <b style="color:${d.status==='approved'?'#22c55e':'#eab308'}">${d.status}</b></div>`;
+            });
+        } else { html += '<p style="color:#94a3b8;">No deposit records found.</p>'; }
+        document.getElementById('historyContent').innerHTML = html;
+    }
+
+    function loadWithdrawalHistoryView() {
+        if(!globalHistoryData) return;
+        let html = '<h4 style="color:#2ecc71; margin-bottom:8px;">Withdrawal Records</h4>';
+        if(globalHistoryData.withdrawals.length > 0) {
+            globalHistoryData.withdrawals.forEach(w => {
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${w.amount}</b> | Mobile: ${w.mobile} | Status: <b style="color:${w.status==='approved'?'#22c55e':'#eab308'}">${w.status}</b></div>`;
+            });
+        } else { html += '<p style="color:#94a3b8;">No withdrawal records found.</p>'; }
+        document.getElementById('historyContent').innerHTML = html;
     }
 
     async function loadAdminPanelData() {
         let res = await fetch('/api/admin/requests').then(r => r.json());
+        let betsSumRes = await fetch('/api/admin/bets-summary').then(r => r.json());
+        
         if(res.success) {
             let html = '<h4 style="color:#facc15; margin-bottom:5px;">Deposit Requests</h4>';
             res.deposits.forEach(d => {
@@ -574,6 +606,7 @@
                     ${d.status === 'pending' ? `<button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
                 </div>`;
             });
+
             html += '<h4 style="color:#facc15; margin:15px 0 5px 0;">Withdrawal Requests</h4>';
             res.withdrawals.forEach(w => {
                 html += `<div class="card" style="padding:8px; margin-bottom:5px;">
@@ -581,6 +614,33 @@
                     ${w.status === 'pending' ? `<button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:4px 8px; border-radius:4px; margin-left:5px;">Approve</button>` : ''}
                 </div>`;
             });
+
+            if (betsSumRes.success) {
+                html += '<h4 style="color:#38bdf8; margin:20px 0 8px 0;">🛡️ Admin Winnings Control Panel (Total Bets Sum)</h4>';
+                betsSumRes.summaries.forEach(s => {
+                    html += `<div class="card" style="padding:10px; margin-bottom:10px; background:#1e293b;">
+                        <div style="font-weight:bold; color:#facc15; margin-bottom:4px;">Period: ${s.period} (${s.timerType})</div>
+                        <div style="font-size:12px; margin-bottom:6px;">Size Bets: Big(₹${s.bigSum}) | Small(₹${s.smallSum})</div>
+                        <div style="font-size:12px; margin-bottom:6px;">Color Bets: Green(₹${s.greenSum}) | Red(₹${s.redSum}) | Violet(₹${s.violetSum})</div>
+                        <div style="display:flex; gap:5px; align-items:center; margin-top:8px;">
+                            <select id="controlNum_${s.period}" style="background:#121824; color:#fff; padding:6px; border-radius:4px; border:1px solid #334155;">
+                                <option value="0">Force Number 0 (Violet)</option>
+                                <option value="1">Force Number 1 (Green)</option>
+                                <option value="2">Force Number 2 (Red)</option>
+                                <option value="3">Force Number 3 (Green)</option>
+                                <option value="4">Force Number 4 (Red)</option>
+                                <option value="5">Force Number 5 (Violet)</option>
+                                <option value="6">Force Number 6 (Red)</option>
+                                <option value="7">Force Number 7 (Green)</option>
+                                <option value="8">Force Number 8 (Red)</option>
+                                <option value="9">Force Number 9 (Green)</option>
+                            </select>
+                            <button onclick="adminForceOutcome('${s.period}')" style="background:#6366f1; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Set Result</button>
+                        </div>
+                    </div>`;
+                });
+            }
+
             document.getElementById('adminRequestsContainer').innerHTML = html;
         }
     }
@@ -591,7 +651,18 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ type, id, action })
         }).then(r => r.json());
-        alert(res.message);
+        showToast(res.message);
+        loadAdminPanelData();
+    }
+
+    async function adminForceOutcome(period) {
+        let selectedNum = document.getElementById(`controlNum_${period}`).value;
+        let res = await fetch('/api/admin/set-result', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ period, number: selectedNum })
+        }).then(r => r.json());
+        showToast(res.message);
         loadAdminPanelData();
     }
 
@@ -601,8 +672,8 @@
         window.location.href = 'auth.html';
     }
 
-    function claimDaily() { alert('Daily reward claimed (+10 coins)!'); }
-    function startWatchAd() { alert('Watching ad...'); }
+    function claimDaily() { showToast('Daily reward claimed (+10 coins)!'); }
+    function startWatchAd() { showToast('Watching ad...'); }
 </script>
 </body>
 </html>
