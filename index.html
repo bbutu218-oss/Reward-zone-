@@ -9,6 +9,42 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
         body { background: #0f172a; color: #fff; display: flex; justify-content: center; }
+        
+        /* Splash Screen Styling */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #0f172a;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease;
+        }
+        .splash-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 22px;
+            object-fit: contain;
+            margin-bottom: 15px;
+            animation: pulse 1.5s infinite;
+        }
+        .splash-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f8fafc;
+            letter-spacing: 0.5px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
         .container { width: 100%; max-width: 450px; background: #121824; min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; }
         .page { display: none; }
         .page.active { display: block; }
@@ -58,6 +94,12 @@
     </style>
 </head>
 <body>
+
+<!-- Splash Screen with Logo -->
+<div id="splash-screen">
+    <img src="logo.svg" alt="Logo" class="splash-logo">
+    <div class="splash-title">Reward Zone</div>
+</div>
 
 <div class="container">
     <div id="homePage" class="page active">
@@ -316,7 +358,7 @@
 
     const baseBanks = ["State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", "Federal Bank", "IndusInd Bank", "IDFC First Bank"];
     
-    window.addEventListener('DOMContentLoaded', async () => {
+    window.addEventListener('load', async () => {
         let listEl = document.getElementById('banksList');
         baseBanks.forEach(b => {
             let opt = document.createElement('option');
@@ -329,16 +371,25 @@
             listEl.appendChild(opt);
         }
 
-        if (!loggedInMobile) {
-            window.location.href = 'auth.html';
-            return;
-        }
+        // 1.5 Seconds Splash Screen Delay before auth check & rendering dashboard
+        setTimeout(async () => {
+            let splashScreen = document.getElementById('splash-screen');
+            if (splashScreen) {
+                splashScreen.style.opacity = '0';
+                setTimeout(() => splashScreen.style.display = 'none', 500);
+            }
 
-        await fetchUserData();
+            if (!loggedInMobile) {
+                window.location.href = 'auth.html';
+                return;
+            }
 
-        if (!sessionStorage.getItem('terms_accepted')) {
-            document.getElementById('termsModal').style.display = 'flex';
-        }
+            await fetchUserData();
+
+            if (!sessionStorage.getItem('terms_accepted')) {
+                document.getElementById('termsModal').style.display = 'flex';
+            }
+        }, 1600);
     });
 
     async function fetchUserData() {
