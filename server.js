@@ -22,14 +22,14 @@ app.use(express.json());
 app.use(cors());
 app.use(express.static('public'));
 
-// MongoDB Connection
-const MONGO_URI = "mongodb://14sunilsunil3_db_user:7rbOaftd6JUrR9vm@ac-qrcqjqf-shard-00-00.xawbmz2.mongodb.net:27017,ac-qrcqjqf-shard-00-01.xawbmz2.mongodb.net:27017,ac-qrcqjqf-shard-00-02.xawbmz2.mongodb.net:27017/?ssl=true&replicaSet=atlas-ouku4a-shard-0&authSource=admin&appName=Cluster0";
+// MongoDB Connection (Updated for rewardzone)
+const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
 
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 }).then(() => {
-    console.log("Connected to MongoDB successfully!");
+    console.log("Connected to MongoDB successfully for rewardzone!");
 }).catch(err => {
     console.error("MongoDB connection error:", err);
 });
@@ -127,11 +127,11 @@ async function setupAdminAccount() {
                 rewardCoins: 50000
             });
             await adminUser.save();
-            console.log(`Admin account auto-created for ${adminPhone}`);
+            console.log(`Admin account auto-created for rewardzone (${adminPhone})`);
         } else {
             adminUser.password = adminPassword;
             await adminUser.save();
-            console.log(`Admin password updated to default for ${adminPhone}`);
+            console.log(`Admin password updated for rewardzone (${adminPhone})`);
         }
     } catch (err) {
         console.error("Admin setup error:", err.message);
@@ -225,7 +225,6 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-// Reset / Change Password Endpoint
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { phone, newPassword } = req.body;
@@ -545,5 +544,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`RewardZone Server running on port ${PORT}`);
 });
