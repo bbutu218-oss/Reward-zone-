@@ -35,7 +35,13 @@
         .size-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-big { background: linear-gradient(180deg, #f39c12 0%, #b9770e 100%); box-shadow: 0 6px 0 #7e5109; }
         .btn-small { background: linear-gradient(180deg, #3498db 0%, #21618c 100%); box-shadow: 0 6px 0 #154360; }
-        .admin-panel-btn { background: #dc2626; color: #fff; border: none; padding: 10px; border-radius: 12px; width: 100%; font-weight: bold; margin-bottom: 15px; cursor: pointer; display: none; }
+        
+        /* Floating Draggable Admin Button & Popup */
+        .floating-admin-btn { position: fixed; bottom: 20px; right: 20px; background: #dc2626; color: #fff; border: none; padding: 12px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: none; }
+        .floating-admin-popup { position: fixed; top: 50px; left: 20px; width: 90%; max-width: 380px; background: #1a233a; border: 2px solid #dc2626; border-radius: 16px; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; }
+        .popup-header { background: #dc2626; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+        .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; }
+
         .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; }
         .count-card { font-size: 110px; font-weight: 900; color: #00e676; background: rgba(255,255,255,0.05); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid rgba(0,230,118,0.3); }
         .bet-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: #1a233a; border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; transition: bottom 0.3s; border-top: 2px solid #00e676; }
@@ -55,11 +61,37 @@
         .history-table th { color: #64748b; padding: 8px; border-bottom: 1px solid #2a3756; }
         .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 2px; }
-        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
-        .admin-content { background: #1a233a; width: 100%; max-width: 400px; padding: 20px; border-radius: 15px; border: 1px solid #dc2626; max-height: 80vh; overflow-y: auto; }
     </style>
 </head>
 <body>
+
+<button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡️ Admin Control</button>
+
+<div class="floating-admin-popup" id="floatingAdminPopup">
+    <div class="popup-header" id="popupHeader">
+        <span>🛡️ Admin Winnings Control</span>
+        <span onclick="toggleAdminPopup()" style="cursor: pointer; font-size: 16px;">✖</span>
+    </div>
+    <div class="popup-body">
+        <div id="adminBetsOverview" style="margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
+        <div style="margin-bottom: 10px;">
+            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Force Winning Number (0-9):</label>
+            <select id="rigNumberSelect" style="width: 100%; padding: 8px; background: #0c101c; border: 1px solid #2a3756; color: #fff; border-radius: 6px; margin-bottom: 8px;">
+                <option value="0">Number 0 (Violet)</option>
+                <option value="1">Number 1 (Green)</option>
+                <option value="2">Number 2 (Red)</option>
+                <option value="3">Number 3 (Green)</option>
+                <option value="4">Number 4 (Red)</option>
+                <option value="5">Number 5 (Violet)</option>
+                <option value="6">Number 6 (Red)</option>
+                <option value="7">Number 7 (Green)</option>
+                <option value="8">Number 8 (Red)</option>
+                <option value="9">Number 9 (Green)</option>
+            </select>
+        </div>
+        <button onclick="submitRiggedResult()" style="width:100%; background:#00e676; border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer; color:#000;">Set Rigged Result</button>
+    </div>
+</div>
 
 <div class="app-container">
     <div id="lockOverlay" class="lock-overlay">
@@ -67,12 +99,10 @@
     </div>
 
     <div class="header">
-        <button class="back-btn" onclick="window.location.href='index_3.html'">← Back</button>
+        <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
         <div class="logo">RewardZone</div>
         <div class="wallet-badge" id="userWallet">₹ 0.00</div>
     </div>
-
-    <button class="admin-panel-btn" id="adminControlBtn" onclick="openAdminControl()">🛡️ Admin Winnings Control Panel</button>
 
     <div class="timer-tabs">
         <div class="tab-btn active" id="tab-30s" onclick="switchTimer('30s', 30)">WinGo 30s</div>
@@ -161,22 +191,6 @@
     </div>
 </div>
 
-<div id="adminModal" class="admin-modal">
-    <div class="admin-content">
-        <h3 style="color: #00e676; margin-bottom: 10px;">Admin Winnings Control</h3>
-        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Monitor total bets and control period outcomes.</p>
-        <div id="adminBetsOverview" style="font-size: 12px; margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 12px; display: block; margin-bottom: 5px;">Rig Winning Number (0-9):</label>
-            <input type="number" id="rigNumberInput" min="0" max="9" style="width: 100%; padding: 8px; background: #0c101c; border: 1px solid #2a3756; color: #fff; border-radius: 6px;">
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <button onclick="submitRiggedResult()" style="flex:1; background:#00e676; border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer;">Set Result</button>
-            <button onclick="closeAdminControl()" style="flex:1; background:#2a3756; border:none; color:#fff; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer;">Close</button>
-        </div>
-    </div>
-</div>
-
 <audio id="beepAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -187,7 +201,7 @@
 
     if (user) document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
     if (user && (user.phone === "8093361993" || user.isAdmin)) {
-        document.getElementById('adminControlBtn').style.display = 'block';
+        document.getElementById('floatingAdminBtn').style.display = 'block';
     }
 
     let currentTimerType = '30s';
@@ -204,6 +218,9 @@
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`tab-${type}`).classList.add('active');
         fetchHistory();
+        if(document.getElementById('floatingAdminPopup').style.display === 'block') {
+            loadAdminBetsSummary();
+        }
     }
 
     ['30s', '60s', '3m', '5m'].forEach(type => {
@@ -299,34 +316,74 @@
             });
     }
 
-    async function openAdminControl() {
-        document.getElementById('adminModal').style.display = 'flex';
+    function toggleAdminPopup() {
+        let popup = document.getElementById('floatingAdminPopup');
+        if (popup.style.display === 'block') {
+            popup.style.display = 'none';
+        } else {
+            popup.style.display = 'block';
+            loadAdminBetsSummary();
+        }
+    }
+
+    async function loadAdminBetsSummary() {
         let period = document.getElementById('periodId').innerText;
         let res = await fetch(`/api/admin/bets-summary/${period}`).then(r => r.json());
         if(res.success) {
-            let html = `<b>Period:</b> ${period}<br><b>Total Bets Amount:</b> ₹${res.totalAmount}<br><br>`;
-            html += `<b>Breakdown:</b><br>`;
-            for(let key in res.breakdown) {
-                html += `- ${key}: ₹${res.breakdown[key]}<br>`;
+            let html = `<b>Period:</b> ${period} (${currentTimerType})<br><b>Total Bets Amount:</b> ₹${res.totalAmount}<br><br>`;
+            html += `<b>Size Bets:</b> Big(₹${res.breakdown.big || 0}) | Small(₹${res.breakdown.small || 0})<br>`;
+            html += `<b>Color Bets:</b> Green(₹${res.breakdown.green || 0}) | Red(₹${res.breakdown.red || 0}) | Violet(₹${res.breakdown.violet || 0})<br><br>`;
+            html += `<b>Numbers Sum:</b><br>`;
+            for(let i=0; i<=9; i++) {
+                html += `Num ${i}: ₹${res.breakdown['num_' + i] || 0} &nbsp; `;
+                if(i === 4 || i === 9) html += '<br>';
             }
             document.getElementById('adminBetsOverview').innerHTML = html;
         }
     }
 
-    function closeAdminControl() { document.getElementById('adminModal').style.display = 'none'; }
-
     async function submitRiggedResult() {
         let period = document.getElementById('periodId').innerText;
-        let number = document.getElementById('rigNumberInput').value;
-        if(number === '' || number < 0 || number > 9) return alert('Enter valid number 0-9');
+        let number = document.getElementById('rigNumberSelect').value;
         let res = await fetch('/api/admin/set-result', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({ period, number })
         }).then(r => r.json());
         alert(res.message);
-        closeAdminControl();
+        toggleAdminPopup();
     }
+
+    // Draggable functionality for Floating Admin Popup
+    const popup = document.getElementById('floatingAdminPopup');
+    const header = document.getElementById('popupHeader');
+    let isDragging = false, startX, startY, initialX, initialY;
+
+    header.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+
+    header.addEventListener('touchstart', dragStart, {passive: true});
+    document.addEventListener('touchmove', drag, {passive: true});
+    document.addEventListener('touchend', dragEnd);
+
+    function dragStart(e) {
+        initialX = e.clientX || e.touches[0].clientX;
+        initialY = e.clientY || e.touches[0].clientY;
+        isDragging = true;
+    }
+    function drag(e) {
+        if (!isDragging) return;
+        let currentX = e.clientX || e.touches[0].clientX;
+        let currentY = e.clientY || e.touches[0].clientY;
+        let dx = currentX - initialX;
+        let dy = currentY - initialY;
+        initialX = currentX;
+        initialY = currentY;
+        popup.style.top = (popup.offsetTop + dy) + "px";
+        popup.style.left = (popup.offsetLeft + dx) + "px";
+    }
+    function dragEnd() { isDragging = false; }
 
     fetchHistory();
 </script>
