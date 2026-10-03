@@ -21,10 +21,10 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors());
 
-// Yahan public folder ki jagah __dirname kar diya hai taaki root folder ki files direct serve hon
+// Static files serving root folder
 app.use(express.static(__dirname));
 
-// MongoDB Connection (Updated for rewardzone)
+// MongoDB Connection
 const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
 
 // Helper function to generate unique UID
@@ -105,7 +105,6 @@ const Withdrawal = mongoose.model('Withdrawal', withdrawalSchema);
 // --- ADMIN CONFIGURATION ---
 const ADMIN_NUMBERS = ["8093361993", "+918093361993", "918093361993"];
 
-// Auto-create or Update Admin Account on startup
 async function setupAdminAccount() {
     try {
         const adminPhone = "8093361993";
@@ -335,6 +334,58 @@ app.get('/api/admin/requests', async (req, res) => {
     }
 });
 
+// Added bets-summary endpoint without period parameter to support index_5.html admin panel view
+app.get('/api/admin/bets-summary', async (req, res) => {
+    try {
+        let summaries = [];
+        for (let timerType of ['30s', '60s', '3m', '5m']) {
+            let period = gameStates[timerType].period;
+            let bets = await Bet.find({ period, timerType });
+            let bigSum = 0, smallSum = 0, greenSum = 0, redSum = 0, violetSum = 0;
+            bets.forEach(b => {
+                if (b.betType === 'size') {
+                    if (b.betValue === 'big') bigSum += b.amount;
+                    if (b.betValue === 'small') smallSum += b.amount;
+                } else if (b.betType === 'color') {
+                    if (b.betValue === 'green') greenSum += b.amount;
+                    if (b.betValue === 'red') redSum += b.amount;
+                    if (b.betValue === 'violet') violetSum += b.amount;
+                }
+            });
+            summaries.push({
+                period,
+                timerType,
+                bigSum,
+                smallSum,
+                greenSum,
+                redSum,
+                violetSum
+            });
+        }
+        res.json({ success: true, summaries });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+// Existing bets-summary endpoint with period parameter for color-game modal
+app.get('/api/admin/bets-summary/:period', async (req, res) => {
+    try {
+        const { period } = req.params;
+        const bets = await Bet.find({ period });
+        let totalAmount = 0;
+        let breakdown = {};
+        bets.forEach(b => {
+            totalAmount += b.amount;
+            let key = `${b.betType}_${b.betValue}`;
+            breakdown[key] = (breakdown[key] || 0) + b.amount;
+        });
+        res.json({ success: true, period, totalAmount, breakdown });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 app.post('/api/admin/action', async (req, res) => {
     try {
         const { type, id, action } = req.body;
@@ -519,7 +570,7 @@ function startTimerLoop(timerType, intervalSeconds) {
     }, 1000);
 }
 
-// Connect to MongoDB and then start server & timers
+// Connect to MongoDB and start server
 mongoose.connect(MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -527,7 +578,6 @@ mongoose.connect(MONGO_URI, {
     console.log("Connected to MongoDB successfully for rewardzone!");
     setupAdminAccount();
 
-    // Start timer loops AFTER successful connection
     startTimerLoop('30s', 30);
     startTimerLoop('60s', 60);
     startTimerLoop('3m', 180);
