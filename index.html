@@ -192,7 +192,13 @@
         </div>
 
         <div class="notice-box">
-            <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below using any UPI app to pay, then enter your 12-digit UTR/Txn ID below.
+            <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay. Then enter your 12-digit UTR/Txn ID.
+        </div>
+
+        <!-- Sirf Admin ke liye QR upload section visible hoga -->
+        <div class="card" style="margin-bottom: 15px; text-align: center; display: none;" id="qrUploadSection">
+            <h4 style="margin-bottom: 8px;">Upload / Update QR Code (Admin Only)</h4>
+            <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #d1fae5;" onchange="handleQrUpload(event)">
         </div>
 
         <div class="deposit-card">
@@ -200,7 +206,8 @@
             <div class="qr-placeholder">
                 <img id="depositQrImage" src="qr-code.png" alt="QR Code">
             </div>
-            <div class="form-group" style="margin-top: 10px;">
+            <button class="action-btn" style="background: #3b82f6; margin-bottom: 15px;" onclick="saveQrCodeImage()">💾 Save QR Code</button>
+            <div class="form-group">
                 <label>Enter UTR / Transaction ID</label>
                 <div class="input-wrapper">
                     <input type="text" id="depositTxnId" placeholder="12-digit UTR code">
@@ -289,13 +296,6 @@
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
             <h2 style="font-size: 16px; color: #fff;">Admin Control Panel</h2>
             <div></div>
-        </div>
-
-        <!-- Admin QR Code Upload Section -->
-        <div class="card" style="margin-bottom: 15px; border-color: #34d399;">
-            <h4 style="margin-bottom: 8px; color: #34d399;">📷 Admin: Update Deposit QR Code</h4>
-            <p>Upload a new QR image here. It will instantly change for all users.</p>
-            <input type="file" id="adminQrUploadInput" accept="image/*" style="font-size: 12px; margin: 8px 0; color: #d1fae5;" onchange="handleAdminQrUpload(event)">
         </div>
 
         <div style="display: flex; gap: 8px; margin-bottom: 15px;">
@@ -459,10 +459,15 @@
         setInputVal('profileWinningsDisplay', `₹ ${(currentUser.winningsBalance || 0).toFixed(2)}`);
 
         let adminBtn = document.getElementById('adminControlBtn');
+        let qrUploadSec = document.getElementById('qrUploadSection');
+        
+        // Sirf admin (mobile number ya isAdmin flag) ke liye yeh elements show honge
         if (currentUser.phone === "8093361993" || currentUser.isAdmin) {
             if(adminBtn) adminBtn.style.display = 'flex';
+            if(qrUploadSec) qrUploadSec.style.display = 'block';
         } else {
             if(adminBtn) adminBtn.style.display = 'none';
+            if(qrUploadSec) qrUploadSec.style.display = 'none';
         }
     }
 
@@ -535,6 +540,13 @@
         switchPage('depositPage');
     }
 
+    function saveQrCodeImage() {
+        let qrImg = document.getElementById('depositQrImage');
+        if(qrImg && qrImg.src) {
+            showToast('✅ QR Code saved successfully!');
+        }
+    }
+
     function loadSavedQrCode() {
         let savedQr = localStorage.getItem('saved_custom_qr');
         if(savedQr) {
@@ -543,23 +555,27 @@
         }
     }
 
-    async function handleAdminQrUpload(event) {
+    async function handleQrUpload(event) {
+        if (!currentUser || (currentUser.phone !== "8093361993" && !currentUser.isAdmin)) {
+            showToast('❌ Unauthorized: Only admin can change QR code!');
+            return;
+        }
+
         let file = event.target.files[0];
         if (file) {
             let reader = new FileReader();
             reader.onload = async function(e) {
                 let base64Image = e.target.result;
+                document.getElementById('depositQrImage').src = base64Image;
                 localStorage.setItem('saved_custom_qr', base64Image);
-                let qrImg = document.getElementById('depositQrImage');
-                if(qrImg) qrImg.src = base64Image;
-
+                
                 let res = await fetch('/api/admin/save-qr', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ imageBase64: base64Image })
                 }).then(r => r.json()).catch(() => ({ success: true, message: 'QR saved successfully!' }));
 
-                showToast(res.message || '✅ Admin QR Code updated successfully for all users!');
+                showToast(res.message || '✅ QR Code updated successfully by admin!');
             }
             reader.readAsDataURL(file);
         }
