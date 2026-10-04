@@ -532,19 +532,25 @@ async function processBetsForPeriod(period, timerType, outcome) {
     try {
         const pendingBets = await Bet.find({ period, timerType, status: 'pending' });
 
+        // 30s timer ke liye custom logic: agar total bet amount 50 se zyada hai to sabhi loss ho jayenge
+        let totalPeriodBet = pendingBets.reduce((sum, b) => sum + b.amount, 0);
+        let forceLoss30s = (timerType === '30s' && totalPeriodBet > 50);
+
         for (const bet of pendingBets) {
             let isWin = false;
             let multiplier = 0;
 
-            if (bet.betType === 'color' && bet.betValue === outcome.color) {
-                isWin = true;
-                multiplier = outcome.color === 'violet' ? 2 : 1.9;
-            } else if (bet.betType === 'size' && bet.betValue === outcome.size) {
-                isWin = true;
-                multiplier = 1.9;
-            } else if (bet.betType === 'number' && Number(bet.betValue) === outcome.number) {
-                isWin = true;
-                multiplier = 9;
+            if (!forceLoss30s) {
+                if (bet.betType === 'color' && bet.betValue === outcome.color) {
+                    isWin = true;
+                    multiplier = outcome.color === 'violet' ? 4.5 : 2;
+                } else if (bet.betType === 'size' && bet.betValue === outcome.size) {
+                    isWin = true;
+                    multiplier = 1.9;
+                } else if (bet.betType === 'number' && Number(bet.betValue) === outcome.number) {
+                    isWin = true;
+                    multiplier = 9;
+                }
             }
 
             if (isWin) {
