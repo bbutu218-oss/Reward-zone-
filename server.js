@@ -119,8 +119,8 @@ async function setupAdminAccount() {
     }
 }
 
-// Yarwin / WinGo style dynamic period counters
-const periodCounters = { '30s': 1000, '60s': 2000, '3m': 3000, '5m': 5000 };
+// Yarwin style dynamic period counters matching large platforms
+const periodCounters = { '30s': 50000, '60s': 20000, '3m': 30000, '5m': 50000 };
 
 async function initializePeriodCounters() {
     try {
@@ -136,7 +136,9 @@ async function initializePeriodCounters() {
                 const todayPrefix = `${year}${month}${day}`;
 
                 if (periodStr.startsWith(todayPrefix)) {
-                    const counterVal = parseInt(periodStr.slice(-4));
+                    // Extract the full counter suffix after the prefix
+                    let gamePrefixLength = todayPrefix.length + 1; // date + game code digit
+                    const counterVal = parseInt(periodStr.slice(gamePrefixLength));
                     if (!isNaN(counterVal)) {
                         periodCounters[key] = counterVal;
                     }
@@ -156,16 +158,16 @@ function generatePeriodCode(timerType) {
     const day = String(now.getDate()).padStart(2, '0');
     
     let key = timerType === '60s' ? '1m' : timerType;
-    if (!periodCounters[key]) periodCounters[key] = 1000;
+    if (!periodCounters[key]) periodCounters[key] = 50000;
     periodCounters[key]++;
     
-    // Yarwin style prefix formatting: YYYYMMDD + GameTypeID + Counter
+    // Exact Yarwin format: YYYYMMDD + GameTypeID + 5-digit Counter
     let gamePrefix = '1'; // 30s
-    if (key === '1m') gamePrefix = '2'; // 1 Min / 60s
-    if (timerType === '3m') gamePrefix = '3'; // 3 Min
-    if (timerType === '5m') gamePrefix = '5'; // 5 Min
+    if (key === '1m') gamePrefix = '2'; // 60s
+    if (timerType === '3m') gamePrefix = '3'; // 3m
+    if (timerType === '5m') gamePrefix = '5'; // 5m
 
-    return `${year}${month}${day}${gamePrefix}${periodCounters[key]}`;
+    return `${year}${month}${day}${gamePrefix}${String(periodCounters[key]).padStart(5, '0')}`;
 }
 
 const gameStates = {
@@ -534,7 +536,6 @@ async function processBetsForPeriod(period, timerType, outcome) {
     try {
         const pendingBets = await Bet.find({ period, timerType, status: 'pending' });
 
-        // Safety control rule for 30s timer
         let totalPeriodBet = pendingBets.reduce((sum, b) => sum + b.amount, 0);
         let forceLoss30s = (timerType === '30s' && totalPeriodBet > 50);
 
@@ -622,9 +623,7 @@ mongoose.connect(MONGO_URI).then(async () => {
     await initializePeriodCounters();
 
     ['30s', '60s', '3m', '5m'].forEach(type => {
-        let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' / 60 ? 180 : 300));
-        if (type === '3m') interval = 180;
-        if (type === '5m') interval = 300;
+        let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
         gameStates[type].period = generatePeriodCode(type);
         startTimerLoop(type, interval);
     });
