@@ -25,14 +25,15 @@ app.use(express.static(__dirname));
 const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
 
 function generateUID() {
-    return 'UID-' + Math.floor(100000 + Math.random() * 900000);
+    return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 const userSchema = new mongoose.Schema({
     uid: { type: String, unique: true, default: generateUID },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    balance: { type: Number, default: 500 },
+    balance: { type: Number, default: 500 }, 
+    winningsBalance: { type: Number, default: 0 }, 
     rewardCoins: { type: Number, default: 0 }, 
     referredBy: { type: String, default: null },
     createdAt: { type: Date, default: Date.now }
@@ -105,6 +106,7 @@ async function setupAdminAccount() {
                 phone: adminPhone,
                 password: adminPassword,
                 balance: 1000000,
+                winningsBalance: 500000,
                 rewardCoins: 50000
             });
             await adminUser.save();
@@ -154,6 +156,7 @@ app.post('/api/register', async (req, res) => {
             phone, 
             password, 
             balance: 500, 
+            winningsBalance: 0,
             rewardCoins: 0,
             referredBy: refUid || null 
         });
@@ -182,6 +185,7 @@ app.post('/api/login', async (req, res) => {
             message: "Login successful!", 
             userId: user._id, 
             balance: user.balance,
+            winningsBalance: user.winningsBalance,
             rewardCoins: user.rewardCoins,
             isAdmin: isAdmin,
             user: { 
@@ -189,6 +193,7 @@ app.post('/api/login', async (req, res) => {
                 uid: user.uid,
                 phone: user.phone, 
                 balance: user.balance, 
+                winningsBalance: user.winningsBalance,
                 rewardCoins: user.rewardCoins,
                 isAdmin: isAdmin
             } 
@@ -218,7 +223,7 @@ app.get('/api/user/:userId', async (req, res) => {
         const user = await User.findById(req.params.userId);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         const isAdmin = ADMIN_NUMBERS.includes(user.phone);
-        res.json({ success: true, balance: user.balance, rewardCoins: user.rewardCoins, isAdmin, user });
+        res.json({ success: true, balance: user.balance, winningsBalance: user.winningsBalance, rewardCoins: user.rewardCoins, isAdmin, user });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -249,10 +254,10 @@ app.post('/api/convert-coins', async (req, res) => {
 
         const addedMoney = coins / 100;
         user.rewardCoins -= coins;
-        user.balance += addedMoney;
+        user.winningsBalance += addedMoney;
         await user.save();
 
-        res.json({ success: true, message: `Successfully converted ${coins} Coins to ₹${addedMoney}!` });
+        res.json({ success: true, message: `Successfully converted ${coins} Coins to ₹${addedMoney} winnings!` });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -276,9 +281,10 @@ app.post('/api/withdraw', async (req, res) => {
         
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         if (user.password !== password) return res.status(400).json({ success: false, message: "Incorrect password!" });
-        if (user.balance < amount) return res.status(400).json({ success: false, message: "Insufficient balance!" });
+        if (Number(amount) < 110) return res.status(400).json({ success: false, message: "Minimum withdrawal amount is ₹110!" });
+        if (user.winningsBalance < Number(amount)) return res.status(400).json({ success: false, message: "Insufficient winnings balance! Deposit amount cannot be withdrawn directly." });
 
-        user.balance -= Number(amount);
+        user.winningsBalance -= Number(amount);
         await user.save();
 
         const withdrawal = new Withdrawal({ userId, amount, accountHolderName, upiId, bankName, accountNumber, ifsc, mobile });
@@ -335,7 +341,7 @@ app.post('/api/admin/action', async (req, res) => {
             if (action === 'reject' && wit.status === 'pending') {
                 wit.status = 'rejected';
                 await wit.save();
-                await User.findByIdAndUpdate(wit.userId, { $inc: { balance: wit.amount } });
+                await User.findByIdAndUpdate(wit.userId, { $inc: { winningsBalance: wit.amount } });
             } else {
                 wit.status = action;
                 await wit.save();
@@ -403,17 +409,25 @@ app.post('/api/bet', async (req, res) => {
         }
 
         const user = await User.findById(userId);
-        if (!user || user.balance < Number(amount)) {
-            return res.status(400).json({ success: false, message: "Insufficient balance or user not found!" });
+        const totalUserBal = (user.balance || 0) + (user.winningsBalance || 0);
+        if (!user || totalUserBal < Number(amount)) {
+            return res.status(400).json({ success: false, message: "Insufficient balance!" });
         }
 
-        user.balance -= Number(amount);
+        let deductAmt = Number(amount);
+        if (user.balance >= deductAmt) {
+            user.balance -= deductAmt;
+        } else {
+            let remain = deductAmt - user.balance;
+            user.balance = 0;
+            user.winningsBalance -= remain;
+        }
         await user.save();
 
         const newBet = new Bet({ userId, timerType, period, betType, betValue, amount });
         await newBet.save();
 
-        res.json({ success: true, message: "Bet placed successfully!", newBalance: user.balance });
+        res.json({ success: true, message: "Bet placed successfully!", newBalance: user.balance, newWinnings: user.winningsBalance });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -464,7 +478,7 @@ async function processBetsForPeriod(period, timerType, outcome) {
                 bet.status = 'win';
                 bet.payout = winnings;
                 await bet.save();
-                await User.findByIdAndUpdate(bet.userId, { $inc: { balance: winnings } });
+                await User.findByIdAndUpdate(bet.userId, { $inc: { winningsBalance: winnings } });
             } else {
                 bet.status = 'loss';
                 await bet.save();
