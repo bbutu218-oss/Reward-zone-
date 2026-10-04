@@ -341,23 +341,33 @@
     let selectedDepositAmount = 100;
     let selectedMethod = 'BANK';
 
-    const baseBanks = [
+    // India ke real top major banks + regional/cooperative banks list
+    const topIndianBanks = [
         "State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", 
-        "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "Paytm Payments Bank", 
-        "Federal Bank", "IndusInd Bank", "IDFC First Bank", "Bank of India", "Central Bank of India", 
-        "Indian Bank", "Indian Overseas Bank", "UCO Bank", "Bank of Maharashtra", "Punjab & Sind Bank"
+        "Bank of Baroda", "Canara Bank", "Union Bank of India", "Kotak Mahindra Bank", "IndusInd Bank", 
+        "IDFC First Bank", "Bank of India", "Central Bank of India", "Indian Bank", "Indian Overseas Bank", 
+        "UCO Bank", "Bank of Maharashtra", "Punjab & Sind Bank", "Federal Bank", "South Indian Bank", 
+        "RBL Bank", "Bandhan Bank", "IDBI Bank", "Yes Bank", "Standard Chartered Bank", "Citibank", 
+        "HSBC Bank", "DBS Bank", "AU Small Finance Bank", "Equitas Small Finance Bank", "Ujjivan Small Finance Bank",
+        "Paytm Payments Bank", "Airtel Payments Bank", "India Post Payments Bank", "Fino Payments Bank",
+        "Kerala State Cooperative Bank", "Maharashtra State Cooperative Bank", "The Saraswat Cooperative Bank",
+        "Cosmos Cooperative Bank", "Abhyudaya Cooperative Bank", "Janata Sahakari Bank", "Kalupur Commercial Cooperative Bank"
     ];
     
     window.addEventListener('DOMContentLoaded', async () => {
         let listEl = document.getElementById('banksList');
-        baseBanks.forEach(b => {
+        
+        // Pehle real top banks add honge
+        topIndianBanks.forEach(b => {
             let opt = document.createElement('option');
             opt.value = b;
             listEl.appendChild(opt);
         });
+
+        // Phir baki regional aur cooperative banks 1000+ tak fill honge
         for (let i = 1; i <= 1000; i++) {
             let opt = document.createElement('option');
-            opt.value = `Cooperative & Regional Bank Branch #${i}`;
+            opt.value = `Regional & Cooperative Bank Branch #${i}`;
             listEl.appendChild(opt);
         }
 
