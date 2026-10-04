@@ -10,29 +10,19 @@
         body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; padding: 10px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
         .app-container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #34d399; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
         
-        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(52, 211, 153, 0.3); }
-        .back-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
-        .back-btn:hover { border-color: #34d399; }
-        
-        /* Logo with left-to-right animation */
-        .logo { 
-            font-size: 18px; 
-            font-weight: 800; 
-            color: #ffffff; 
-            letter-spacing: 0.5px; 
-            background: linear-gradient(135deg, #c084fc, #34d399); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent; 
-            text-transform: uppercase; 
-            animation: moveLogo 3s ease-in-out infinite alternate;
-        }
-        @keyframes moveLogo {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(12px); }
+        /* Updated Header Styles */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .logo-ticker-container { width: 100%; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(52, 211, 153, 0.3); border-bottom: 1px solid rgba(52, 211, 153, 0.3); padding: 6px 0; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); }
+        .logo-ticker { display: inline-block; font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; animation: marquee 8s linear infinite; }
+        @keyframes marquee {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(450px); }
         }
 
+        .back-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .back-btn:hover { border-color: #34d399; }
         .wallet-badge-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .wallet-badge { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 13px; box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2); }
+        .wallet-badge { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 12px; box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2); }
         
         .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
         .tab-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
@@ -43,11 +33,6 @@
         .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 8px; display: inline-block; color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
         .timer-clock { background: rgba(15, 23, 42, 0.9); color: #34d399; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; border: 1px solid #7c3aed; }
         
-        /* Betting Area Wrapper & Transparent Lock Overlay */
-        .betting-area-wrapper { position: relative; }
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(3px); border-radius: 14px; }
-        .count-card { font-size: 70px; font-weight: 900; color: #34d399; background: rgba(30,27,75,0.8); width: 130px; height: 130px; display: flex; justify-content: center; align-items: center; border-radius: 20px; border: 2px solid #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.4); }
-
         .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .btn-green { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 4px 12px rgba(16,185,129,0.3); border: 1px solid #34d399; }
@@ -77,6 +62,9 @@
         .popup-header { background: #064e3b; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #34d399; }
         .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; color: #d1fae5; }
 
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(5px); }
+        .count-card { font-size: 110px; font-weight: 900; color: #34d399; background: rgba(30,27,75,0.8); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.3); }
+        
         .bet-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999; display: none; backdrop-filter: blur(3px); }
         .bet-modal-overlay.active { display: block; }
 
@@ -166,12 +154,21 @@
 </div>
 
 <div class="app-container">
-    <div class="header">
+    <div id="lockOverlay" class="lock-overlay">
+        <div class="count-card" id="lockNum">5</div>
+    </div>
+
+    <!-- Updated Header Layout -->
+    <div class="header-top">
         <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
-        <div class="logo">Rewards Zone</div>
         <div class="wallet-badge-container">
             <div class="wallet-badge" id="userWallet">Total: ₹ 0.00</div>
+            <div style="font-size: 10px; color: #a7f3d0;" id="subWalletInfo">Dep: ₹0 | Win: ₹0</div>
         </div>
+    </div>
+    
+    <div class="logo-ticker-container">
+        <div class="logo-ticker">Rewards Zone</div>
     </div>
 
     <div class="controls-row" style="margin-top: 12px;">
@@ -193,37 +190,30 @@
         <div class="timer-clock" id="countdown">00:30</div>
     </div>
 
-    <!-- Betting Area Wrapper with Transparent Lock Overlay -->
-    <div class="betting-area-wrapper">
-        <div id="lockOverlay" class="lock-overlay">
-            <div class="count-card" id="lockNum">5</div>
-        </div>
+    <div class="color-row">
+        <button class="btn-3d btn-green" onclick="openBetModal('color', 'green')">Green</button>
+        <button class="btn-3d btn-violet" onclick="openBetModal('color', 'violet')">Violet</button>
+        <button class="btn-3d btn-red" onclick="openBetModal('color', 'red')">Red</button>
+    </div>
 
-        <div class="color-row">
-            <button class="btn-3d btn-green" onclick="openBetModal('color', 'green')">Green</button>
-            <button class="btn-3d btn-violet" onclick="openBetModal('color', 'violet')">Violet</button>
-            <button class="btn-3d btn-red" onclick="openBetModal('color', 'red')">Red</button>
+    <div class="ball-container">
+        <div class="ball-grid">
+            <button class="ball-3d ball-half" onclick="openBetModal('number', '0')">0</button>
+            <button class="ball-3d ball-green" onclick="openBetModal('number', '1')">1</button>
+            <button class="ball-3d ball-red" onclick="openBetModal('number', '2')">2</button>
+            <button class="ball-3d ball-green" onclick="openBetModal('number', '3')">3</button>
+            <button class="ball-3d ball-red" onclick="openBetModal('number', '4')">4</button>
+            <button class="ball-3d ball-half-red" onclick="openBetModal('number', '5')">5</button>
+            <button class="ball-3d ball-red" onclick="openBetModal('number', '6')">6</button>
+            <button class="ball-3d ball-green" onclick="openBetModal('number', '7')">7</button>
+            <button class="ball-3d ball-red" onclick="openBetModal('number', '8')">8</button>
+            <button class="ball-3d ball-green" onclick="openBetModal('number', '9')">9</button>
         </div>
+    </div>
 
-        <div class="ball-container">
-            <div class="ball-grid">
-                <button class="ball-3d ball-half" onclick="openBetModal('number', '0')">0</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '1')">1</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '2')">2</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '3')">3</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '4')">4</button>
-                <button class="ball-3d ball-half-red" onclick="openBetModal('number', '5')">5</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '6')">6</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '7')">7</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '8')">8</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '9')">9</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <button class="btn-3d btn-big" onclick="openBetModal('size', 'big')">Big</button>
-            <button class="btn-3d btn-small" onclick="openBetModal('size', 'small')">Small</button>
-        </div>
+    <div class="size-row">
+        <button class="btn-3d btn-big" onclick="openBetModal('size', 'big')">Big</button>
+        <button class="btn-3d btn-small" onclick="openBetModal('size', 'small')">Small</button>
     </div>
 
     <div class="history-card">
@@ -250,7 +240,6 @@
     </div>
 </div>
 
-<!-- Outside Click Backdrop Overlay -->
 <div id="betModalOverlay" class="bet-modal-overlay" onclick="closeBetModal()"></div>
 
 <div id="betModal" class="bet-modal">
@@ -325,6 +314,7 @@
             winningsBal = u.winningsBalance || 0;
             let total = depositBal + winningsBal;
             document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
+            document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
             
             if (u.phone === "8093361993" || res.isAdmin) {
                 document.getElementById('floatingAdminBtn').style.display = 'flex';
@@ -465,6 +455,7 @@
             winningsBal = data.newWinnings;
             let total = depositBal + winningsBal;
             document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
+            document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
             closeBetModal();
             showNotification('Bet successfully added!');
             if (currentHistoryTab === 'myhistory') loadHistoryData();
