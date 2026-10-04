@@ -11,7 +11,8 @@
         .auth-section { width: 100%; max-width: 420px; display: none; background: rgba(30, 27, 75, 0.85); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #34d399; backdrop-filter: blur(10px); }
         .auth-section.active { display: block; }
         .brand-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
-        .auth-logo { width: 45px; height: 45px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); }
+        .auth-logo { width: 45px; height: 45px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); overflow: hidden; }
+        .auth-logo img { width: 100%; height: 100%; object-fit: cover; }
         .brand-title { font-size: 26px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         h2 { font-size: 20px; text-align: center; margin-bottom: 5px; color: #ffffff; font-weight: 700; }
         p { font-size: 13px; text-align: center; color: #a7f3d0; margin-bottom: 20px; }
@@ -43,7 +44,7 @@
     <!-- Login Section -->
     <div id="loginSection" class="auth-section active">
         <div class="brand-header">
-            <div class="auth-logo">⭐</div>
+            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Sign in</h2>
@@ -75,7 +76,7 @@
     <!-- Register Section -->
     <div id="registerSection" class="auth-section">
         <div class="brand-header">
-            <div class="auth-logo">⭐</div>
+            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Register</h2>
@@ -116,7 +117,7 @@
     <!-- Forgot Password Section -->
     <div id="forgotSection" class="auth-section">
         <div class="brand-header">
-            <div class="auth-logo">⭐</div>
+            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Reset password</h2>
