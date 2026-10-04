@@ -393,8 +393,55 @@ app.get('/api/admin/bets-summary/:period', async (req, res) => {
 app.get('/api/game-history/:timerType', async (req, res) => {
     try {
         const { timerType } = req.params;
-        const history = await GameResult.find({ timerType }).sort({ _id: -1 }).limit(20);
-        res.json({ success: true, history });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const total = await GameResult.countDocuments({ timerType });
+        const history = await GameResult.find({ timerType }).sort({ _id: -1 }).skip(skip).limit(limit);
+        
+        res.json({ success: true, history, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/user-bets/:userId/:timerType', async (req, res) => {
+    try {
+        const { userId, timerType } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const total = await Bet.countDocuments({ userId, timerType });
+        const bets = await Bet.find({ userId, timerType }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+        res.json({ success: true, bets, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/user-round-result', async (req, res) => {
+    try {
+        const { userId, period, timerType } = req.query;
+        const bet = await Bet.findOne({ userId, period, timerType });
+        if (!bet) return res.json({ success: true, hasBet: false });
+
+        const gameRes = await GameResult.findOne({ period });
+        res.json({ 
+            success: true, 
+            hasBet: true, 
+            betData: {
+                status: bet.status,
+                amount: bet.amount,
+                payout: bet.payout,
+                betValue: bet.betValue,
+                number: gameRes ? gameRes.number : '?',
+                color: gameRes ? gameRes.color : '?',
+                size: gameRes ? gameRes.size : '?'
+            } 
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
