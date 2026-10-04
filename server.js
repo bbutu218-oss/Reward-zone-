@@ -119,7 +119,6 @@ async function setupAdminAccount() {
     }
 }
 
-// Yarwin style dynamic period counters matching large platforms
 const periodCounters = { '30s': 50000, '60s': 20000, '3m': 30000, '5m': 50000 };
 
 async function initializePeriodCounters() {
@@ -139,7 +138,6 @@ async function initializePeriodCounters() {
                     let gamePrefixLength = todayPrefix.length + 1; 
                     const counterVal = parseInt(periodStr.slice(gamePrefixLength));
                     if (!isNaN(counterVal)) {
-                        // -1 kiya taaki startup par generatePeriodCode() call hone par exact match ho
                         periodCounters[key] = counterVal - 1;
                     }
                 }
@@ -161,19 +159,19 @@ function generatePeriodCode(timerType) {
     if (!periodCounters[key]) periodCounters[key] = 50000;
     periodCounters[key]++;
     
-    let gamePrefix = '1'; // 30s
-    if (key === '1m') gamePrefix = '2'; // 60s
-    if (timerType === '3m') gamePrefix = '3'; // 3m
-    if (timerType === '5m') gamePrefix = '5'; // 5m
+    let gamePrefix = '1'; 
+    if (key === '1m') gamePrefix = '2'; 
+    if (timerType === '3m') gamePrefix = '3'; 
+    if (timerType === '5m') gamePrefix = '5'; 
 
     return `${year}${month}${day}${gamePrefix}${String(periodCounters[key]).padStart(5, '0')}`;
 }
 
 const gameStates = {
-    '30s': { countdown: 30, isBettingOpen: true, period: '' },
-    '60s': { countdown: 60, isBettingOpen: true, period: '' },
-    '3m':  { countdown: 180, isBettingOpen: true, period: '' },
-    '5m':  { countdown: 300, isBettingOpen: true, period: '' }
+    '30s': { countdown: 30, isBettingOpen: true, period: '', startTime: 0 },
+    '60s': { countdown: 60, isBettingOpen: true, period: '', startTime: 0 },
+    '3m':  { countdown: 180, isBettingOpen: true, period: '', startTime: 0 },
+    '5m':  { countdown: 300, isBettingOpen: true, period: '', startTime: 0 }
 };
 
 app.post('/api/register', async (req, res) => {
@@ -312,7 +310,7 @@ app.post('/api/withdraw', async (req, res) => {
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         if (user.password !== password) return res.status(400).json({ success: false, message: "Incorrect password!" });
         if (Number(amount) < 110) return res.status(400).json({ success: false, message: "Minimum withdrawal amount is ₹110!" });
-        if (user.winningsBalance < Number(amount)) return res.status(400).json({ success: false, message: "Insufficient winnings balance! Deposit amount cannot be withdrawn directly." });
+        if (user.winningsBalance < Number(amount)) return res.status(400).json({ success: false, message: "Insufficient winnings balance!" });
 
         user.winningsBalance -= Number(amount);
         await user.save();
@@ -572,18 +570,27 @@ async function processBetsForPeriod(period, timerType, outcome) {
 }
 
 function startTimerLoop(timerType, intervalSeconds) {
+    const state = gameStates[timerType];
+    const intervalMs = intervalSeconds * 1000;
+    
+    const now = Date.now();
+    state.startTime = Math.floor(now / intervalMs) * intervalMs;
+    state.period = generatePeriodCode(timerType);
+
     setInterval(async () => {
         try {
-            const state = gameStates[timerType];
-            state.countdown--;
+            const currentTime = Date.now();
+            const elapsedMs = currentTime - state.startTime;
+            const elapsedSeconds = Math.floor(elapsedMs / 1000);
+            let countdown = intervalSeconds - elapsedSeconds;
 
-            if (state.countdown === 5) {
-                state.isBettingOpen = false;
-                io.emit(`bettingStatus_${timerType}`, { isOpen: false, period: state.period });
-            }
-
-            if (state.countdown <= 0) {
+            if (countdown <= 0) {
                 const currentPeriod = state.period;
+                
+                state.startTime += intervalMs;
+                const newElapsedMs = Date.now() - state.startTime;
+                countdown = intervalSeconds - Math.floor(newElapsedMs / 1000);
+
                 const outcome = await getGameOutcome(currentPeriod, timerType);
 
                 const existingResult = await GameResult.findOne({ period: currentPeriod });
@@ -601,11 +608,16 @@ function startTimerLoop(timerType, intervalSeconds) {
                 });
 
                 state.period = generatePeriodCode(timerType);
-                state.countdown = intervalSeconds;
                 state.isBettingOpen = true;
-
                 io.emit(`bettingStatus_${timerType}`, { isOpen: true, period: state.period });
             }
+
+            if (countdown <= 5 && state.isBettingOpen) {
+                state.isBettingOpen = false;
+                io.emit(`bettingStatus_${timerType}`, { isOpen: false, period: state.period });
+            }
+
+            state.countdown = countdown;
 
             io.emit(`timerTick_${timerType}`, { 
                 countdown: state.countdown, isBettingOpen: state.isBettingOpen, period: state.period 
@@ -623,7 +635,6 @@ mongoose.connect(MONGO_URI).then(async () => {
 
     ['30s', '60s', '3m', '5m'].forEach(type => {
         let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
-        gameStates[type].period = generatePeriodCode(type);
         startTimerLoop(type, interval);
     });
 
@@ -634,7 +645,7 @@ mongoose.connect(MONGO_URI).then(async () => {
 io.on('connection', (socket) => {
     ['30s', '60s', '3m', '5m'].forEach(type => {
         socket.emit(`timerTick_${type}`, { 
-            countdown: gameStates[type].countdown, isBettingOpen: gameStates[type].isBettingOpen, period: gameStates[type].period 
+            countdown: gameStates[type].countdown, isBettingOpen: gameStates[type].isBettingOpen, period: state = gameStates[type].period 
         });
     });
 });
