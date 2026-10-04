@@ -121,6 +121,33 @@ async function setupAdminAccount() {
 
 const periodCounters = { '30s': 1000, '60s': 2000, '3m': 3000, '5m': 5000 };
 
+async function initializePeriodCounters() {
+    try {
+        for (const timerType of ['30s', '60s', '3m', '5m']) {
+            let key = timerType === '60s' ? '1m' : timerType;
+            const latest = await GameResult.findOne({ timerType }).sort({ _id: -1 });
+            if (latest && latest.period) {
+                const periodStr = latest.period.toString();
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const todayPrefix = `${year}${month}${day}`;
+
+                if (periodStr.startsWith(todayPrefix)) {
+                    const counterVal = parseInt(periodStr.slice(-4));
+                    if (!isNaN(counterVal)) {
+                        periodCounters[key] = counterVal;
+                    }
+                }
+            }
+        }
+        console.log("Period counters initialized successfully:", periodCounters);
+    } catch (err) {
+        console.error("Error initializing period counters:", err);
+    }
+}
+
 function generatePeriodCode(timerType) {
     const now = new Date();
     const year = now.getFullYear();
@@ -140,10 +167,10 @@ function generatePeriodCode(timerType) {
 }
 
 const gameStates = {
-    '30s': { countdown: 30, isBettingOpen: true, period: generatePeriodCode('30s') },
-    '60s': { countdown: 60, isBettingOpen: true, period: generatePeriodCode('60s') },
-    '3m':  { countdown: 180, isBettingOpen: true, period: generatePeriodCode('3m') },
-    '5m':  { countdown: 300, isBettingOpen: true, period: generatePeriodCode('5m') }
+    '30s': { countdown: 30, isBettingOpen: true, period: '' },
+    '60s': { countdown: 60, isBettingOpen: true, period: '' },
+    '3m':  { countdown: 180, isBettingOpen: true, period: '' },
+    '5m':  { countdown: 300, isBettingOpen: true, period: '' }
 };
 
 app.post('/api/register', async (req, res) => {
@@ -474,7 +501,7 @@ app.post('/api/bet', async (req, res) => {
         const newBet = new Bet({ userId, timerType, period, betType, betValue, amount });
         await newBet.save();
 
-        res.json({ success: true, message: "Bet placed successfully!", newBalance: user.balance, newWinnings: user.winningsBalance });
+        res.json({ success: true, message: "Bet successfully added!", newBalance: user.balance, newWinnings: user.winningsBalance });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -581,14 +608,17 @@ function startTimerLoop(timerType, intervalSeconds) {
     }, 1000);
 }
 
-mongoose.connect(MONGO_URI).then(() => {
+mongoose.connect(MONGO_URI).then(async () => {
     console.log("Connected to MongoDB successfully for rewardzone!");
-    setupAdminAccount();
+    await setupAdminAccount();
+    await initializePeriodCounters();
 
-    startTimerLoop('30s', 30);
-    startTimerLoop('60s', 60);
-    startTimerLoop('3m', 180);
-    startTimerLoop('5m', 300);
+    // Initialize initial period codes after counters are loaded
+    ['30s', '60s', '3m', '5m'].forEach(type => {
+        let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
+        gameStates[type].period = generatePeriodCode(type);
+        startTimerLoop(type, interval);
+    });
 
 }).catch(err => {
     console.error("MongoDB connection error:", err);
