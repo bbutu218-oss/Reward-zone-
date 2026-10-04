@@ -3,64 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reward Zone</title>
+    <title>Rewards Zone</title>
     <meta name="monetag" content="461f12f4999caa17cb8e670a67481109">
     <script>(function(s){s.dataset.zone='11824344',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #0f172a; color: #fff; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 450px; background: #121824; min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .page { display: none; }
         .page.active { display: block; }
-        .top-balance-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 15px; }
-        .mini-wallet { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #2ecc71; display: flex; align-items: center; gap: 5px; }
-        .mini-money-wallet { background: #1e293b; border: 1px solid #334155; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #38bdf8; display: flex; align-items: center; gap: 5px; }
-        .card { background: #1e293b; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #334155; }
-        .card h4 { font-size: 15px; margin-bottom: 5px; color: #f8fafc; }
-        .card p { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
-        .action-btn { background: #6366f1; color: white; border: none; padding: 12px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; }
-        .action-btn:hover { opacity: 0.9; }
         
-        .profile-top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; }
-        .avatar-box { width: 80px; height: 80px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #38bdf8; }
+        .brand-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .auth-logo { width: 40px; height: 40px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); }
+        .brand-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .top-balance-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 15px; }
+        .mini-wallet { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #34d399; display: flex; align-items: center; gap: 5px; }
+        .mini-money-wallet { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #c084fc; display: flex; align-items: center; gap: 5px; }
+        
+        .card { background: rgba(30, 27, 75, 0.85); padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #7c3aed; backdrop-filter: blur(10px); }
+        .card h4 { font-size: 15px; margin-bottom: 5px; color: #ffffff; }
+        .card p { font-size: 12px; color: #a7f3d0; margin-bottom: 12px; }
+        
+        .action-btn { background: linear-gradient(135deg, #a855f7, #10b981); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
+        .action-btn:hover { opacity: 0.95; }
+        
+        .profile-top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: rgba(30, 27, 75, 0.85); padding: 15px; border-radius: 16px; border: 1px solid #7c3aed; }
+        .avatar-box { width: 80px; height: 80px; background: linear-gradient(135deg, #a855f7, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #34d399; }
         .profile-right-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .profile-info-row label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 2px; }
-        .profile-info-row input { width: 100%; background: #121824; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: white; font-size: 13px; outline: none; }
+        .profile-info-row label { font-size: 11px; color: #d1fae5; display: block; margin-bottom: 2px; }
+        .profile-info-row input { width: 100%; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; border-radius: 8px; padding: 8px 10px; color: white; font-size: 13px; outline: none; }
         .uid-row { display: flex; gap: 6px; align-items: center; }
-        .copy-uid-btn { background: #38bdf8; color: #0f172a; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        .copy-uid-btn { background: #34d399; color: #022c22; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
         
         .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-        .profile-square-btn { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
+        .profile-square-btn { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
         .square-icon { font-size: 26px; margin-bottom: 8px; }
-        .square-title { font-size: 13px; font-weight: 600; color: #f8fafc; }
+        .square-title { font-size: 13px; font-weight: 600; color: #ffffff; }
         
-        .deposit-card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 15px; }
-        .qr-placeholder { width: 240px; height: 240px; background: #ffffff; margin: 15px auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; border: 4px solid #38bdf8; overflow: hidden; }
+        .deposit-card { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 15px; }
+        .qr-placeholder { width: 240px; height: 240px; background: #ffffff; margin: 15px auto; border-radius: 12px; display: flex; align-items: center; justify-content: center; border: 4px solid #34d399; overflow: hidden; }
         .qr-placeholder img { width: 100%; height: 100%; object-fit: contain; }
         .deposit-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .deposit-amt-btn { background: #121824; border: 1px solid #334155; color: white; padding: 10px 0; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
-        .deposit-amt-btn.active { background: #6366f1; border-color: #6366f1; }
-        .notice-box { background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.3); padding: 12px; border-radius: 8px; font-size: 12px; color: #fde047; text-align: left; margin-bottom: 15px; line-height: 1.5; }
+        .deposit-amt-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: white; padding: 10px 0; border-radius: 8px; font-weight: bold; font-size: 13px; cursor: pointer; text-align: center; }
+        .deposit-amt-btn.active { background: linear-gradient(135deg, #a855f7, #10b981); border-color: #34d399; }
+        .notice-box { background: rgba(52, 211, 153, 0.1); border: 1px solid rgba(52, 211, 153, 0.3); padding: 12px; border-radius: 10px; font-size: 12px; color: #a7f3d0; text-align: left; margin-bottom: 15px; line-height: 1.5; }
         
         .form-group { margin-bottom: 15px; width: 100%; text-align: left; }
-        .form-group label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 6px; }
-        .input-wrapper { position: relative; width: 100%; display: flex; align-items: center; background: #1e293b; border: 1px solid #334155; border-radius: 12px; overflow: hidden; }
+        .form-group label { display: block; font-size: 13px; color: #d1fae5; margin-bottom: 6px; }
+        .input-wrapper { position: relative; width: 100%; display: flex; align-items: center; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; border-radius: 10px; overflow: hidden; }
         .form-group input, .form-group select { width: 100%; padding: 12px; background: transparent; border: none; color: white; font-size: 14px; outline: none; }
         
         .method-selector { display: flex; gap: 10px; margin-bottom: 15px; }
-        .method-btn { flex: 1; padding: 10px; background: #1e293b; border: 1px solid #334155; color: white; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; }
-        .method-btn.active { background: #6366f1; border-color: #6366f1; }
+        .method-btn { flex: 1; padding: 10px; background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; color: white; border-radius: 10px; font-weight: bold; cursor: pointer; text-align: center; }
+        .method-btn.active { background: linear-gradient(135deg, #a855f7, #10b981); border-color: #34d399; }
         
-        #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #334155; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #475569; }
+        #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #1e1b4b; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #34d399; }
         #toastNotification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: #1e293b; display: flex; justify-content: space-around; border-top: 1px solid #334155; padding: 12px 0; z-index: 100; }
-        .nav-item { text-align: center; color: #94a3b8; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
-        .nav-item.active { color: #6366f1; }
+        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: rgba(30, 27, 75, 0.95); display: flex; justify-content: space-around; border-top: 1px solid #7c3aed; padding: 12px 0; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-item { text-align: center; color: #a7f3d0; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
+        .nav-item.active { color: #34d399; }
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-        .modal-content { background: #1e293b; border: 1px solid #334155; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #94a3b8; background: none; border: none; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #a7f3d0; background: none; border: none; }
     </style>
 </head>
 <body>
@@ -69,6 +76,11 @@
 
 <div class="container">
     <div id="homePage" class="page active">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div class="top-balance-bar">
             <div class="mini-wallet"><span>🪙</span> <span id="userwallet">0</span></div>
             <div class="mini-money-wallet"><span>₹</span> <span id="usermoney">0</span></div>
@@ -83,34 +95,39 @@
         <div class="card">
             <h4>📺 Watch Ad & Earn</h4>
             <p>Watch the ad for 60 seconds to claim instant coins (+20 coins).</p>
-            <div id="timerDisplay" style="font-size: 14px; color: #00ffcc; margin: 8px 0; font-weight: bold;"></div>
+            <div id="timerDisplay" style="font-size: 14px; color: #34d399; margin: 8px 0; font-weight: bold;"></div>
             <button class="action-btn" id="watchAdBtn" onclick="startWatchAd()">Watch Ad Now (60s)</button>
         </div>
 
-        <div class="card" style="background: linear-gradient(135deg, #1e1b4b, #312e81);">
+        <div class="card" style="background: linear-gradient(135deg, #2e1065, #064e3b);">
             <h4>🚀 Refer & Earn</h4>
             <p>Share your link! Get <b>500 Coins</b> instantly when your friend registers.</p>
             <button class="action-btn" style="background: #10b981;" onclick="shareReferralLink()">🔗 Share Referral Link</button>
         </div>
-
-        <div style="text-align: center; margin-top: 25px; padding: 15px; background: #1e293b; border-radius: 12px; border: 1px solid #334155;">
-            <div style="font-size: 16px; font-weight: bold; color: #facc15;">🪙 Reward Zone</div>
-            <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Official Gaming & Earning Platform</p>
-        </div>
     </div>
 
     <div id="gamesHubPage" class="page">
-        <h2 style="font-size: 18px; margin-bottom: 5px;">🎮 Games Arena</h2>
-        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Choose your favorite game and start winning!</p>
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
+        <h2 style="font-size: 18px; margin-bottom: 5px; color: #fff;">🎮 Games Arena</h2>
+        <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Choose your favorite game and start winning!</p>
         
-        <div class="card" onclick="window.location.href='color-game.html'" style="cursor: pointer; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+        <div class="card" onclick="window.location.href='color-game.html'" style="cursor: pointer; background: linear-gradient(135deg, #4c1d95, #065f46);">
             <h3>🎨 WinGo Color Trading</h3>
             <p>Prediction Game (30s / 1m / 3m / 5m)</p>
-            <button class="action-btn" style="padding: 8px; font-size: 12px; background: #1e293b; margin-top: 8px;">Play Now</button>
+            <button class="action-btn" style="padding: 8px; font-size: 12px; background: rgba(15, 23, 42, 0.7); margin-top: 8px;">Play Now</button>
         </div>
     </div>
 
     <div id="profilePage" class="page">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div class="top-balance-bar">
             <div class="mini-wallet"><span>🪙</span> <span id="profileUserwallet">0</span></div>
             <div class="mini-money-wallet"><span>₹</span> <span id="profileUsermoney">0</span></div>
@@ -132,7 +149,7 @@
                 </div>
                 <div class="profile-info-row">
                     <label>Winnings Balance (Withdrawable)</label>
-                    <input type="text" id="profileWinningsDisplay" disabled style="color: #2ecc71; font-weight: bold;">
+                    <input type="text" id="profileWinningsDisplay" disabled style="color: #34d399; font-weight: bold;">
                 </div>
             </div>
         </div>
@@ -153,7 +170,7 @@
             <div class="profile-square-btn" onclick="showToast('Support Email: 14sunilsunil3@gmail.com')">
                 <div class="square-icon">🎧</div><div class="square-title">Support</div>
             </div>
-            <div class="profile-square-btn" id="adminControlBtn" style="display:none; background:#dc2626;" onclick="switchPage('adminPanelPage')">
+            <div class="profile-square-btn" id="adminControlBtn" style="display:none; background:#7f1d1d;" onclick="switchPage('adminPanelPage')">
                 <div class="square-icon">🛡️</div><div class="square-title">Admin Panel</div>
             </div>
             <div class="profile-square-btn" onclick="logout()" style="border-color: #7f1d1d; background: rgba(127,29,29,0.2); grid-column: span 2;">
@@ -163,9 +180,14 @@
     </div>
 
     <div id="depositPage" class="page">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
-            <h2 style="font-size: 16px;">Deposit Funds</h2>
+            <h2 style="font-size: 16px; color: #fff;">Deposit Funds</h2>
             <div></div>
         </div>
 
@@ -175,11 +197,11 @@
 
         <div class="card" style="margin-bottom: 15px; text-align: center;" id="qrUploadSection">
             <h4 style="margin-bottom: 8px;">Upload / Update QR Code</h4>
-            <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #cbd5e1;" onchange="handleQrUpload(event)">
+            <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #d1fae5;" onchange="handleQrUpload(event)">
         </div>
 
         <div class="deposit-card">
-            <h3 id="selectedAmtDisplay" style="color: #38bdf8; margin-bottom: 10px;">Selected: ₹100</h3>
+            <h3 id="selectedAmtDisplay" style="color: #34d399; margin-bottom: 10px;">Selected: ₹100</h3>
             <div class="qr-placeholder">
                 <img id="depositQrImage" src="qr-code.png" alt="QR Code">
             </div>
@@ -194,14 +216,19 @@
     </div>
 
     <div id="withdrawPage" class="page">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
-            <h2 style="font-size: 16px;">Withdrawal</h2>
+            <h2 style="font-size: 16px; color: #fff;">Withdrawal</h2>
             <div></div>
         </div>
 
         <div class="notice-box" style="background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3); color: #93c5fd;">
-            ℹ️ Min Withdrawal: <b>₹110</b> | Max: <b>₹50,000</b>. Only Game Winnings amount can be withdrawn.
+            ℹ️️ Min Withdrawal: <b>₹110</b> | Max: <b>₹50,000</b>. Only Game Winnings amount can be withdrawn.
         </div>
 
         <div class="form-group">
@@ -233,13 +260,18 @@
             <div class="form-group"><label>Mobile Number</label><div class="input-wrapper"><input type="tel" id="upiMobile" placeholder="Enter Mobile Number"></div></div>
         </div>
 
-        <button class="action-btn" style="background: #2ecc71;" onclick="openPasswordConfirmModal()">Submit Withdrawal</button>
+        <button class="action-btn" style="background: #10b981;" onclick="openPasswordConfirmModal()">Submit Withdrawal</button>
     </div>
 
     <div id="historyPage" class="page">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
-            <h2 style="font-size: 16px;">History & Activities</h2>
+            <h2 style="font-size: 16px; color: #fff;">History & Activities</h2>
             <div></div>
         </div>
 
@@ -249,16 +281,21 @@
         </div>
 
         <div style="font-size: 13px; font-weight: bold; color: #facc15; margin-bottom: 8px;">Game Betting Winnings, Losses & Coin Conversions</div>
-        <div id="historyContent" style="font-size: 12px; color: #cbd5e1; max-height: 60vh; overflow-y: auto;">Loading activity details...</div>
+        <div id="historyContent" style="font-size: 12px; color: #d1fae5; max-height: 60vh; overflow-y: auto;">Loading activity details...</div>
     </div>
 
     <div id="adminPanelPage" class="page">
+        <div class="brand-header">
+            <div class="auth-logo">⭐</div>
+            <div class="brand-title">Rewards Zone</div>
+        </div>
+
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
             <button class="action-btn" style="width: auto; padding: 6px 12px; background: #334155;" onclick="switchPage('profilePage')">← Back</button>
-            <h2 style="font-size: 16px;">Admin Panel</h2>
+            <h2 style="font-size: 16px; color: #fff;">Admin Panel</h2>
             <div></div>
         </div>
-        <div id="adminRequestsContainer" style="font-size: 12px; color: #cbd5e1;">Loading requests...</div>
+        <div id="adminRequestsContainer" style="font-size: 12px; color: #d1fae5;">Loading requests...</div>
     </div>
 
     <div class="nav-bar" id="bottomNavBar">
@@ -271,8 +308,8 @@
 <div class="modal-overlay" id="termsModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeTermsModal()">×</button>
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">📜 Terms & Conditions</h3>
-        <div style="max-height: 250px; overflow-y: auto; font-size: 12px; color: #cbd5e1; line-height: 1.6; text-align: left; margin-bottom: 15px;">
+        <h3 style="margin-bottom: 10px; color: #34d399;">📜 Terms & Conditions</h3>
+        <div style="max-height: 250px; overflow-y: auto; font-size: 12px; color: #d1fae5; line-height: 1.6; text-align: left; margin-bottom: 15px;">
             <p><b>1. User Responsibility:</b> Users must be 18 years or older.</p>
             <p><b>2. Fair Play:</b> Any system exploitation or illegal activity will result in an immediate account ban.</p>
             <p><b>3. Withdrawal Rules:</b> Minimum withdrawal limit is ₹110. Only game winnings are eligible for withdrawal.</p>
@@ -286,7 +323,7 @@
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeConvertModal()">×</button>
         <h3 style="margin-bottom: 10px; color: #facc15;">🔄 Convert Coins to Wallet</h3>
-        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Rate: 100 Coins = ₹1 Real Money (Min Convert: 10,000 Coins)</p>
+        <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Rate: 100 Coins = ₹1 Real Money (Min Convert: 10,000 Coins)</p>
         <div class="form-group">
             <label>Coins Amount</label>
             <div class="input-wrapper">
@@ -303,7 +340,7 @@
 <div class="modal-overlay" id="depositSelectModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeDepositSelectModal()">×</button>
-        <h3 style="margin-bottom: 10px; color: #38bdf8;">💳 Select Deposit Amount</h3>
+        <h3 style="margin-bottom: 10px; color: #34d399;">💳 Select Deposit Amount</h3>
         <div class="deposit-grid">
             <div class="deposit-amt-btn active" onclick="setDepositAmt(100, this)">₹100</div>
             <div class="deposit-amt-btn" onclick="setDepositAmt(200, this)">₹200</div>
@@ -321,15 +358,15 @@
 <div class="modal-overlay" id="passConfirmModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closePassModal()">×</button>
-        <h3 style="margin-bottom: 10px; color: #2ecc71;">🔒 Confirm Withdrawal</h3>
-        <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Please enter your account password to verify request.</p>
+        <h3 style="margin-bottom: 10px; color: #34d399;">🔒 Confirm Withdrawal</h3>
+        <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Please enter your account password to verify request.</p>
         <div class="form-group">
             <label>Login Password</label>
             <div class="input-wrapper">
                 <input type="password" id="withdrawPassInput" placeholder="Enter password">
             </div>
         </div>
-        <button class="action-btn" style="background: #2ecc71;" onclick="submitWithdrawalFinal()">Verify & Submit</button>
+        <button class="action-btn" style="background: #10b981;" onclick="submitWithdrawalFinal()">Verify & Submit</button>
     </div>
 </div>
 
@@ -426,7 +463,7 @@
         let uid = currentUser ? currentUser.uid : '';
         let shareUrl = `${window.location.origin}/auth.html?ref=${uid}`;
         if (navigator.share) {
-            navigator.share({ title: 'Reward Zone', text: 'Join Reward Zone and earn real rewards!', url: shareUrl }).catch(err => console.log(err));
+            navigator.share({ title: 'Rewards Zone', text: 'Join Rewards Zone and earn real rewards!', url: shareUrl }).catch(err => console.log(err));
         } else {
             navigator.clipboard.writeText(shareUrl);
             showToast('Referral link copied to clipboard!');
@@ -586,7 +623,7 @@
                 html += `<div class="card" style="padding:10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <div style="font-weight:bold; color:#f8fafc;">Period: ${b.period} (${b.timerType})</div>
-                        <div style="font-size:11px; color:#94a3b8;">Type: ${b.betType} | Val: <b>${b.betValue}</b> | Bet: ₹${b.amount}</div>
+                        <div style="font-size:11px; color:#a7f3d0;">Type: ${b.betType} | Val: <b>${b.betValue}</b> | Bet: ₹${b.amount}</div>
                     </div>
                     <div style="text-align:right;">
                         <span style="background:${badgeColor}; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:bold; color:#fff;">${b.status.toUpperCase()}</span>
@@ -595,30 +632,30 @@
                 </div>`;
             });
         } else {
-            html += '<p style="color:#94a3b8;">No game betting activities found yet.</p>';
+            html += '<p style="color:#a7f3d0;">No game betting activities found yet.</p>';
         }
         document.getElementById('historyContent').innerHTML = html;
     }
 
     function loadDepositHistoryView() {
         if(!globalHistoryData) return;
-        let html = '<h4 style="color:#38bdf8; margin-bottom:8px;">Deposit Records</h4>';
+        let html = '<h4 style="color:#34d399; margin-bottom:8px;">Deposit Records</h4>';
         if(globalHistoryData.deposits.length > 0) {
             globalHistoryData.deposits.forEach(d => {
                 html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${d.amount}</b> | TXN: ${d.transactionId} | Status: <b style="color:${d.status==='approved'?'#22c55e':'#eab308'}">${d.status}</b></div>`;
             });
-        } else { html += '<p style="color:#94a3b8;">No deposit records found.</p>'; }
+        } else { html += '<p style="color:#a7f3d0;">No deposit records found.</p>'; }
         document.getElementById('historyContent').innerHTML = html;
     }
 
     function loadWithdrawalHistoryView() {
         if(!globalHistoryData) return;
-        let html = '<h4 style="color:#2ecc71; margin-bottom:8px;">Withdrawal Records</h4>';
+        let html = '<h4 style="color:#34d399; margin-bottom:8px;">Withdrawal Records</h4>';
         if(globalHistoryData.withdrawals.length > 0) {
             globalHistoryData.withdrawals.forEach(w => {
                 html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${w.amount}</b> | Mobile: ${w.mobile} | Status: <b style="color:${w.status==='approved'?'#22c55e':'#eab308'}">${w.status}</b></div>`;
             });
-        } else { html += '<p style="color:#94a3b8;">No withdrawal records found.</p>'; }
+        } else { html += '<p style="color:#a7f3d0;">No withdrawal records found.</p>'; }
         document.getElementById('historyContent').innerHTML = html;
     }
 
