@@ -155,7 +155,7 @@ app.post('/api/register', async (req, res) => {
         const newUser = new User({ 
             phone, 
             password, 
-            balance: 500, 
+            balance: 5, 
             winningsBalance: 0,
             rewardCoins: 0,
             referredBy: refUid || null 
