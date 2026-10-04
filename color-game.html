@@ -12,7 +12,8 @@
         .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #1e293b; }
         .back-btn { background: #1e293b; border: 1px solid #2a3756; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .logo { font-size: 18px; font-weight: 800; color: #00e676; text-transform: uppercase; font-style: italic; text-shadow: 0 0 10px rgba(0,230,118,0.4); }
-        .wallet-badge { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #00e676; padding: 6px 14px; border-radius: 25px; font-weight: bold; color: #00e676; font-size: 13px; }
+        .wallet-badge-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+        .wallet-badge { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #00e676; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: #00e676; font-size: 12px; }
         .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
         .tab-btn { flex: 1; background: #1a233a; border: 1px solid #2a3756; color: #94a3b8; padding: 10px 5px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
         .tab-btn.active { background: linear-gradient(135deg, #00c853, #00e676); color: #fff; border-color: #00e676; }
@@ -68,7 +69,7 @@
 
 <div class="floating-admin-popup" id="floatingAdminPopup">
     <div class="popup-header" id="popupHeader">
-        <span>🛡️️ Admin Winnings Control</span>
+        <span>🛡 Admin Winnings Control</span>
         <span onclick="toggleAdminPopup()" style="cursor: pointer; font-size: 16px;">✖</span>
     </div>
     <div class="popup-body">
@@ -100,7 +101,10 @@
     <div class="header">
         <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
         <div class="logo">RewardZone</div>
-        <div class="wallet-badge" id="userWallet">₹ 0.00</div>
+        <div class="wallet-badge-container">
+            <div class="wallet-badge" id="userWallet">Total: ₹ 0.00</div>
+            <div style="font-size: 10px; color: #94a3b8;" id="subWalletInfo">Dep: ₹0 | Win: ₹0</div>
+        </div>
     </div>
 
     <div class="timer-tabs">
@@ -194,14 +198,32 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
     const socket = io();
-    let user = JSON.parse(localStorage.getItem('user')) || JSON.parse(localStorage.getItem('rewards_loggedInUser'));
-    let userId = user ? (user._id || user.userId) : null;
-    let balance = user ? (user.winningsBalance !== undefined ? user.winningsBalance : (user.balance || 0)) : 0;
+    let loggedInMobile = localStorage.getItem('rewards_loggedMobile') || sessionStorage.getItem('rewards_loggedMobile');
+    let userId = localStorage.getItem('rewards_userId') || sessionStorage.getItem('rewards_userId');
 
-    if (user) document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
-    if (user && (user.phone === "8093361993" || user.isAdmin)) {
-        document.getElementById('floatingAdminBtn').style.display = 'block';
+    let depositBal = 0;
+    let winningsBal = 0;
+
+    async function fetchUserData() {
+        if (!loggedInMobile && !userId) return;
+        let url = userId ? `/api/user/${userId}` : `/api/user/mobile/${loggedInMobile}`;
+        let res = await fetch(url).then(r => r.json());
+        if (res.success) {
+            let u = res.user;
+            userId = u._id;
+            depositBal = u.balance || 0;
+            winningsBal = u.winningsBalance || 0;
+            let total = depositBal + winningsBal;
+            document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
+            document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
+            
+            if (u.phone === "8093361993" || res.isAdmin) {
+                document.getElementById('floatingAdminBtn').style.display = 'block';
+            }
+        }
     }
+
+    fetchUserData();
 
     let currentTimerType = '30s';
     let timeLeft = 30;
@@ -250,7 +272,7 @@
         socket.on(`gameResult_${type}`, () => {
             if (currentTimerType === type) {
                 fetchHistory();
-                updateUserBalance();
+                fetchUserData();
             }
         });
     });
@@ -280,20 +302,13 @@
         });
         const data = await response.json();
         if (data.success) {
-            balance = data.newWinnings;
-            document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
+            depositBal = data.newBalance;
+            winningsBal = data.newWinnings;
+            let total = depositBal + winningsBal;
+            document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
+            document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
             closeBetModal();
         } else { alert(data.message); }
-    }
-
-    async function updateUserBalance() {
-        if(!userId) return;
-        const res = await fetch(`/api/user/${userId}`);
-        const data = await res.json();
-        if(data.success) {
-            balance = data.winningsBalance;
-            document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
-        }
     }
 
     function fetchHistory() {
