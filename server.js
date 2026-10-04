@@ -613,7 +613,6 @@ mongoose.connect(MONGO_URI).then(async () => {
     await setupAdminAccount();
     await initializePeriodCounters();
 
-    // Initialize initial period codes after counters are loaded
     ['30s', '60s', '3m', '5m'].forEach(type => {
         let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
         gameStates[type].period = generatePeriodCode(type);
