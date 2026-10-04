@@ -119,52 +119,25 @@ async function setupAdminAccount() {
     }
 }
 
-const periodCounters = { '30s': 50000, '60s': 20000, '3m': 30000, '5m': 50000 };
+// Time-based exact period generator matching live global platforms
+function getPeriodCodeForTime(timerType, timestamp = Date.now()) {
+    const now = new Date(timestamp);
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const elapsedSeconds = Math.floor((now.getTime() - startOfDay) / 1000);
 
-async function initializePeriodCounters() {
-    try {
-        for (const timerType of ['30s', '60s', '3m', '5m']) {
-            let key = timerType === '60s' ? '1m' : timerType;
-            const latest = await GameResult.findOne({ timerType }).sort({ _id: -1 });
-            if (latest && latest.period) {
-                const periodStr = latest.period.toString();
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                const todayPrefix = `${year}${month}${day}`;
+    let intervalSeconds = 30;
+    let gamePrefix = '1';
+    if (timerType === '60s' || timerType === '1m') { intervalSeconds = 60; gamePrefix = '2'; }
+    else if (timerType === '3m') { intervalSeconds = 180; gamePrefix = '3'; }
+    else if (timerType === '5m') { intervalSeconds = 300; gamePrefix = '5'; }
 
-                if (periodStr.startsWith(todayPrefix)) {
-                    let gamePrefixLength = todayPrefix.length + 1; 
-                    const counterVal = parseInt(periodStr.slice(gamePrefixLength));
-                    if (!isNaN(counterVal)) {
-                        periodCounters[key] = counterVal - 1;
-                    }
-                }
-            }
-        }
-        console.log("Period counters initialized successfully:", periodCounters);
-    } catch (err) {
-        console.error("Error initializing period counters:", err);
-    }
-}
+    const periodNumber = Math.floor(elapsedSeconds / intervalSeconds) + 1;
 
-function generatePeriodCode(timerType) {
-    const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
-    
-    let key = timerType === '60s' ? '1m' : timerType;
-    if (!periodCounters[key]) periodCounters[key] = 50000;
-    periodCounters[key]++;
-    
-    let gamePrefix = '1'; 
-    if (key === '1m') gamePrefix = '2'; 
-    if (timerType === '3m') gamePrefix = '3'; 
-    if (timerType === '5m') gamePrefix = '5'; 
 
-    return `${year}${month}${day}${gamePrefix}${String(periodCounters[key]).padStart(5, '0')}`;
+    return `${year}${month}${day}${gamePrefix}${String(periodNumber).padStart(5, '0')}`;
 }
 
 const gameStates = {
@@ -573,41 +546,55 @@ function startTimerLoop(timerType, intervalSeconds) {
     const state = gameStates[timerType];
     const intervalMs = intervalSeconds * 1000;
     
-    const now = Date.now();
-    state.startTime = Math.floor(now / intervalMs) * intervalMs;
-    state.period = generatePeriodCode(timerType);
+    const initTimer = () => {
+        const now = Date.now();
+        const startOfDay = new Date(new Date(now).setHours(0,0,0,0)).getTime();
+        const elapsedMs = now - startOfDay;
+        const currentIntervalIndex = Math.floor(elapsedMs / intervalMs);
+        
+        state.startTime = startOfDay + (currentIntervalIndex * intervalMs);
+        const elapsedIntoInterval = now - state.startTime;
+        state.countdown = intervalSeconds - Math.floor(elapsedIntoInterval / 1000);
+        if (state.countdown < 0) state.countdown = 0;
+
+        state.period = getPeriodCodeForTime(timerType, state.startTime);
+        state.isBettingOpen = state.countdown > 5;
+    };
+
+    initTimer();
 
     setInterval(async () => {
         try {
-            const currentTime = Date.now();
-            const elapsedMs = currentTime - state.startTime;
-            const elapsedSeconds = Math.floor(elapsedMs / 1000);
-            let countdown = intervalSeconds - elapsedSeconds;
+            const now = Date.now();
+            const elapsedIntoInterval = now - state.startTime;
+            let countdown = intervalSeconds - Math.floor(elapsedIntoInterval / 1000);
 
-            if (countdown <= 0) {
-                const currentPeriod = state.period;
-                
+            if (countdown <= 0 || now >= state.startTime + intervalMs) {
+                const oldPeriod = state.period;
+
                 state.startTime += intervalMs;
-                const newElapsedMs = Date.now() - state.startTime;
-                countdown = intervalSeconds - Math.floor(newElapsedMs / 1000);
+                const newElapsedIntoInterval = now - state.startTime;
+                countdown = intervalSeconds - Math.floor(newElapsedIntoInterval / 1000);
 
-                const outcome = await getGameOutcome(currentPeriod, timerType);
+                const newPeriod = getPeriodCodeForTime(timerType, state.startTime);
 
-                const existingResult = await GameResult.findOne({ period: currentPeriod });
+                const outcome = await getGameOutcome(oldPeriod, timerType);
+
+                const existingResult = await GameResult.findOne({ period: oldPeriod });
                 if (!existingResult) {
                     const gameResult = new GameResult({
-                        timerType, period: currentPeriod, number: outcome.number, color: outcome.color, size: outcome.size
+                        timerType, period: oldPeriod, number: outcome.number, color: outcome.color, size: outcome.size
                     });
                     await gameResult.save();
                 }
 
-                await processBetsForPeriod(currentPeriod, timerType, outcome);
+                await processBetsForPeriod(oldPeriod, timerType, outcome);
 
                 io.emit(`gameResult_${timerType}`, {
-                    period: currentPeriod, number: outcome.number, color: outcome.color, size: outcome.size
+                    period: oldPeriod, number: outcome.number, color: outcome.color, size: outcome.size
                 });
 
-                state.period = generatePeriodCode(timerType);
+                state.period = newPeriod;
                 state.isBettingOpen = true;
                 io.emit(`bettingStatus_${timerType}`, { isOpen: true, period: state.period });
             }
@@ -631,7 +618,6 @@ function startTimerLoop(timerType, intervalSeconds) {
 mongoose.connect(MONGO_URI).then(async () => {
     console.log("Connected to MongoDB successfully!");
     await setupAdminAccount();
-    await initializePeriodCounters();
 
     ['30s', '60s', '3m', '5m'].forEach(type => {
         let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
@@ -645,7 +631,7 @@ mongoose.connect(MONGO_URI).then(async () => {
 io.on('connection', (socket) => {
     ['30s', '60s', '3m', '5m'].forEach(type => {
         socket.emit(`timerTick_${type}`, { 
-            countdown: gameStates[type].countdown, isBettingOpen: gameStates[type].isBettingOpen, period: state = gameStates[type].period 
+            countdown: gameStates[type].countdown, isBettingOpen: gameStates[type].isBettingOpen, period: gameStates[type].period 
         });
     });
 });
