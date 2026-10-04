@@ -7,100 +7,89 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
-        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; padding: 10px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
-        .app-container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); border-radius: 20px; padding: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); border: 2px solid #34d399; position: relative; overflow: hidden; backdrop-filter: blur(10px); }
-        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(52, 211, 153, 0.3); }
-        .back-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
-        .logo { font-size: 18px; font-weight: 800; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; font-style: italic; }
+        body { background: #0c101c; color: #fff; padding: 10px; display: flex; justify-content: center; }
+        .app-container { width: 100%; max-width: 450px; background: #121929; border-radius: 20px; padding: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #1e293b; }
+        .back-btn { background: #1e293b; border: 1px solid #2a3756; color: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; }
+        .logo { font-size: 18px; font-weight: 800; color: #00e676; text-transform: uppercase; font-style: italic; text-shadow: 0 0 10px rgba(0,230,118,0.4); }
         .wallet-badge-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .wallet-badge { background: linear-gradient(135deg, #1e1b4b, #064e3b); border: 1px solid #34d399; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 12px; }
+        .wallet-badge { background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #00e676; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: #00e676; font-size: 12px; }
         .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
-        .tab-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 10px 5px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
-        .tab-btn.active { background: linear-gradient(135deg, #a855f7, #10b981); color: #fff; border-color: #34d399; }
-        .timer-board { background: linear-gradient(135deg, #a855f7, #10b981); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
-        .board-left p { font-size: 11px; opacity: 0.9; text-transform: uppercase; font-weight: bold; color: #fff; }
-        .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; color: #fff; }
-        .timer-clock { background: #fff; color: #10b981; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; }
+        .tab-btn { flex: 1; background: #1a233a; border: 1px solid #2a3756; color: #94a3b8; padding: 10px 5px; border-radius: 12px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .tab-btn.active { background: linear-gradient(135deg, #00c853, #00e676); color: #fff; border-color: #00e676; }
+        .timer-board { background: linear-gradient(135deg, #00c853, #009624); border-radius: 16px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .board-left p { font-size: 11px; opacity: 0.9; text-transform: uppercase; font-weight: bold; }
+        .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.2); padding: 2px 8px; border-radius: 10px; display: inline-block; }
+        .timer-clock { background: #fff; color: #00c853; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; }
         .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .btn-green { background: linear-gradient(180deg, #34d399 0%, #059669 100%); box-shadow: 0 6px 0 #047857; }
-        .btn-violet { background: linear-gradient(180deg, #c084fc 0%, #7c3aed 100%); box-shadow: 0 6px 0 #6d28d9; }
-        .btn-red { background: linear-gradient(180deg, #f87171 0%, #dc2626 100%); box-shadow: 0 6px 0 #b91c1c; }
-        .ball-container { background: rgba(30, 27, 75, 0.85); padding: 15px; border-radius: 16px; border: 1px solid #7c3aed; margin-bottom: 15px; }
+        .btn-green { background: linear-gradient(180deg, #2ecc71 0%, #1e8449 100%); box-shadow: 0 6px 0 #145a32; }
+        .btn-violet { background: linear-gradient(180deg, #a569bd 0%, #6c3483 100%); box-shadow: 0 6px 0 #4a235a; }
+        .btn-red { background: linear-gradient(180deg, #e74c3c 0%, #922b21 100%); box-shadow: 0 6px 0 #641e16; }
+        .ball-container { background: #1a233a; padding: 15px; border-radius: 16px; border: 1px solid #2a3756; margin-bottom: 15px; }
         .ball-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; justify-items: center; }
         .ball-3d { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; color: #fff; cursor: pointer; border: none; }
-        .ball-green { background: radial-gradient(circle at 30% 30%, #34d399, #059669 60%, #047857 100%); }
-        .ball-red { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626 60%, #b91c1c 100%); }
-        .ball-half { background: radial-gradient(circle at 30% 30%, #c084fc 0%, #7c3aed 45%, #059669 55%, #047857 100%); }
-        .ball-half-red { background: radial-gradient(circle at 30% 30%, #c084fc 0%, #7c3aed 45%, #dc2626 55%, #b91c1c 100%); }
+        .ball-green { background: radial-gradient(circle at 30% 30%, #58d68d, #1e8449 60%, #114b29 100%); }
+        .ball-red { background: radial-gradient(circle at 30% 30%, #ec7063, #b03a2e 60%, #641e16 100%); }
+        .ball-half { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #1e8449 55%, #114b29 100%); }
+        .ball-half-red { background: radial-gradient(circle at 30% 30%, #af7ac5 0%, #a569bd 45%, #b03a2e 55%, #641e16 100%); }
         .size-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-big { background: linear-gradient(180deg, #fbbf24 0%, #d97706 100%); box-shadow: 0 6px 0 #b45309; }
-        .btn-small { background: linear-gradient(180deg, #38bdf8 0%, #0284c7 100%); box-shadow: 0 6px 0 #0369a1; }
+        .btn-big { background: linear-gradient(180deg, #f39c12 0%, #b9770e 100%); box-shadow: 0 6px 0 #7e5109; }
+        .btn-small { background: linear-gradient(180deg, #3498db 0%, #21618c 100%); box-shadow: 0 6px 0 #154360; }
         
-        .floating-admin-btn { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 20px; 
-            background: #dc2626; 
-            color: #fff; 
-            border: none; 
-            width: 55px; 
-            height: 55px; 
-            border-radius: 50%; 
-            font-weight: bold; 
-            cursor: pointer; 
-            z-index: 9999; 
-            box-shadow: 0 5px 20px rgba(220,38,38,0.6); 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 20px;
-            touch-action: none;
-        }
+        .floating-admin-btn { position: fixed; bottom: 30px; right: 20px; background: #dc2626; color: #fff; border: none; width: 55px; height: 55px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 5px 20px rgba(220,38,38,0.6); display: none; align-items: center; justify-content: center; font-size: 20px; touch-action: none; }
+        .floating-admin-popup { position: fixed; top: 50px; left: 20px; width: 90%; max-width: 380px; background: #1a233a; border: 2px solid #dc2626; border-radius: 16px; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; }
+        .popup-header { background: #dc2626; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
+        .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; }
 
-        .floating-admin-popup { position: fixed; top: 50px; left: 20px; width: 90%; max-width: 380px; background: rgba(30, 27, 75, 0.95); border: 2px solid #34d399; border-radius: 16px; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; backdrop-filter: blur(10px); }
-        .popup-header { background: linear-gradient(135deg, #a855f7, #10b981); color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
-        .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; color: #a7f3d0; }
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 15, 25, 0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; }
+        .count-card { font-size: 110px; font-weight: 900; color: #00e676; background: rgba(255,255,255,0.05); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid rgba(0,230,118,0.3); }
+        
+        .bet-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; display: none; justify-content: flex-end; flex-direction: column; }
+        .bet-modal { width: 100%; background: #1a233a; border-radius: 25px 25px 0 0; padding: 20px; border-top: 2px solid #00e676; transform: translateY(100%); transition: transform 0.3s ease; }
+        .bet-modal-overlay.active { display: flex; }
+        .bet-modal-overlay.active .bet-modal { transform: translateY(0); }
 
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.92); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(5px); }
-        .count-card { font-size: 110px; font-weight: 900; color: #34d399; background: rgba(255,255,255,0.05); width: 180px; height: 180px; display: flex; justify-content: center; align-items: center; border-radius: 25px; border: 2px solid rgba(52, 211, 153, 0.3); }
-        .bet-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: rgba(30, 27, 75, 0.95); border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; transition: bottom 0.3s; border-top: 2px solid #34d399; backdrop-filter: blur(15px); }
-        .bet-modal.active { bottom: 0; }
-        .modal-header { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 15px; color: #34d399; text-transform: uppercase; }
+        .modal-header { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 15px; color: #00e676; text-transform: uppercase; }
         .chip-selector, .multiplier-selector { display: flex; gap: 8px; margin-bottom: 12px; }
-        .chip-btn, .mult-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; }
-        .chip-btn.active, .mult-btn.active { background: #34d399; color: #0f172a; border-color: #34d399; }
+        .chip-btn, .mult-btn { flex: 1; background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; }
+        .chip-btn.active, .mult-btn.active { background: #00e676; color: #000; }
         .qty-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; }
-        .qty-btn { background: #7c3aed; color: #fff; border: none; width: 35px; height: 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .qty-input { width: 60px; text-align: center; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px; border-radius: 8px; font-weight: bold; }
+        .qty-btn { background: #2a3756; color: #fff; border: none; width: 35px; height: 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .qty-input { width: 60px; text-align: center; background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 6px; border-radius: 8px; font-weight: bold; }
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-confirm { flex: 2; background: linear-gradient(135deg, #a855f7, #10b981); border: none; padding: 12px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; }
-        .btn-cancel { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; border-radius: 10px; color: #a7f3d0; font-weight: bold; cursor: pointer; }
+        .btn-confirm { flex: 2; background: linear-gradient(135deg, #00c853, #00e676); border: none; padding: 12px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; }
+        .btn-cancel { flex: 1; background: #2a3756; border: none; padding: 12px; border-radius: 10px; color: #aaa; font-weight: bold; cursor: pointer; }
         
-        .history-card { background: rgba(30, 27, 75, 0.85); border-radius: 16px; padding: 12px; border: 1px solid #7c3aed; margin-top: 15px; backdrop-filter: blur(10px); }
+        .history-card { background: #1a233a; border-radius: 16px; padding: 12px; border: 1px solid #2a3756; margin-top: 15px; }
         .history-toggle-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .history-toggle-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
-        .history-toggle-btn.active { background: #7c3aed; color: #fff; border-color: #34d399; }
-        .history-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; color: #d1fae5; }
-        .history-table th { color: #a7f3d0; padding: 8px; border-bottom: 1px solid rgba(124, 58, 237, 0.4); }
+        .history-toggle-btn { flex: 1; background: #0c101c; border: 1px solid #2a3756; color: #94a3b8; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .history-toggle-btn.active { background: #2a3756; color: #00e676; border-color: #00e676; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
+        .history-table th { color: #64748b; padding: 8px; border-bottom: 1px solid #2a3756; }
         .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 2px; }
-        .pagination-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(124, 58, 237, 0.4); }
-        .page-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .pagination-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #2a3756; }
+        .page-btn { background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
         .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .notification-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #34d399; color: #0f172a; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 20000; transition: transform 0.3s ease; box-shadow: 0 5px 15px rgba(52,211,153,0.4); }
+        .notification-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #00e676; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 20000; transition: transform 0.3s ease; box-shadow: 0 5px 15px rgba(0,230,118,0.4); }
         .notification-toast.show { transform: translateX(-50%) translateY(0); }
 
-        .result-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 30000; backdrop-filter: blur(5px); }
-        .result-popup-box { width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popScale 0.3s ease; }
-        .result-popup-box.win { background: linear-gradient(135deg, #10b981, #059669); border: 2px solid #34d399; }
-        .result-popup-box.loss { background: linear-gradient(135deg, #475569, #1e293b); border: 2px solid #64748b; }
+        /* Updated Result Popup Styles: Win matches Color Game, Loss uses Bright Orange */
+        .result-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(12, 16, 28, 0.85); display: none; justify-content: center; align-items: center; z-index: 30000; backdrop-filter: blur(4px); }
+        .result-popup-box { width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; color: #fff; box-shadow: 0 15px 35px rgba(0,0,0,0.8); animation: popScale 0.3s ease; }
+        .result-popup-box.win { background: linear-gradient(135deg, #121929, #1a233a); border: 2px solid #00e676; }
+        .result-popup-box.loss { background: linear-gradient(135deg, #121929, #1a233a); border: 2px solid #ff9800; }
         @keyframes popScale { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
         .result-title { font-size: 26px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
-        .result-details { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px; font-size: 13px; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-        .result-row-item { display: flex; justify-content: space-between; align-items: center; }
-        .result-close-btn { background: #fff; color: #0f172a; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; }
+        .result-popup-box.win .result-title { color: #00e676; text-shadow: 0 0 12px rgba(0,230,118,0.4); }
+        .result-popup-box.loss .result-title { color: #ff9800; text-shadow: 0 0 12px rgba(255,152,0,0.4); }
+        .result-details { background: #0c101c; border: 1px solid #2a3756; border-radius: 12px; padding: 12px; font-size: 13px; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .result-row-item { display: flex; justify-content: space-between; align-items: center; color: #94a3b8; }
+        .result-row-item strong { color: #fff; }
+        .result-close-btn { background: linear-gradient(135deg, #00c853, #00e676); color: #000; border: none; padding: 12px 25px; border-radius: 14px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; box-shadow: 0 4px 15px rgba(0,230,118,0.3); }
+        .result-popup-box.loss .result-close-btn { background: linear-gradient(135deg, #f57c00, #ff9800); color: #fff; box-shadow: 0 4px 15px rgba(255,152,0,0.3); }
     </style>
 </head>
 <body>
@@ -128,10 +117,10 @@
         <span onclick="toggleAdminPopup()" style="cursor: pointer; font-size: 16px;">✖</span>
     </div>
     <div class="popup-body">
-        <div id="adminBetsOverview" style="margin-bottom: 15px; color: #a7f3d0;">Loading bets summary...</div>
+        <div id="adminBetsOverview" style="margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
         <div style="margin-bottom: 10px;">
-            <label style="font-size: 11px; display: block; margin-bottom: 5px; color: #d1fae5;">Force Winning Number (0-9):</label>
-            <select id="rigNumberSelect" style="width: 100%; padding: 8px; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; border-radius: 6px; margin-bottom: 8px;">
+            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Force Winning Number (0-9):</label>
+            <select id="rigNumberSelect" style="width: 100%; padding: 8px; background: #0c101c; border: 1px solid #2a3756; color: #fff; border-radius: 6px; margin-bottom: 8px;">
                 <option value="0">Number 0 (Violet)</option>
                 <option value="1">Number 1 (Green)</option>
                 <option value="2">Number 2 (Red)</option>
@@ -144,7 +133,7 @@
                 <option value="9">Number 9 (Green)</option>
             </select>
         </div>
-        <button onclick="submitRiggedResult()" style="width:100%; background:linear-gradient(135deg, #a855f7, #10b981); border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer; color:#fff;">Set Rigged Result</button>
+        <button onclick="submitRiggedResult()" style="width:100%; background:#00e676; border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer; color:#000;">Set Rigged Result</button>
     </div>
 </div>
 
@@ -158,7 +147,7 @@
         <div class="logo">RewardZone</div>
         <div class="wallet-badge-container">
             <div class="wallet-badge" id="userWallet">Total: ₹ 0.00</div>
-            <div style="font-size: 10px; color: #a7f3d0;" id="subWalletInfo">Dep: ₹0 | Win: ₹0</div>
+            <div style="font-size: 10px; color: #94a3b8;" id="subWalletInfo">Dep: ₹0 | Win: ₹0</div>
         </div>
     </div>
 
@@ -221,40 +210,42 @@
         </table>
         <div class="pagination-row">
             <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">Previous</button>
-            <span id="pageIndicator" style="font-size: 11px; color: #a7f3d0;">Page 1</span>
+            <span id="pageIndicator" style="font-size: 11px; color: #94a3b8;">Page 1</span>
             <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Next</button>
         </div>
     </div>
 </div>
 
-<div id="betModal" class="bet-modal">
-    <div class="modal-header" id="modalTitle">Select Bet</div>
-    <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px;">Base Amount</p>
-    <div class="chip-selector">
-        <div class="chip-btn active" onclick="selectBase(1)">₹1</div>
-        <div class="chip-btn" onclick="selectBase(10)">₹10</div>
-        <div class="chip-btn" onclick="selectBase(100)">₹100</div>
-        <div class="chip-btn" onclick="selectBase(1000)">₹1000</div>
-    </div>
-    <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px;">Multiplier</p>
-    <div class="multiplier-selector">
-        <div class="mult-btn active" onclick="selectMult(1)">X1</div>
-        <div class="mult-btn" onclick="selectMult(5)">X5</div>
-        <div class="mult-btn" onclick="selectMult(10)">X10</div>
-        <div class="mult-btn" onclick="selectMult(20)">X20</div>
-        <div class="mult-btn" onclick="selectMult(50)">X50</div>
-    </div>
-    <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty(-1)">-</button>
-        <input type="number" class="qty-input" id="betQty" value="1" readonly>
-        <button class="qty-btn" onclick="changeQty(1)">+</button>
-    </div>
-    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; color: #d1fae5;">
-        Total Amount: <span id="totalBetCalc" style="color: #34d399;">₹ 1.00</span>
-    </div>
-    <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeBetModal()">Cancel</button>
-        <button class="btn-confirm" onclick="submitBet()">Confirm Bet</button>
+<div id="betModalOverlay" class="bet-modal-overlay" onclick="handleOutsideClick(event)">
+    <div id="betModal" class="bet-modal">
+        <div class="modal-header" id="modalTitle">Select Bet</div>
+        <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Base Amount</p>
+        <div class="chip-selector">
+            <div class="chip-btn active" onclick="selectBase(1)">₹1</div>
+            <div class="chip-btn" onclick="selectBase(10)">₹10</div>
+            <div class="chip-btn" onclick="selectBase(100)">₹100</div>
+            <div class="chip-btn" onclick="selectBase(1000)">₹1000</div>
+        </div>
+        <p style="font-size: 11px; color: #888; margin-bottom: 5px;">Multiplier</p>
+        <div class="multiplier-selector">
+            <div class="mult-btn active" onclick="selectMult(1)">X1</div>
+            <div class="mult-btn" onclick="selectMult(5)">X5</div>
+            <div class="mult-btn" onclick="selectMult(10)">X10</div>
+            <div class="mult-btn" onclick="selectMult(20)">X20</div>
+            <div class="mult-btn" onclick="selectMult(50)">X50</div>
+        </div>
+        <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">-</button>
+            <input type="number" class="qty-input" id="betQty" value="1" readonly>
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <div style="text-align: center; font-weight: bold; margin-bottom: 10px;">
+            Total Amount: <span id="totalBetCalc" style="color: #00e676;">₹ 1.00</span>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeBetModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitBet()">Confirm Bet</button>
+        </div>
     </div>
 </div>
 
@@ -373,13 +364,13 @@
                 document.getElementById('resPopupTitle').innerText = 'WIN';
                 document.getElementById('resAmountLabel').innerText = 'Winning Amount:';
                 document.getElementById('resAmount').innerText = `₹ ${data.payout.toFixed(2)}`;
-                document.getElementById('resAmount').style.color = '#fff';
+                document.getElementById('resAmount').style.color = '#00e676';
             } else {
                 popupBox.className = 'result-popup-box loss';
                 document.getElementById('resPopupTitle').innerText = 'LOSS';
                 document.getElementById('resAmountLabel').innerText = 'Loss Amount:';
                 document.getElementById('resAmount').innerText = `₹ ${data.amount.toFixed(2)}`;
-                document.getElementById('resAmount').style.color = '#ff4d4d';
+                document.getElementById('resAmount').style.color = '#ff9800';
             }
             popupOverlay.style.display = 'flex';
         }
@@ -394,11 +385,20 @@
         activeBetType = type;
         activeBetValue = val;
         document.getElementById('modalTitle').innerText = `Select ${val.toUpperCase()}`;
-        document.getElementById('betModal').classList.add('active');
+        document.getElementById('betModalOverlay').classList.add('active');
         calcTotal();
     }
 
-    function closeBetModal() { document.getElementById('betModal').classList.remove('active'); }
+    function closeBetModal() { 
+        document.getElementById('betModalOverlay').classList.remove('active'); 
+    }
+
+    function handleOutsideClick(event) {
+        if (event.target.id === 'betModalOverlay') {
+            closeBetModal();
+        }
+    }
+
     function selectBase(amt) { baseAmount = amt; document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
     function selectMult(m) { multiplier = m; document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
     function changeQty(val) { quantity = Math.max(1, quantity + val); document.getElementById('betQty').value = quantity; calcTotal(); }
@@ -460,7 +460,7 @@
                         const tbody = document.getElementById('historyBody');
                         tbody.innerHTML = '';
                         data.history.forEach(item => {
-                            let dotColor = item.color === 'green' ? '#34d399' : (item.color === 'red' ? '#f87171' : '#c084fc');
+                            let dotColor = item.color === 'green' ? '#2ecc71' : (item.color === 'red' ? '#e74c3c' : '#a569bd');
                             tbody.innerHTML += `<tr>
                                 <td>${item.period.slice(-6)}</td>
                                 <td style="font-weight:bold; color:${dotColor};">${item.number}</td>
@@ -490,7 +490,7 @@
                         const tbody = document.getElementById('historyBody');
                         tbody.innerHTML = '';
                         data.bets.forEach(bet => {
-                            let statusColor = bet.status === 'win' ? '#34d399' : (bet.status === 'loss' ? '#f87171' : '#fbbf24');
+                            let statusColor = bet.status === 'win' ? '#00e676' : (bet.status === 'loss' ? '#ff9800' : '#f39c12');
                             let statusText = bet.status === 'win' ? `+₹${bet.payout}` : (bet.status === 'loss' ? `-₹${bet.amount}` : 'Pending');
                             tbody.innerHTML += `<tr>
                                 <td>${bet.period.slice(-6)}</td>
