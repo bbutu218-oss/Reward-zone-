@@ -184,7 +184,7 @@ app.post('/api/register', async (req, res) => {
             password, 
             balance: 5, 
             winningsBalance: 0,
-            rewardCoins: 0,
+            rewardCoins: 500,
             referredBy: refUid || null 
         });
 
