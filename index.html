@@ -22,10 +22,13 @@
         .action-btn:hover { opacity: 0.9; }
         
         .profile-top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 12px; border: 1px solid #334155; }
-        .avatar-box { width: 80px; height: 80px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #38bdf8; cursor: pointer; }
+        .avatar-box { width: 80px; height: 80px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #38bdf8; }
         .profile-right-col { flex: 1; display: flex; flex-direction: column; gap: 8px; }
         .profile-info-row label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 2px; }
         .profile-info-row input { width: 100%; background: #121824; border: 1px solid #334155; border-radius: 6px; padding: 8px 10px; color: white; font-size: 13px; outline: none; }
+        .uid-row { display: flex; gap: 6px; align-items: center; }
+        .copy-uid-btn { background: #38bdf8; color: #0f172a; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; }
+        
         .profile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
         .profile-square-btn { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px 15px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 110px; }
         .square-icon { font-size: 26px; margin-bottom: 8px; }
@@ -118,11 +121,18 @@
             <div class="profile-right-col">
                 <div class="profile-info-row">
                     <label>Unique UID</label>
-                    <input type="text" id="profileUidDisplay" disabled>
+                    <div class="uid-row">
+                        <input type="text" id="profileUidDisplay" disabled style="flex:1;">
+                        <button class="copy-uid-btn" onclick="copyUidText()">Copy</button>
+                    </div>
                 </div>
                 <div class="profile-info-row">
                     <label>Username</label>
-                    <input type="text" id="profileUsernameInput">
+                    <input type="text" id="profileUsernameInput" disabled>
+                </div>
+                <div class="profile-info-row">
+                    <label>Winnings Balance (Withdrawable)</label>
+                    <input type="text" id="profileWinningsDisplay" disabled style="color: #2ecc71; font-weight: bold;">
                 </div>
             </div>
         </div>
@@ -383,11 +393,12 @@
     function updateDashboardUI() {
         if(!currentUser) return;
         document.getElementById('userwallet').innerText = currentUser.rewardCoins || 0;
-        document.getElementById('usermoney').innerText = currentUser.balance || 0;
+        document.getElementById('usermoney').innerText = (currentUser.balance || 0) + (currentUser.winningsBalance || 0);
         document.getElementById('profileUserwallet').innerText = currentUser.rewardCoins || 0;
-        document.getElementById('profileUsermoney').innerText = currentUser.balance || 0;
-        document.getElementById('profileUidDisplay').value = currentUser.uid || 'UID-102938';
+        document.getElementById('profileUsermoney').innerText = (currentUser.balance || 0) + (currentUser.winningsBalance || 0);
+        document.getElementById('profileUidDisplay').value = currentUser.uid || '';
         document.getElementById('profileUsernameInput').value = currentUser.phone;
+        document.getElementById('profileWinningsDisplay').value = `₹ ${(currentUser.winningsBalance || 0).toFixed(2)}`;
 
         if (currentUser.phone === "8093361993") {
             document.getElementById('adminControlBtn').style.display = 'flex';
@@ -395,6 +406,12 @@
         } else {
             document.getElementById('qrUploadSection').style.display = 'none';
         }
+    }
+
+    function copyUidText() {
+        let uidVal = document.getElementById('profileUidDisplay').value;
+        navigator.clipboard.writeText(uidVal);
+        showToast('✅ UID copied to clipboard!');
     }
 
     function switchPage(pageId) {
@@ -405,7 +422,7 @@
     }
 
     function shareReferralLink() {
-        let uid = currentUser ? currentUser.uid : 'UID-000000';
+        let uid = currentUser ? currentUser.uid : '';
         let shareUrl = `${window.location.origin}/auth.html?ref=${uid}`;
         if (navigator.share) {
             navigator.share({ title: 'Reward Zone', text: 'Join Reward Zone and earn real rewards!', url: shareUrl }).catch(err => console.log(err));
