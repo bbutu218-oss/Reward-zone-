@@ -107,7 +107,7 @@ async function setupAdminAccount() {
                 password: adminPassword,
                 balance: 1000000,
                 winningsBalance: 500000,
-                rewardCoins: 50000
+                rewardCoins: 50050
             });
             await adminUser.save();
         } else {
