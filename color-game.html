@@ -196,7 +196,7 @@
     const socket = io();
     let user = JSON.parse(localStorage.getItem('user')) || JSON.parse(localStorage.getItem('rewards_loggedInUser'));
     let userId = user ? (user._id || user.userId) : null;
-    let balance = user ? (user.balance !== undefined ? user.balance : user.points) : 0;
+    let balance = user ? (user.winningsBalance !== undefined ? user.winningsBalance : (user.balance || 0)) : 0;
 
     if (user) document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
     if (user && (user.phone === "8093361993" || user.isAdmin)) {
@@ -272,7 +272,6 @@
 
     async function submitBet() {
         let finalAmount = baseAmount * multiplier * quantity;
-        if (finalAmount > balance) return alert('Insufficient Balance!');
         const period = document.getElementById('periodId').innerText;
         const response = await fetch('/api/bet', {
             method: 'POST',
@@ -281,7 +280,7 @@
         });
         const data = await response.json();
         if (data.success) {
-            balance = data.newBalance;
+            balance = data.newWinnings;
             document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
             closeBetModal();
         } else { alert(data.message); }
@@ -292,7 +291,7 @@
         const res = await fetch(`/api/user/${userId}`);
         const data = await res.json();
         if(data.success) {
-            balance = data.balance;
+            balance = data.winningsBalance;
             document.getElementById('userWallet').innerText = `₹ ${balance.toFixed(2)}`;
         }
     }
