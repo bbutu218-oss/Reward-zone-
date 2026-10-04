@@ -490,7 +490,8 @@ async function getGameOutcome(period, timerType) {
         override.used = true;
         await override.save();
     } else {
-        const hash = crypto.createHash('sha256').update(period + timerType).digest('hex');
+        const seed = period + "_" + timerType + "_yarwin_sync";
+        const hash = crypto.createHash('sha256').update(seed).digest('hex');
         randomNum = parseInt(hash.substring(0, 8), 16) % 10;
     }
 
@@ -506,24 +507,19 @@ async function processBetsForPeriod(period, timerType, outcome) {
     try {
         const pendingBets = await Bet.find({ period, timerType, status: 'pending' });
 
-        let totalPeriodBet = pendingBets.reduce((sum, b) => sum + b.amount, 0);
-        let forceLoss30s = (timerType === '30s' && totalPeriodBet > 50);
-
         for (const bet of pendingBets) {
             let isWin = false;
             let multiplier = 0;
 
-            if (!forceLoss30s) {
-                if (bet.betType === 'size' && bet.betValue === outcome.size) {
-                    isWin = true;
-                    multiplier = 1.9;
-                } else if (bet.betType === 'color' && bet.betValue === outcome.color) {
-                    isWin = true;
-                    multiplier = (outcome.color === 'violet' ? 2 : 1.9);
-                } else if (bet.betType === 'number' && Number(bet.betValue) === outcome.number) {
-                    isWin = true;
-                    multiplier = 9;
-                }
+            if (bet.betType === 'size' && bet.betValue === outcome.size) {
+                isWin = true;
+                multiplier = 1.9;
+            } else if (bet.betType === 'color' && bet.betValue === outcome.color) {
+                isWin = true;
+                multiplier = (outcome.color === 'violet' ? 2 : 1.9);
+            } else if (bet.betType === 'number' && Number(bet.betValue) === outcome.number) {
+                isWin = true;
+                multiplier = 9;
             }
 
             if (isWin) {
