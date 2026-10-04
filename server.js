@@ -136,11 +136,11 @@ async function initializePeriodCounters() {
                 const todayPrefix = `${year}${month}${day}`;
 
                 if (periodStr.startsWith(todayPrefix)) {
-                    // Extract the full counter suffix after the prefix
-                    let gamePrefixLength = todayPrefix.length + 1; // date + game code digit
+                    let gamePrefixLength = todayPrefix.length + 1; 
                     const counterVal = parseInt(periodStr.slice(gamePrefixLength));
                     if (!isNaN(counterVal)) {
-                        periodCounters[key] = counterVal;
+                        // -1 kiya taaki startup par generatePeriodCode() call hone par exact match ho
+                        periodCounters[key] = counterVal - 1;
                     }
                 }
             }
@@ -161,7 +161,6 @@ function generatePeriodCode(timerType) {
     if (!periodCounters[key]) periodCounters[key] = 50000;
     periodCounters[key]++;
     
-    // Exact Yarwin format: YYYYMMDD + GameTypeID + 5-digit Counter
     let gamePrefix = '1'; // 30s
     if (key === '1m') gamePrefix = '2'; // 60s
     if (timerType === '3m') gamePrefix = '3'; // 3m
