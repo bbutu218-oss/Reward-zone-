@@ -9,12 +9,30 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; padding: 10px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
         .app-container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #34d399; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
+        
         .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(52, 211, 153, 0.3); }
         .back-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
         .back-btn:hover { border-color: #34d399; }
-        .logo { font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; }
+        
+        /* Logo with left-to-right animation */
+        .logo { 
+            font-size: 18px; 
+            font-weight: 800; 
+            color: #ffffff; 
+            letter-spacing: 0.5px; 
+            background: linear-gradient(135deg, #c084fc, #34d399); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            text-transform: uppercase; 
+            animation: moveLogo 3s ease-in-out infinite alternate;
+        }
+        @keyframes moveLogo {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(12px); }
+        }
+
         .wallet-badge-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .wallet-badge { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; padding: 6px 14px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 12px; box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2); }
+        .wallet-badge { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; padding: 6px 12px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 13px; box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2); }
         
         .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
         .tab-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
@@ -25,8 +43,11 @@
         .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 8px; display: inline-block; color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
         .timer-clock { background: rgba(15, 23, 42, 0.9); color: #34d399; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; border: 1px solid #7c3aed; }
         
+        /* Betting Area Wrapper & Transparent Lock Overlay */
         .betting-area-wrapper { position: relative; }
-        
+        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(3px); border-radius: 14px; }
+        .count-card { font-size: 70px; font-weight: 900; color: #34d399; background: rgba(30,27,75,0.8); width: 130px; height: 130px; display: flex; justify-content: center; align-items: center; border-radius: 20px; border: 2px solid #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.4); }
+
         .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
         .btn-green { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 4px 12px rgba(16,185,129,0.3); border: 1px solid #34d399; }
@@ -56,10 +77,6 @@
         .popup-header { background: #064e3b; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #34d399; }
         .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; color: #d1fae5; }
 
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.75); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(3px); border-radius: 14px; }
-        .count-card { font-size: 70px; font-weight: 900; color: #34d399; background: rgba(30,27,75,0.9); width: 120px; height: 120px; display: flex; justify-content: center; align-items: center; border-radius: 20px; border: 2px solid #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.3); }
-        
-        /* Modal Backdrop Overlay for Outside Clicks */
         .bet-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999; display: none; backdrop-filter: blur(3px); }
         .bet-modal-overlay.active { display: block; }
 
@@ -176,6 +193,7 @@
         <div class="timer-clock" id="countdown">00:30</div>
     </div>
 
+    <!-- Betting Area Wrapper with Transparent Lock Overlay -->
     <div class="betting-area-wrapper">
         <div id="lockOverlay" class="lock-overlay">
             <div class="count-card" id="lockNum">5</div>
