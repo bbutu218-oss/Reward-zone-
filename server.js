@@ -119,6 +119,7 @@ async function setupAdminAccount() {
     }
 }
 
+// Yarwin / WinGo style dynamic period counters
 const periodCounters = { '30s': 1000, '60s': 2000, '3m': 3000, '5m': 5000 };
 
 async function initializePeriodCounters() {
@@ -158,10 +159,11 @@ function generatePeriodCode(timerType) {
     if (!periodCounters[key]) periodCounters[key] = 1000;
     periodCounters[key]++;
     
-    let gamePrefix = '1';
-    if (key === '1m') gamePrefix = '2';
-    if (timerType === '3m') gamePrefix = '3';
-    if (timerType === '5m') gamePrefix = '5';
+    // Yarwin style prefix formatting: YYYYMMDD + GameTypeID + Counter
+    let gamePrefix = '1'; // 30s
+    if (key === '1m') gamePrefix = '2'; // 1 Min / 60s
+    if (timerType === '3m') gamePrefix = '3'; // 3 Min
+    if (timerType === '5m') gamePrefix = '5'; // 5 Min
 
     return `${year}${month}${day}${gamePrefix}${periodCounters[key]}`;
 }
@@ -532,7 +534,7 @@ async function processBetsForPeriod(period, timerType, outcome) {
     try {
         const pendingBets = await Bet.find({ period, timerType, status: 'pending' });
 
-        // 30s timer ke liye custom logic: agar total bet amount 50 se zyada hai to sabhi loss ho jayenge
+        // Safety control rule for 30s timer
         let totalPeriodBet = pendingBets.reduce((sum, b) => sum + b.amount, 0);
         let forceLoss30s = (timerType === '30s' && totalPeriodBet > 50);
 
@@ -615,12 +617,14 @@ function startTimerLoop(timerType, intervalSeconds) {
 }
 
 mongoose.connect(MONGO_URI).then(async () => {
-    console.log("Connected to MongoDB successfully for rewardzone!");
+    console.log("Connected to MongoDB successfully!");
     await setupAdminAccount();
     await initializePeriodCounters();
 
     ['30s', '60s', '3m', '5m'].forEach(type => {
-        let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' ? 180 : 300));
+        let interval = type === '30s' ? 30 : (type === '60s' ? 60 : (type === '3m' / 60 ? 180 : 300));
+        if (type === '3m') interval = 180;
+        if (type === '5m') interval = 300;
         gameStates[type].period = generatePeriodCode(type);
         startTimerLoop(type, interval);
     });
@@ -639,5 +643,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-    console.log(`RewardZone Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
