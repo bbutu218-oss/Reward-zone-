@@ -56,14 +56,52 @@
         .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-confirm { flex: 2; background: linear-gradient(135deg, #00c853, #00e676); border: none; padding: 12px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; }
         .btn-cancel { flex: 1; background: #2a3756; border: none; padding: 12px; border-radius: 10px; color: #aaa; font-weight: bold; cursor: pointer; }
+        
+        /* History Section & Toggle Buttons */
         .history-card { background: #1a233a; border-radius: 16px; padding: 12px; border: 1px solid #2a3756; margin-top: 15px; }
+        .history-toggle-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .history-toggle-btn { flex: 1; background: #0c101c; border: 1px solid #2a3756; color: #94a3b8; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
+        .history-toggle-btn.active { background: #2a3756; color: #00e676; border-color: #00e676; }
         .history-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
         .history-table th { color: #64748b; padding: 8px; border-bottom: 1px solid #2a3756; }
         .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 2px; }
+        .pagination-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #2a3756; }
+        .page-btn { background: #0c101c; border: 1px solid #2a3756; color: #fff; padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
+        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+        /* Notification Toast */
+        .notification-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #00e676; color: #000; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 20000; transition: transform 0.3s ease; box-shadow: 0 5px 15px rgba(0,230,118,0.4); }
+        .notification-toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Win/Loss Popup Modal */
+        .result-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 30000; }
+        .result-popup-box { width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popScale 0.3s ease; }
+        .result-popup-box.win { background: linear-gradient(135deg, #f39c12, #d35400); border: 2px solid #f1c40f; }
+        .result-popup-box.loss { background: linear-gradient(135deg, #7f8c8d, #34495e); border: 2px solid #bdc3c7; }
+        @keyframes popScale { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .result-title { font-size: 26px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
+        .result-details { background: rgba(0,0,0,0.25); border-radius: 12px; padding: 12px; font-size: 13px; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+        .result-row-item { display: flex; justify-content: space-between; align-items: center; }
+        .result-close-btn { background: #fff; color: #333; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; }
     </style>
 </head>
 <body>
+
+<div id="notificationToast" class="notification-toast">Bet placed successfully!</div>
+
+<div id="resultPopupOverlay" class="result-popup-overlay">
+    <div id="resultPopupBox" class="result-popup-box">
+        <div class="result-title" id="resPopupTitle">WIN</div>
+        <div class="result-details" id="resPopupDetails">
+            <div class="result-row-item"><span>Period:</span> <strong id="resPeriod">---</strong></div>
+            <div class="result-row-item"><span>Size:</span> <strong id="resSize" style="text-transform: uppercase;">---</strong></div>
+            <div class="result-row-item"><span>Color / Number:</span> <strong id="resColorNum">---</strong></div>
+            <div class="result-row-item"><span id="resAmountLabel">Winning Amount:</span> <strong id="resAmount" style="color: #fff;">₹0.00</strong></div>
+        </div>
+        <button class="result-close-btn" onclick="closeResultPopup()">OK</button>
+    </div>
+</div>
 
 <button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡️ Admin Control</button>
 
@@ -149,9 +187,13 @@
     </div>
 
     <div class="history-card">
+        <div class="history-toggle-row">
+            <div class="history-toggle-btn active" id="toggleHistBtn" onclick="switchHistoryTab('history')">History</div>
+            <div class="history-toggle-btn" id="toggleMyHistBtn" onclick="switchHistoryTab('myhistory')">My History</div>
+        </div>
         <table class="history-table">
             <thead>
-                <tr>
+                <tr id="historyTableHeader">
                     <th>Period</th>
                     <th>Number</th>
                     <th>Big/Small</th>
@@ -160,6 +202,11 @@
             </thead>
             <tbody id="historyBody"></tbody>
         </table>
+        <div class="pagination-row">
+            <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">Previous</button>
+            <span id="pageIndicator" style="font-size: 11px; color: #94a3b8;">Page 1</span>
+            <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Next</button>
+        </div>
     </div>
 </div>
 
@@ -203,6 +250,9 @@
 
     let depositBal = 0;
     let winningsBal = 0;
+    let currentHistoryTab = 'history'; // 'history' or 'myhistory'
+    let currentPage = 1;
+    let totalPages = 1;
 
     async function fetchUserData() {
         if (!loggedInMobile && !userId) return;
@@ -236,9 +286,10 @@
     function switchTimer(type, seconds) {
         currentTimerType = type;
         timeLeft = seconds;
+        currentPage = 1;
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
         document.getElementById(`tab-${type}`).classList.add('active');
-        fetchHistory();
+        loadHistoryData();
         if(document.getElementById('floatingAdminPopup').style.display === 'block') {
             loadAdminBetsSummary();
         }
@@ -269,13 +320,56 @@
             }
         });
 
-        socket.on(`gameResult_${type}`, () => {
+        socket.on(`gameResult_${type}`, (resultData) => {
             if (currentTimerType === type) {
-                fetchHistory();
+                loadHistoryData();
                 fetchUserData();
+                checkUserRoundResult(resultData.period);
             }
         });
     });
+
+    function showNotification(msg) {
+        const toast = document.getElementById('notificationToast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    async function checkUserRoundResult(period) {
+        if (!userId) return;
+        let res = await fetch(`/api/user-round-result?userId=${userId}&period=${period}&timerType=${currentTimerType}`).then(r => r.json());
+        if (res.success && res.hasBet) {
+            let data = res.betData;
+            const popupOverlay = document.getElementById('resultPopupOverlay');
+            const popupBox = document.getElementById('resultPopupBox');
+            
+            document.getElementById('resPeriod').innerText = period.slice(-6);
+            document.getElementById('resSize').innerText = data.size || '---';
+            document.getElementById('resColorNum').innerText = `Num: ${data.number} (${data.color})`;
+
+            if (data.status === 'win') {
+                popupBox.className = 'result-popup-box win';
+                document.getElementById('resPopupTitle').innerText = 'WIN';
+                document.getElementById('resAmountLabel').innerText = 'Winning Amount:';
+                document.getElementById('resAmount').innerText = `₹ ${data.payout.toFixed(2)}`;
+                document.getElementById('resAmount').style.color = '#fff';
+            } else {
+                popupBox.className = 'result-popup-box loss';
+                document.getElementById('resPopupTitle').innerText = 'LOSS';
+                document.getElementById('resAmountLabel').innerText = 'Loss Amount:';
+                document.getElementById('resAmount').innerText = `₹ ${data.amount.toFixed(2)}`;
+                document.getElementById('resAmount').style.color = '#ff4d4d';
+            }
+            popupOverlay.style.display = 'flex';
+        }
+    }
+
+    function closeResultPopup() {
+        document.getElementById('resultPopupOverlay').style.display = 'none';
+    }
 
     function openBetModal(type, val) {
         if (timeLeft <= 5) return alert('Betting closed for this round!');
@@ -308,27 +402,88 @@
             document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
             document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
             closeBetModal();
+            showNotification('Bet successfully added!');
+            if (currentHistoryTab === 'myhistory') loadHistoryData();
         } else { alert(data.message); }
     }
 
-    function fetchHistory() {
-        fetch(`/api/game-history/${currentTimerType}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && data.history) {
-                    const tbody = document.getElementById('historyBody');
-                    tbody.innerHTML = '';
-                    data.history.forEach(item => {
-                        let dotColor = item.color === 'green' ? '#2ecc71' : (item.color === 'red' ? '#e74c3c' : '#a569bd');
-                        tbody.innerHTML += `<tr>
-                            <td>${item.period.slice(-6)}</td>
-                            <td style="font-weight:bold; color:${dotColor};">${item.number}</td>
-                            <td style="text-transform:uppercase;">${item.size}</td>
-                            <td><span class="dot" style="background:${dotColor}"></span></td>
-                        </tr>`;
-                    });
-                }
-            });
+    function switchHistoryTab(tab) {
+        currentHistoryTab = tab;
+        currentPage = 1;
+        document.getElementById('toggleHistBtn').classList.toggle('active', tab === 'history');
+        document.getElementById('toggleMyHistBtn').classList.toggle('active', tab === 'myhistory');
+        loadHistoryData();
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        loadHistoryData();
+    }
+
+    function loadHistoryData() {
+        if (currentHistoryTab === 'history') {
+            document.getElementById('historyTableHeader').innerHTML = `
+                <th>Period</th>
+                <th>Number</th>
+                <th>Big/Small</th>
+                <th>Color</th>
+            `;
+            fetch(`/api/game-history/${currentTimerType}?page=${currentPage}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.history) {
+                        totalPages = data.totalPages || 1;
+                        document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+                        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+                        const tbody = document.getElementById('historyBody');
+                        tbody.innerHTML = '';
+                        data.history.forEach(item => {
+                            let dotColor = item.color === 'green' ? '#2ecc71' : (item.color === 'red' ? '#e74c3c' : '#a569bd');
+                            tbody.innerHTML += `<tr>
+                                <td>${item.period.slice(-6)}</td>
+                                <td style="font-weight:bold; color:${dotColor};">${item.number}</td>
+                                <td style="text-transform:uppercase;">${item.size}</td>
+                                <td><span class="dot" style="background:${dotColor}"></span></td>
+                            </tr>`;
+                        });
+                    }
+                });
+        } else {
+            document.getElementById('historyTableHeader').innerHTML = `
+                <th>Period</th>
+                <th>Bet</th>
+                <th>Amount</th>
+                <th>Result</th>
+            `;
+            if (!userId) return;
+            fetch(`/api/user-bets/${userId}/${currentTimerType}?page=${currentPage}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.bets) {
+                        totalPages = data.totalPages || 1;
+                        document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+                        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+
+                        const tbody = document.getElementById('historyBody');
+                        tbody.innerHTML = '';
+                        data.bets.forEach(bet => {
+                            let statusColor = bet.status === 'win' ? '#00e676' : (bet.status === 'loss' ? '#ff4d4d' : '#f39c12');
+                            let statusText = bet.status === 'win' ? `+₹${bet.payout}` : (bet.status === 'loss' ? `-₹${bet.amount}` : 'Pending');
+                            tbody.innerHTML += `<tr>
+                                <td>${bet.period.slice(-6)}</td>
+                                <td style="text-transform:uppercase;">${bet.betValue}</td>
+                                <td>₹${bet.amount}</td>
+                                <td style="font-weight:bold; color:${statusColor}; text-transform:uppercase;">${statusText}</td>
+                            </tr>`;
+                        });
+                    }
+                });
+        }
     }
 
     function toggleAdminPopup() {
@@ -399,7 +554,7 @@
     }
     function dragEnd() { isDragging = false; }
 
-    fetchHistory();
+    loadHistoryData();
 </script>
 </body>
 </html>
