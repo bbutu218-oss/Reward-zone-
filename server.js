@@ -534,10 +534,7 @@ function startTimerLoop(timerType, intervalSeconds) {
     }, 1000);
 }
 
-mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(() => {
+mongoose.connect(MONGO_URI).then(() => {
     console.log("Connected to MongoDB successfully for rewardzone!");
     setupAdminAccount();
 
