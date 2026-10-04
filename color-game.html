@@ -37,7 +37,28 @@
         .btn-big { background: linear-gradient(180deg, #f39c12 0%, #b9770e 100%); box-shadow: 0 6px 0 #7e5109; }
         .btn-small { background: linear-gradient(180deg, #3498db 0%, #21618c 100%); box-shadow: 0 6px 0 #154360; }
         
-        .floating-admin-btn { position: fixed; bottom: 20px; right: 20px; background: #dc2626; color: #fff; border: none; padding: 12px 16px; border-radius: 30px; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: none; }
+        /* Draggable Floating Admin Button */
+        .floating-admin-btn { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 20px; 
+            background: #dc2626; 
+            color: #fff; 
+            border: none; 
+            width: 55px; 
+            height: 55px; 
+            border-radius: 50%; 
+            font-weight: bold; 
+            cursor: pointer; 
+            z-index: 9999; 
+            box-shadow: 0 5px 20px rgba(220,38,38,0.6); 
+            display: none; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px;
+            touch-action: none;
+        }
+
         .floating-admin-popup { position: fixed; top: 50px; left: 20px; width: 90%; max-width: 380px; background: #1a233a; border: 2px solid #dc2626; border-radius: 16px; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; }
         .popup-header { background: #dc2626; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; }
         .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; }
@@ -100,7 +121,8 @@
     </div>
 </div>
 
-<button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡 Admin Control</button>
+<!-- Draggable Circle Admin Button -->
+<button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡</button>
 
 <div class="floating-admin-popup" id="floatingAdminPopup">
     <div class="popup-header" id="popupHeader">
@@ -265,7 +287,7 @@
             document.getElementById('subWalletInfo').innerText = `Dep: ₹${depositBal.toFixed(2)} | Win: ₹${winningsBal.toFixed(2)}`;
             
             if (u.phone === "8093361993" || res.isAdmin) {
-                document.getElementById('floatingAdminBtn').style.display = 'block';
+                document.getElementById('floatingAdminBtn').style.display = 'flex';
             }
         }
     }
@@ -319,7 +341,7 @@
 
         socket.on(`gameResult_${type}`, (resultData) => {
             if (currentTimerType === type) {
-                currentPage = 1; // Auto reset to Page 1 on new result and auto-refresh table
+                currentPage = 1; 
                 loadHistoryData();
                 fetchUserData();
                 checkUserRoundResult(resultData.period);
@@ -522,24 +544,57 @@
         toggleAdminPopup();
     }
 
+    // Draggable functionality for both Floating Button and Admin Popup Header
+    const floatBtn = document.getElementById('floatingAdminBtn');
     const popup = document.getElementById('floatingAdminPopup');
     const header = document.getElementById('popupHeader');
+
     let isDragging = false, startX, startY, initialX, initialY;
 
-    header.addEventListener('mousedown', dragStart);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', dragEnd);
+    // Draggable Floating Button logic
+    floatBtn.addEventListener('mousedown', dragStartBtn);
+    document.addEventListener('mousemove', dragBtn);
+    document.addEventListener('mouseup', dragEndBtn);
 
-    header.addEventListener('touchstart', dragStart, {passive: true});
-    document.addEventListener('touchmove', drag, {passive: true});
-    document.addEventListener('touchend', dragEnd);
+    floatBtn.addEventListener('touchstart', dragStartBtn, {passive: true});
+    document.addEventListener('touchmove', dragBtn, {passive: true});
+    document.addEventListener('touchend', dragEndBtn);
 
-    function dragStart(e) {
+    function dragStartBtn(e) {
         initialX = e.clientX || e.touches[0].clientX;
         initialY = e.clientY || e.touches[0].clientY;
         isDragging = true;
     }
-    function drag(e) {
+    function dragBtn(e) {
+        if (!isDragging) return;
+        let currentX = e.clientX || e.touches[0].clientX;
+        let currentY = e.clientY || e.touches[0].clientY;
+        let dx = currentX - initialX;
+        let dy = currentY - initialY;
+        initialX = currentX;
+        initialY = currentY;
+        floatBtn.style.top = (floatBtn.offsetTop + dy) + "px";
+        floatBtn.style.left = (floatBtn.offsetLeft + dx) + "px";
+        floatBtn.style.bottom = 'auto';
+        floatBtn.style.right = 'auto';
+    }
+    function dragEndBtn() { isDragging = false; }
+
+    // Draggable Admin Popup Header logic
+    header.addEventListener('mousedown', dragStartPopup);
+    document.addEventListener('mousemove', dragPopup);
+    document.addEventListener('mouseup', dragEndPopup);
+
+    header.addEventListener('touchstart', dragStartPopup, {passive: true});
+    document.addEventListener('touchmove', dragPopup, {passive: true});
+    document.addEventListener('touchend', dragEndPopup);
+
+    function dragStartPopup(e) {
+        initialX = e.clientX || e.touches[0].clientX;
+        initialY = e.clientY || e.touches[0].clientY;
+        isDragging = true;
+    }
+    function dragPopup(e) {
         if (!isDragging) return;
         let currentX = e.clientX || e.touches[0].clientX;
         let currentY = e.clientY || e.touches[0].clientY;
@@ -550,7 +605,7 @@
         popup.style.top = (popup.offsetTop + dy) + "px";
         popup.style.left = (popup.offsetLeft + dx) + "px";
     }
-    function dragEnd() { isDragging = false; }
+    function dragEndPopup() { isDragging = false; }
 
     loadHistoryData();
 </script>
