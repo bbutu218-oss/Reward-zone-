@@ -348,9 +348,7 @@
         "UCO Bank", "Bank of Maharashtra", "Punjab & Sind Bank", "Federal Bank", "South Indian Bank", 
         "RBL Bank", "Bandhan Bank", "IDBI Bank", "Yes Bank", "Standard Chartered Bank", "Citibank", 
         "HSBC Bank", "DBS Bank", "AU Small Finance Bank", "Equitas Small Finance Bank", "Ujjivan Small Finance Bank",
-        "Paytm Payments Bank", "Airtel Payments Bank", "India Post Payments Bank", "Fino Payments Bank",
-        "Kerala State Cooperative Bank", "Maharashtra State Cooperative Bank", "The Saraswat Cooperative Bank",
-        "Cosmos Cooperative Bank", "Abhyudaya Cooperative Bank", "Janata Sahakari Bank", "Kalupur Commercial Cooperative Bank"
+        "Paytm Payments Bank", "Airtel Payments Bank", "India Post Payments Bank", "Fino Payments Bank"
     ];
     
     window.addEventListener('DOMContentLoaded', async () => {
@@ -360,12 +358,6 @@
             opt.value = b;
             listEl.appendChild(opt);
         });
-
-        for (let i = 1; i <= 1000; i++) {
-            let opt = document.createElement('option');
-            opt.value = `Regional & Cooperative Bank Branch #${i}`;
-            listEl.appendChild(opt);
-        }
 
         if (!loggedInMobile && !userId) {
             window.location.href = 'auth.html';
@@ -485,13 +477,21 @@
         switchPage('depositPage');
     }
 
-    function handleQrUpload(event) {
+    async function handleQrUpload(event) {
         let file = event.target.files[0];
         if (file) {
             let reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('depositQrImage').src = e.target.result;
-                showToast('✅ QR Code updated successfully!');
+            reader.onload = async function(e) {
+                let base64Image = e.target.result;
+                document.getElementById('depositQrImage').src = base64Image;
+                
+                let res = await fetch('/api/admin/save-qr', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageBase64: base64Image })
+                }).then(r => r.json());
+
+                showToast(res.message);
             }
             reader.readAsDataURL(file);
         }
