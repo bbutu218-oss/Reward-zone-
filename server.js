@@ -5,8 +5,6 @@ const { Server } = require('socket.io');
 const cors = require('cors');
 const dns = require('dns');
 const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
 
 try {
     dns.setServers(['8.8.8.8', '1.1.1.1']);
@@ -20,7 +18,7 @@ const io = new Server(server, {
     cors: { origin: "*", methods: ["GET", "POST"] }
 });
 
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json());
 app.use(cors());
 app.use(express.static(__dirname));
 
@@ -144,6 +142,7 @@ async function initializePeriodCounters() {
                 }
             }
         }
+        console.log("Period counters initialized successfully:", periodCounters);
     } catch (err) {
         console.error("Error initializing period counters:", err);
     }
@@ -231,22 +230,16 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
-app.post('/api/admin/save-qr', async (req, res) => {
+app.post('/api/reset-password', async (req, res) => {
     try {
-        const { imageBase64 } = req.body;
-        if (!imageBase64) {
-            return res.status(400).json({ success: false, message: "Image data missing!" });
-        }
-        
-        let base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
-        let filePath = path.join(__dirname, 'qr-code.png');
-        
-        fs.writeFile(filePath, base64Data, 'base64', (err) => {
-            if (err) {
-                return res.status(500).json({ success: false, message: "Failed to save QR code image." });
-            }
-            res.json({ success: true, message: "QR Code successfully updated for all users!" });
-        });
+        const { phone, newPassword } = req.body;
+        const user = await User.findOne({ phone });
+        if (!user) return res.status(404).json({ success: false, message: "User not found!" });
+
+        user.password = newPassword;
+        await user.save();
+
+        res.json({ success: true, message: "Password updated successfully!" });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -316,7 +309,7 @@ app.post('/api/withdraw', async (req, res) => {
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         if (user.password !== password) return res.status(400).json({ success: false, message: "Incorrect password!" });
         if (Number(amount) < 110) return res.status(400).json({ success: false, message: "Minimum withdrawal amount is ₹110!" });
-        if (user.winningsBalance < Number(amount)) return res.status(400).json({ success: false, message: "Insufficient winnings balance!" });
+        if (user.winningsBalance < Number(amount)) return res.status(400).json({ success: false, message: "Insufficient winnings balance! Deposit amount cannot be withdrawn directly." });
 
         user.winningsBalance -= Number(amount);
         await user.save();
@@ -387,6 +380,43 @@ app.post('/api/admin/action', async (req, res) => {
     }
 });
 
+app.post('/api/admin/set-result', async (req, res) => {
+    try {
+        const { period, number } = req.body;
+        await ManualOverride.findOneAndUpdate(
+            { period },
+            { number: Number(number), used: false },
+            { upsert: true, new: true }
+        );
+        res.json({ success: true, message: `Manual override set for period ${period}` });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/admin/bets-summary/:period', async (req, res) => {
+    try {
+        const { period } = req.params;
+        const bets = await Bet.find({ period });
+        let totalAmount = 0;
+        let breakdown = { big: 0, small: 0, green: 0, red: 0, violet: 0 };
+
+        bets.forEach(b => {
+            totalAmount += b.amount;
+            if (b.betType === 'size' || b.betType === 'color') {
+                breakdown[b.betValue] = (breakdown[b.betValue] || 0) + b.amount;
+            } else if (b.betType === 'number') {
+                let key = 'num_' + b.betValue;
+                breakdown[key] = (breakdown[key] || 0) + b.amount;
+            }
+        });
+
+        res.json({ success: true, totalAmount, breakdown });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 app.get('/api/game-history/:timerType', async (req, res) => {
     try {
         const { timerType } = req.params;
@@ -414,6 +444,31 @@ app.get('/api/user-bets/:userId/:timerType', async (req, res) => {
         const bets = await Bet.find({ userId, timerType }).sort({ createdAt: -1 }).skip(skip).limit(limit);
 
         res.json({ success: true, bets, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/user-round-result', async (req, res) => {
+    try {
+        const { userId, period, timerType } = req.query;
+        const bet = await Bet.findOne({ userId, period, timerType });
+        if (!bet) return res.json({ success: true, hasBet: false });
+
+        const gameRes = await GameResult.findOne({ period });
+        res.json({ 
+            success: true, 
+            hasBet: true, 
+            betData: {
+                status: bet.status,
+                amount: bet.amount,
+                payout: bet.payout,
+                betValue: bet.betValue,
+                number: gameRes ? gameRes.number : '?',
+                color: gameRes ? gameRes.color : '?',
+                size: gameRes ? gameRes.size : '?'
+            } 
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -576,7 +631,7 @@ io.on('connection', (socket) => {
     });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.500 || 5000;
 server.listen(PORT, () => {
     console.log(`RewardZone Server running on port ${PORT}`);
 });
