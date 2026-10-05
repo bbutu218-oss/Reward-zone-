@@ -422,7 +422,7 @@
         }
 
         await fetchUserData();
-        loadSavedQrCode();
+        await loadSavedQrCode();
 
         if (!sessionStorage.getItem('terms_accepted')) {
             let termsModal = document.getElementById('termsModal');
@@ -490,6 +490,7 @@
         if(targetPage) targetPage.classList.add('active');
         if (pageId === 'historyPage') loadHistoryData();
         if (pageId === 'adminPanelPage') loadAdminPanelData();
+        if (pageId === 'depositPage') loadSavedQrCode();
     }
 
     function shareReferralLink() {
@@ -547,11 +548,15 @@
         switchPage('depositPage');
     }
 
-    function loadSavedQrCode() {
-        let savedQr = localStorage.getItem('saved_custom_qr');
-        if(savedQr) {
-            let qrImg = document.getElementById('depositQrImage');
-            if(qrImg) qrImg.src = savedQr;
+    async function loadSavedQrCode() {
+        try {
+            let res = await fetch('/api/get-qr').then(r => r.json());
+            if (res.success && res.imageBase64) {
+                let qrImg = document.getElementById('depositQrImage');
+                if(qrImg) qrImg.src = res.imageBase64;
+            }
+        } catch(e) {
+            console.error("Failed to load server QR code", e);
         }
     }
 
@@ -578,19 +583,20 @@
     async function confirmAndSaveQr() {
         if (!temporarySelectedQrBase64) return;
 
-        localStorage.setItem('saved_custom_qr', temporarySelectedQrBase64);
-        
         let res = await fetch('/api/admin/save-qr', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ imageBase64: temporarySelectedQrBase64 })
-        }).then(r => r.json()).catch(() => ({ success: true, message: 'QR saved successfully!' }));
+        }).then(r => r.json()).catch(() => ({ success: false, message: 'Failed to save QR!' }));
 
         showToast(res.message || '✅ QR Code updated successfully by admin!');
         
-        // Hide action buttons after save
-        document.getElementById('adminQrActionBtns').style.display = 'none';
-        temporarySelectedQrBase64 = null;
+        if(res.success) {
+            // Hide action buttons after save
+            document.getElementById('adminQrActionBtns').style.display = 'none';
+            temporarySelectedQrBase64 = null;
+            loadSavedQrCode();
+        }
     }
 
     function cancelQrUpload() {
