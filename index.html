@@ -9,27 +9,28 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; }
-        .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow: hidden; }
+        .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: hidden; }
         .page { display: none; }
         .page.active { display: block; }
         
-        .brand-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; overflow: hidden; white-space: nowrap; position: relative; width: 100%; }
+        .brand-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; overflow: hidden; position: relative; width: 100%; padding: 5px 0; }
+        .auth-logo { width: 40px; height: 40px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); overflow: hidden; flex-shrink: 0; }
+        .auth-logo img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Nonstop Sliding Animation for Logo and Brand Title */
-        .sliding-brand-wrapper {
+        /* Moving Animation for Logo and Brand Title */
+        .moving-brand-wrapper {
             display: flex;
             align-items: center;
             gap: 10px;
-            animation: slideAnimation 6s linear infinite;
+            white-space: nowrap;
+            animation: moveLogoTitle 8s linear infinite;
+        }
+        
+        @keyframes moveLogoTitle {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        @keyframes slideAnimation {
-            0% { transform: translateX(100vw); }
-            100% { transform: translateX(-100vw); }
-        }
-
-        .auth-logo { width: 40px; height: 40px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); overflow: hidden; flex-shrink: 0; }
-        .auth-logo img { width: 100%; height: 100%; object-fit: cover; }
         .brand-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .top-balance-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 15px; }
@@ -92,7 +93,7 @@
 <div class="container">
     <div id="homePage" class="page active">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -125,7 +126,7 @@
 
     <div id="gamesHubPage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -143,7 +144,7 @@
 
     <div id="profilePage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -202,7 +203,7 @@
 
     <div id="depositPage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -245,7 +246,7 @@
 
     <div id="withdrawPage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -295,7 +296,7 @@
 
     <div id="historyPage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
@@ -318,7 +319,7 @@
 
     <div id="adminPanelPage" class="page">
         <div class="brand-header">
-            <div class="sliding-brand-wrapper">
+            <div class="moving-brand-wrapper">
                 <div class="auth-logo"><img src="logo_2.svg" alt="Logo"></div>
                 <div class="brand-title">Rewards Zone</div>
             </div>
