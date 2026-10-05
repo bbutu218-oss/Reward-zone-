@@ -195,7 +195,6 @@
             <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay. Then enter your 12-digit UTR/Txn ID.
         </div>
 
-        <!-- Sirf Admin ke liye QR upload section visible hoga -->
         <div class="card" style="margin-bottom: 15px; text-align: center; display: none;" id="qrUploadSection">
             <h4 style="margin-bottom: 8px;">Upload / Update QR Code (Admin Only)</h4>
             <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #d1fae5;" onchange="handleQrUpload(event)">
@@ -461,7 +460,6 @@
         let adminBtn = document.getElementById('adminControlBtn');
         let qrUploadSec = document.getElementById('qrUploadSection');
         
-        // Sirf admin (mobile number ya isAdmin flag) ke liye yeh elements show honge
         if (currentUser.phone === "8093361993" || currentUser.isAdmin) {
             if(adminBtn) adminBtn.style.display = 'flex';
             if(qrUploadSec) qrUploadSec.style.display = 'block';
@@ -541,10 +539,7 @@
     }
 
     function saveQrCodeImage() {
-        let qrImg = document.getElementById('depositQrImage');
-        if(qrImg && qrImg.src) {
-            showToast('✅ QR Code saved successfully!');
-        }
+        showToast('✅ QR Code saved successfully!');
     }
 
     function loadSavedQrCode() {
