@@ -13,7 +13,6 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        /* Updated Header Styles matching color-game.html */
         .brand-header { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; position: relative; width: 100%; padding: 5px 0; }
         .logo-ticker-container { width: 100%; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(52, 211, 153, 0.3); border-bottom: 1px solid rgba(52, 211, 153, 0.3); padding: 6px 0; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); text-align: center; }
         .logo-ticker { display: inline-block; font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; animation: marquee 8s linear infinite; }
@@ -728,8 +727,9 @@
         let html = '<h4 style="color:#34d399; margin-bottom:8px;">Deposit Records</h4>';
         if(globalHistoryData.deposits.length > 0) {
             globalHistoryData.deposits.forEach(d => {
-                let statusText = d.status === 'approved' ? 'complete' : d.status;
-                let statusColor = d.status === 'approved' ? '#22c55e' : '#eab308';
+                let rawStatus = (d.status || '').toLowerCase();
+                let statusText = (rawStatus === 'approved' || rawStatus === 'approve') ? 'complete' : rawStatus;
+                let statusColor = (rawStatus === 'approved' || rawStatus === 'approve') ? '#22c55e' : '#eab308';
                 html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${d.amount}</b> | TXN: ${d.transactionId} | Status: <b style="color:${statusColor}">${statusText.toUpperCase()}</b></div>`;
             });
         } else { html += '<p style="color:#a7f3d0;">No deposit records found.</p>'; }
@@ -741,8 +741,9 @@
         let html = '<h4 style="color:#34d399; margin-bottom:8px;">Withdrawal Records</h4>';
         if(globalHistoryData.withdrawals.length > 0) {
             globalHistoryData.withdrawals.forEach(w => {
-                let statusText = w.status === 'approved' ? 'complete' : w.status;
-                let statusColor = w.status === 'approved' ? '#22c55e' : '#eab308';
+                let rawStatus = (w.status || '').toLowerCase();
+                let statusText = (rawStatus === 'approved' || rawStatus === 'approve') ? 'complete' : rawStatus;
+                let statusColor = (rawStatus === 'approved' || rawStatus === 'approve') ? '#22c55e' : '#eab308';
                 html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${w.amount}</b> | Mobile: ${w.mobile} | Status: <b style="color:${statusColor}">${statusText.toUpperCase()}</b></div>`;
             });
         } else { html += '<p style="color:#a7f3d0;">No withdrawal records found.</p>'; }
@@ -772,13 +773,14 @@
                 html += '<p style="color:#a7f3d0;">No deposit requests found.</p>';
             } else {
                 cachedAdminData.deposits.forEach(d => {
-                    let statusText = d.status === 'approved' ? 'complete' : d.status;
-                    let statusColor = d.status === 'approved' ? '#22c55e' : (d.status === 'rejected' ? '#ef4444' : '#eab308');
+                    let rawStatus = (d.status || '').toLowerCase();
+                    let statusText = (rawStatus === 'approved' || rawStatus === 'approve') ? 'complete' : rawStatus;
+                    let statusColor = (rawStatus === 'approved' || rawStatus === 'approve') ? '#22c55e' : (rawStatus === 'rejected' ? '#ef4444' : '#eab308');
                     html += `<div class="card" style="padding:10px; margin-bottom:8px;">
                         <b>User UID:</b> ${d.userId ? d.userId.uid : 'N/A'}<br>
                         <b>Amount:</b> ₹${d.amount} | <b>UTR/TXN:</b> ${d.transactionId}<br>
                         <b>Status:</b> <span style="color:${statusColor}">${statusText.toUpperCase()}</span>
-                        ${d.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
+                        ${rawStatus === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
                             <button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Complete</button>
                             <button onclick="adminAction('deposit', '${d._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
                         </div>` : ''}
@@ -791,15 +793,16 @@
                 html += '<p style="color:#a7f3d0;">No withdrawal requests found.</p>';
             } else {
                 cachedAdminData.withdrawals.forEach(w => {
-                    let statusText = w.status === 'approved' ? 'complete' : w.status;
-                    let statusColor = w.status === 'approved' ? '#22c55e' : (w.status === 'rejected' ? '#ef4444' : '#eab308');
+                    let rawStatus = (w.status || '').toLowerCase();
+                    let statusText = (rawStatus === 'approved' || rawStatus === 'approve') ? 'complete' : rawStatus;
+                    let statusColor = (rawStatus === 'approved' || rawStatus === 'approve') ? '#22c55e' : (rawStatus === 'rejected' ? '#ef4444' : '#eab308');
                     html += `<div class="card" style="padding:10px; margin-bottom:8px;">
                         <b>User UID:</b> ${w.userId ? w.userId.uid : 'N/A'}<br>
                         <b>Amount:</b> ₹${w.amount} | <b>Mobile:</b> ${w.mobile}<br>
                         <b>Account Holder:</b> <span style="color:#34d399; font-weight:bold;">${w.accountHolderName || 'N/A'}</span><br>
                         <b>Details:</b> ${w.bankName || 'UPI'} (${w.accountNumber || w.upiId || 'N/A'}) - IFSC: ${w.ifsc || 'N/A'}<br>
                         <b>Status:</b> <span style="color:${statusColor}">${statusText.toUpperCase()}</span>
-                        ${w.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
+                        ${rawStatus === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
                             <button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Complete</button>
                             <button onclick="adminAction('withdrawal', '${w._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
                         </div>` : ''}
