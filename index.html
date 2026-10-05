@@ -13,24 +13,14 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        .brand-header { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px; overflow: hidden; position: relative; width: 100%; padding: 5px 0; }
-        .auth-logo { width: 40px; height: 40px; background: #fbbf24; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 22px; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.5); overflow: hidden; flex-shrink: 0; }
-        .auth-logo img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .moving-brand-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            white-space: nowrap;
-            animation: moveLogoTitle 8s linear infinite;
-        }
-        
-        @keyframes moveLogoTitle {
+        /* Updated Header Styles matching color-game.html */
+        .brand-header { display: flex; align-items: center; justify-content: center; margin-bottom: 20px; overflow: hidden; position: relative; width: 100%; padding: 5px 0; }
+        .logo-ticker-container { width: 100%; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(52, 211, 153, 0.3); border-bottom: 1px solid rgba(52, 211, 153, 0.3); padding: 6px 0; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); text-align: center; }
+        .logo-ticker { display: inline-block; font-size: 18px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; animation: marquee 8s linear infinite; }
+        @keyframes marquee {
             0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            100% { transform: translateX(450px); }
         }
-
-        .brand-title { font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .top-balance-bar { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 15px; }
         .mini-wallet { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; padding: 6px 12px; border-radius: 20px; font-size: 14px; font-weight: bold; color: #34d399; display: flex; align-items: center; gap: 5px; }
@@ -93,9 +83,8 @@
     <!-- Home Page -->
     <div id="homePage" class="page active">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -127,9 +116,8 @@
     <!-- Games Hub Page -->
     <div id="gamesHubPage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -146,9 +134,8 @@
     <!-- Profile Page -->
     <div id="profilePage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -206,9 +193,8 @@
     <!-- Deposit Page -->
     <div id="depositPage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -250,9 +236,8 @@
     <!-- Withdraw Page -->
     <div id="withdrawPage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -301,9 +286,8 @@
     <!-- History Page -->
     <div id="historyPage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -325,9 +309,8 @@
     <!-- Admin Panel Page -->
     <div id="adminPanelPage" class="page">
         <div class="brand-header">
-            <div class="moving-brand-wrapper">
-                <div class="auth-logo"><img src="logo_2.svg" alt="Logo" onerror="this.src='logo_3.svg'"></div>
-                <div class="brand-title">Rewards Zone</div>
+            <div class="logo-ticker-container">
+                <div class="logo-ticker">Rewards Zone</div>
             </div>
         </div>
 
@@ -745,7 +728,9 @@
         let html = '<h4 style="color:#34d399; margin-bottom:8px;">Deposit Records</h4>';
         if(globalHistoryData.deposits.length > 0) {
             globalHistoryData.deposits.forEach(d => {
-                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${d.amount}</b> | TXN: ${d.transactionId} | Status: <b style="color:${d.status==='approved'?'#22c55e':'#eab308'}">${d.status}</b></div>`;
+                let statusText = d.status === 'approved' ? 'complete' : d.status;
+                let statusColor = d.status === 'approved' ? '#22c55e' : '#eab308';
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${d.amount}</b> | TXN: ${d.transactionId} | Status: <b style="color:${statusColor}">${statusText.toUpperCase()}</b></div>`;
             });
         } else { html += '<p style="color:#a7f3d0;">No deposit records found.</p>'; }
         document.getElementById('historyContent').innerHTML = html;
@@ -756,7 +741,9 @@
         let html = '<h4 style="color:#34d399; margin-bottom:8px;">Withdrawal Records</h4>';
         if(globalHistoryData.withdrawals.length > 0) {
             globalHistoryData.withdrawals.forEach(w => {
-                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${w.amount}</b> | Mobile: ${w.mobile} | Status: <b style="color:${w.status==='approved'?'#22c55e':'#eab308'}">${w.status}</b></div>`;
+                let statusText = w.status === 'approved' ? 'complete' : w.status;
+                let statusColor = w.status === 'approved' ? '#22c55e' : '#eab308';
+                html += `<div class="card" style="padding:10px; margin-bottom:8px;">Amount: <b>₹${w.amount}</b> | Mobile: ${w.mobile} | Status: <b style="color:${statusColor}">${statusText.toUpperCase()}</b></div>`;
             });
         } else { html += '<p style="color:#a7f3d0;">No withdrawal records found.</p>'; }
         document.getElementById('historyContent').innerHTML = html;
@@ -785,12 +772,14 @@
                 html += '<p style="color:#a7f3d0;">No deposit requests found.</p>';
             } else {
                 cachedAdminData.deposits.forEach(d => {
+                    let statusText = d.status === 'approved' ? 'complete' : d.status;
+                    let statusColor = d.status === 'approved' ? '#22c55e' : (d.status === 'rejected' ? '#ef4444' : '#eab308');
                     html += `<div class="card" style="padding:10px; margin-bottom:8px;">
                         <b>User UID:</b> ${d.userId ? d.userId.uid : 'N/A'}<br>
                         <b>Amount:</b> ₹${d.amount} | <b>UTR/TXN:</b> ${d.transactionId}<br>
-                        <b>Status:</b> <span style="color:${d.status==='approved'?'#22c55e':(d.status==='rejected'?'#ef4444':'#eab308')}">${d.status.toUpperCase()}</span>
+                        <b>Status:</b> <span style="color:${statusColor}">${statusText.toUpperCase()}</span>
                         ${d.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
-                            <button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Approve</button>
+                            <button onclick="adminAction('deposit', '${d._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Complete</button>
                             <button onclick="adminAction('deposit', '${d._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
                         </div>` : ''}
                     </div>`;
@@ -802,14 +791,16 @@
                 html += '<p style="color:#a7f3d0;">No withdrawal requests found.</p>';
             } else {
                 cachedAdminData.withdrawals.forEach(w => {
+                    let statusText = w.status === 'approved' ? 'complete' : w.status;
+                    let statusColor = w.status === 'approved' ? '#22c55e' : (w.status === 'rejected' ? '#ef4444' : '#eab308');
                     html += `<div class="card" style="padding:10px; margin-bottom:8px;">
                         <b>User UID:</b> ${w.userId ? w.userId.uid : 'N/A'}<br>
                         <b>Amount:</b> ₹${w.amount} | <b>Mobile:</b> ${w.mobile}<br>
                         <b>Account Holder:</b> <span style="color:#34d399; font-weight:bold;">${w.accountHolderName || 'N/A'}</span><br>
                         <b>Details:</b> ${w.bankName || 'UPI'} (${w.accountNumber || w.upiId || 'N/A'}) - IFSC: ${w.ifsc || 'N/A'}<br>
-                        <b>Status:</b> <span style="color:${w.status==='approved'?'#22c55e':(w.status==='rejected'?'#ef4444':'#eab308')}">${w.status.toUpperCase()}</span>
+                        <b>Status:</b> <span style="color:${statusColor}">${statusText.toUpperCase()}</span>
                         ${w.status === 'pending' ? `<div style="margin-top:8px; display:flex; gap:6px;">
-                            <button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Approve</button>
+                            <button onclick="adminAction('withdrawal', '${w._id}', 'approve')" style="background:#22c55e; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Complete</button>
                             <button onclick="adminAction('withdrawal', '${w._id}', 'reject')" style="background:#ef4444; border:none; color:#fff; padding:6px 12px; border-radius:4px; font-weight:bold; cursor:pointer;">Reject</button>
                         </div>` : ''}
                     </div>`;
