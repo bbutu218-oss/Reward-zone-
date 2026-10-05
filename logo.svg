@@ -1,22 +1,119 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4f46e5" />
-      <stop offset="100%" stop-color="#7c3aed" />
-    </linearGradient>
-    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="100%" stop-color="#e0e7ff" />
-    </linearGradient>
-    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffd700" />
-      <stop offset="100%" stop-color="#f59e0b" />
-    </linearGradient>
-  </defs>
-  
-  <rect width="512" height="512" rx="110" fill="url(#bgGrad)" />
-  <circle cx="256" cy="256" r="180" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12" />
-  <circle cx="370" cy="142" r="28" fill="url(#goldGrad)" />
-  <text x="50%" y="54%" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="180" fill="url(#textGrad)" text-anchor="middle" dominant-baseline="middle" letter-spacing="4">RZ</text>
-  <path d="M256 370l15 32 35 5-25 24 6 35-31-16-31 16 6-35-25-24 35-5z" fill="url(#goldGrad)" transform="scale(0.8) translate(64, 40)" />
-</svg>
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Updated Logo Page</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .logo-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        /* Updated 3D RZ Logo Styling */
+        .rz-logo-3d {
+            width: 200px;
+            height: 200px;
+            border-radius: 35px;
+            background: linear-gradient(135deg, #5e35b1, #311b92);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.3);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+            margin: 0 auto;
+        }
+        
+        /* Metal Texture Overlay */
+        .rz-logo-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 35px;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.2) 100%);
+            pointer-events: none;
+        }
+
+        /* Gold Ring Element */
+        .rz-gold-ring {
+            width: 130px;
+            height: 130px;
+            border: 6px solid #e4c562;
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3), inset 0 2px 3px rgba(255,255,255,0.4);
+        }
+
+        /* Gold Sphere Element */
+        .rz-gold-ball {
+            width: 32px;
+            height: 32px;
+            background: radial-gradient(circle at 30% 30%, #fff2b2, #d4af37 60%, #997415 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 15px;
+            right: 18px;
+            box-shadow: 2px 4px 6px rgba(0,0,0,0.4);
+        }
+
+        /* Gold Star Element */
+        .rz-gold-star {
+            font-size: 42px;
+            color: #d4af37;
+            position: absolute;
+            bottom: -5px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        }
+
+        /* Gold RZ Text Element */
+        .rz-gold-text {
+            font-size: 75px;
+            font-weight: 800;
+            background: linear-gradient(180deg, #fff2b2 20%, #d4af37 70%, #997415 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            position: relative;
+            letter-spacing: -2px;
+            filter: drop-shadow(0 3px 2px rgba(0,0,0,0.4));
+        }
+    </style>
+</head>
+<body>
+
+    <div class="logo-container">
+        <div class="logo-title">Updated Logo Preview</div>
+        
+        <!-- Naya 3D RZ Logo Structure -->
+        <div class="rz-logo-3d">
+            <div class="rz-gold-ring"></div>
+            <div class="rz-gold-ball"></div>
+            <div class="rz-gold-text">RZ</div>
+            <div class="rz-gold-star">★</div>
+        </div>
+    </div>
+
+</body>
+</html>
