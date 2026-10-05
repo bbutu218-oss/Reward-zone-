@@ -195,9 +195,18 @@
             <b>🛡️ Safe Deposit Notice:</b> Scan the QR Code below to pay. Then enter your 12-digit UTR/Txn ID.
         </div>
 
+        <!-- Sirf Admin ke liye QR upload section - Sirf Upload button initially dikhega -->
         <div class="card" style="margin-bottom: 15px; text-align: center; display: none;" id="qrUploadSection">
-            <h4 style="margin-bottom: 8px;">Upload / Update QR Code (Admin Only)</h4>
-            <input type="file" id="qrUploadInput" accept="image/*" style="font-size: 12px; margin-bottom: 8px; color: #d1fae5;" onchange="handleQrUpload(event)">
+            <h4 style="margin-bottom: 8px;">Upload QR Code (Admin Only)</h4>
+            <!-- Hidden file input triggered by custom upload button -->
+            <input type="file" id="qrUploadInput" accept="image/*" style="display: none;" onchange="handleFileSelected(event)">
+            <button class="action-btn" style="background: #8b5cf6; margin-bottom: 8px;" onclick="document.getElementById('qrUploadInput').click()">📁 Choose QR Image</button>
+            
+            <!-- Save & Cancel buttons jo pic select hone ke baad dikhenge -->
+            <div id="adminQrActionBtns" style="display: none; gap: 8px; margin-top: 10px;">
+                <button class="action-btn" style="background: #10b981; flex: 1;" onclick="confirmAndSaveQr()">💾 Save</button>
+                <button class="action-btn" style="background: #ef4444; flex: 1;" onclick="cancelQrUpload()">❌ Cancel</button>
+            </div>
         </div>
 
         <div class="deposit-card">
@@ -205,7 +214,6 @@
             <div class="qr-placeholder">
                 <img id="depositQrImage" src="qr-code.png" alt="QR Code">
             </div>
-            <button class="action-btn" style="background: #3b82f6; margin-bottom: 15px;" onclick="saveQrCodeImage()">💾 Save QR Code</button>
             <div class="form-group">
                 <label>Enter UTR / Transaction ID</label>
                 <div class="input-wrapper">
@@ -386,6 +394,7 @@
     let selectedMethod = 'BANK';
     let currentAdminTab = 'deposits';
     let cachedAdminData = null;
+    let temporarySelectedQrBase64 = null;
 
     const topIndianBanks = [
         "State Bank of India (SBI)", "HDFC Bank", "ICICI Bank", "Axis Bank", "Punjab National Bank (PNB)", 
@@ -538,10 +547,6 @@
         switchPage('depositPage');
     }
 
-    function saveQrCodeImage() {
-        showToast('✅ QR Code saved successfully!');
-    }
-
     function loadSavedQrCode() {
         let savedQr = localStorage.getItem('saved_custom_qr');
         if(savedQr) {
@@ -550,7 +555,7 @@
         }
     }
 
-    async function handleQrUpload(event) {
+    function handleFileSelected(event) {
         if (!currentUser || (currentUser.phone !== "8093361993" && !currentUser.isAdmin)) {
             showToast('❌ Unauthorized: Only admin can change QR code!');
             return;
@@ -559,21 +564,40 @@
         let file = event.target.files[0];
         if (file) {
             let reader = new FileReader();
-            reader.onload = async function(e) {
-                let base64Image = e.target.result;
-                document.getElementById('depositQrImage').src = base64Image;
-                localStorage.setItem('saved_custom_qr', base64Image);
-                
-                let res = await fetch('/api/admin/save-qr', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ imageBase64: base64Image })
-                }).then(r => r.json()).catch(() => ({ success: true, message: 'QR saved successfully!' }));
-
-                showToast(res.message || '✅ QR Code updated successfully by admin!');
+            reader.onload = function(e) {
+                temporarySelectedQrBase64 = e.target.result;
+                // Preview in frame immediately
+                document.getElementById('depositQrImage').src = temporarySelectedQrBase64;
+                // Show Save and Cancel buttons
+                document.getElementById('adminQrActionBtns').style.display = 'flex';
             }
             reader.readAsDataURL(file);
         }
+    }
+
+    async function confirmAndSaveQr() {
+        if (!temporarySelectedQrBase64) return;
+
+        localStorage.setItem('saved_custom_qr', temporarySelectedQrBase64);
+        
+        let res = await fetch('/api/admin/save-qr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ imageBase64: temporarySelectedQrBase64 })
+        }).then(r => r.json()).catch(() => ({ success: true, message: 'QR saved successfully!' }));
+
+        showToast(res.message || '✅ QR Code updated successfully by admin!');
+        
+        // Hide action buttons after save
+        document.getElementById('adminQrActionBtns').style.display = 'none';
+        temporarySelectedQrBase64 = null;
+    }
+
+    function cancelQrUpload() {
+        temporarySelectedQrBase64 = null;
+        document.getElementById('adminQrActionBtns').style.display = 'none';
+        loadSavedQrCode(); // Revert preview to previous saved QR
+        showToast('Cancelled QR upload.');
     }
 
     async function submitDeposit() {
