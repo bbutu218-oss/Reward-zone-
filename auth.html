@@ -6,7 +6,51 @@
     <title>Rewards Zone - Authentication</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; }
+        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; overflow: hidden; }
+        
+        /* Splash Screen Styles */
+        #splashScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e1b4b, #064e3b);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .splash-logo {
+            width: 100px;
+            height: 100px;
+            background: #fbbf24;
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            overflow: hidden;
+            animation: pulse 1.5s infinite;
+        }
+        .splash-logo img { width: 100%; height: 100%; object-fit: cover; }
+        .splash-title {
+            margin-top: 20px;
+            font-size: 32px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c084fc, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(52, 211, 153, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+
         .container { width: 100vw; height: 100vh; background: linear-gradient(135deg, #1e1b4b, #064e3b); padding: 30px 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: none; border-radius: 0; border: none; overflow-y: auto; }
         .auth-section { width: 100%; max-width: 420px; display: none; background: rgba(30, 27, 75, 0.85); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #34d399; backdrop-filter: blur(10px); }
         .auth-section.active { display: block; }
@@ -40,11 +84,19 @@
 </head>
 <body>
 
+<!-- 5 Seconds Splash Screen -->
+<div id="splashScreen">
+    <div class="splash-logo">
+        <img src="logo.svg" alt="Rewards Zone Logo">
+    </div>
+    <div class="splash-title">Rewards Zone</div>
+</div>
+
 <div class="container">
     <!-- Login Section -->
-    <div id="loginSection" class="auth-section active">
+    <div id="loginSection" class="auth-section">
         <div class="brand-header">
-            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
+            <div class="auth-logo"><img src="logo.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Sign in</h2>
@@ -76,7 +128,7 @@
     <!-- Register Section -->
     <div id="registerSection" class="auth-section">
         <div class="brand-header">
-            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
+            <div class="auth-logo"><img src="logo.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Register</h2>
@@ -117,7 +169,7 @@
     <!-- Forgot Password Section -->
     <div id="forgotSection" class="auth-section">
         <div class="brand-header">
-            <div class="auth-logo"><img src="logo_3.svg" alt="Logo"></div>
+            <div class="auth-logo"><img src="logo.svg" alt="Logo"></div>
             <div class="brand-title">Rewards Zone</div>
         </div>
         <h2>Reset password</h2>
@@ -157,6 +209,17 @@
 </div>
 
 <script>
+    // 5 seconds ke baad splash screen hide karke login section active karna
+    setTimeout(() => {
+        let splash = document.getElementById('splashScreen');
+        splash.style.opacity = '0';
+        setTimeout(() => {
+            splash.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            document.getElementById('loginSection').classList.add('active');
+        }, 500);
+    }, 5000);
+
     let generatedOtp = '';
     const urlParams = new URLSearchParams(window.location.search);
     const refUid = urlParams.get('ref');
