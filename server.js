@@ -33,14 +33,20 @@ const userSchema = new mongoose.Schema({
     uid: { type: String, unique: true, default: generateUID },
     phone: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    balance: { type: Number, default: 500 }, 
+    balance: { type: Number, default: 5 }, 
     winningsBalance: { type: Number, default: 0 }, 
     rewardCoins: { type: Number, default: 0 }, 
     referredBy: { type: String, default: null },
-    lastDailyClaim: { type: Number, default: 0 },
+    lastDailyClaim: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
+
+const dailyJackpotLogSchema = new mongoose.Schema({
+    dateStr: { type: String, required: true },
+    jackpotUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
+});
+const DailyJackpotLog = mongoose.model('DailyJackpotLog', dailyJackpotLogSchema);
 
 const gameResultSchema = new mongoose.Schema({
     timerType: { type: String, default: '30s' }, 
@@ -161,24 +167,23 @@ app.post('/api/register', async (req, res) => {
         const existingUser = await User.findOne({ phone });
         if (existingUser) return res.status(400).json({ success: false, message: "User already exists!" });
 
-        let validReferrer = null;
-        if (refUid) {
-            validReferrer = await User.findOne({ uid: refUid });
-        }
-
         const newUser = new User({ 
             phone, 
             password, 
             balance: 5, 
             winningsBalance: 0,
-            rewardCoins: 500,
-            referredBy: validReferrer ? refUid : null 
+            rewardCoins: 100, // New user gets 100 coins
+            referredBy: refUid || null 
         });
 
         await newUser.save();
 
-        if (validReferrer) {
-            await User.findOneAndUpdate({ uid: refUid }, { $inc: { rewardCoins: 500 } });
+        if (refUid) {
+            const referrer = await User.findOne({ uid: refUid });
+            if (referrer) {
+                referrer.rewardCoins += 500; // Old/Referrer user gets 500 coins
+                await referrer.save();
+            }
         }
 
         res.json({ success: true, message: "Registration successful!" });
@@ -218,6 +223,73 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+app.post('/api/claim-daily', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found!" });
+
+        const todayStr = new Date().toDateString();
+        if (user.lastDailyClaim === todayStr) {
+            return res.status(400).json({ success: false, message: "You have already claimed your daily bonus today! Come back after 12 AM." });
+        }
+
+        let log = await DailyJackpotLog.findOne({ dateStr: todayStr });
+        if (!log) {
+            log = new DailyJackpotLog({ dateStr: todayStr, jackpotUsers: [] });
+        }
+
+        let earnedReward = 0;
+        let isJackpot = false;
+
+        // Check if today already has 3 jackpot winners
+        if (log.jackpotUsers.length < 3 && !log.jackpotUsers.includes(user._id)) {
+            // 3% chance or random selection for jackpot among daily users, let's make it so first few or random
+            let roll = Math.random();
+            if (roll < 0.25) { // 25% chance to hit jackpot if under 3 winners
+                isJackpot = true;
+            }
+        }
+
+        if (isJackpot) {
+            earnedReward = Math.floor(Math.random() * (100 - 30 + 1)) + 30; // 30 to 100 coins
+            log.jackpotUsers.push(user._id);
+            await log.save();
+        } else {
+            // Random normal reward between 0.10 and 30 coins (let's use float rounded to 2 decimals)
+            earnedReward = parseFloat((Math.random() * (30 - 0.10) + 0.10).toFixed(2));
+        }
+
+        user.rewardCoins += earnedReward;
+        user.lastDailyClaim = todayStr;
+        await user.save();
+
+        res.json({ 
+            success: true, 
+            reward: earnedReward, 
+            isJackpot: isJackpot,
+            message: isJackpot ? `🎉 JACKPOT! You won ${earnedReward} Coins!` : `🎁 You won ${earnedReward} Coins!` 
+        });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.post('/api/watch-ad', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+        user.rewardCoins += 20; // Reward for watching ad
+        await user.save();
+
+        res.json({ success: true, rewardCoins: user.rewardCoins, message: "Successfully earned 20 coins from ad!" });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 app.post('/api/reset-password', async (req, res) => {
     try {
         const { phone, newPassword } = req.body;
@@ -250,97 +322,6 @@ app.get('/api/user/mobile/:mobile', async (req, res) => {
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         const isAdmin = ADMIN_NUMBERS.includes(user.phone);
         res.json({ success: true, isAdmin, user });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-});
-
-// Daily Check-in Bonus API with 12 AM reset and 3 daily jackpot winners (30 to 100 coins)
-app.post('/api/claim-daily', async (req, res) => {
-    try {
-        const { userId } = req.body;
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ success: false, message: "User not found!" });
-
-        const now = new Date();
-        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-
-        if (user.lastDailyClaim && user.lastDailyClaim >= startOfToday) {
-            // Calculate time remaining until next 12 AM
-            const nextMidnight = startOfToday + 86400000;
-            return res.status(400).json({ success: false, message: "Already claimed today! Next claim available after 12:00 AM.", nextReset: nextMidnight });
-        }
-
-        // Check how many users have won a jackpot (30-100 coins) today
-        const jackpotCount = await User.countDocuments({
-            lastDailyClaim: { $gte: startOfToday },
-            rewardCoins: { $gte: 30 } // Flag or threshold for jackpots, let's track specifically or check recent claims >= 30 bonus
-        });
-
-        let reward = 0;
-        let isJackpot = false;
-
-        // Exactly 3 users per day get jackpot (30 to 100 coins)
-        // We can track jackpot winners by storing a daily count or checking users claimed today with high reward
-        const todayJackpotCount = await User.countDocuments({
-            lastDailyClaim: { $gte: startOfToday },
-            $expr: { $gte: ["$rewardCoins", 30] } // simplified tracking or store a daily jackpot collection
-        });
-
-        // Let's implement a robust random reward logic:
-        // Random normal reward: 0.10 to 30 coins. Let's make standard 0.10 to 29.99, and if jackpot slot available (max 3 per day), 30 to 100 coins.
-        // Let's check how many users already got >= 30 coins today:
-        const totalJackpotsToday = await User.countDocuments({
-            lastDailyClaim: { $gte: startOfToday },
-            // We can add a flag or check if reward was >= 30. Let's use a separate counter or field if needed, or check users updated today.
-        });
-
-        // Simpler approach: Random chance or restricted count
-        // Let's check total users who claimed today and got jackpot
-        // Let's store `todaysJackpotCount` globally or in a lightweight schema / static variable
-        if (!global.dailyJackpotTracker) {
-            global.dailyJackpotTracker = { date: startOfToday, count: 0 };
-        }
-        if (global.dailyJackpotTracker.date !== startOfToday) {
-            global.dailyJackpotTracker = { date: startOfToday, count: 0 };
-        }
-
-        if (global.dailyJackpotTracker.count < 3 && Math.random() < 0.2) {
-            // Jackpot win: 30 to 100 coins
-            reward = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
-            global.dailyJackpotTracker.count++;
-            isJackpot = true;
-        } else {
-            // Normal random reward: 0.10 to 30 coins (let's keep it clean with 2 decimal places)
-            reward = parseFloat((Math.random() * (30 - 0.10) + 0.10).toFixed(2));
-        }
-
-        user.rewardCoins += reward;
-        user.lastDailyClaim = now.getTime();
-        await user.save();
-
-        res.json({ 
-            success: true, 
-            message: isJackpot ? `🎉 JACKPOT! You won ${reward} Coins!` : `🎁 Successfully claimed ${reward} Coins!`, 
-            reward, 
-            isJackpot,
-            newCoins: user.rewardCoins 
-        });
-    } catch (err) {
-        res.status(500).json({ success: false, message: err.message });
-    }
-});
-
-app.post('/api/watch-ad', async (req, res) => {
-    try {
-        const { userId } = req.body;
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ success: false, message: "User not found!" });
-
-        user.rewardCoins += 20;
-        await user.save();
-
-        res.json({ success: true, message: "Successfully earned 20 coins!", newCoins: user.rewardCoins });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -516,6 +497,29 @@ app.post('/api/admin/set-result', async (req, res) => {
     }
 });
 
+app.get('/api/admin/bets-summary/:period', async (req, res) => {
+    try {
+        const { period } = req.params;
+        const bets = await Bet.find({ period });
+        let totalAmount = 0;
+        let breakdown = { big: 0, small: 0, green: 0, red: 0, violet: 0 };
+
+        bets.forEach(b => {
+            totalAmount += b.amount;
+            if (b.betType === 'size' || b.betType === 'color') {
+                breakdown[b.betValue] = (breakdown[b.betValue] || 0) + b.amount;
+            } else if (b.betType === 'number') {
+                let key = 'num_' + b.betValue;
+                breakdown[key] = (breakdown[key] || 0) + b.amount;
+            }
+        });
+
+        res.json({ success: true, totalAmount, breakdown });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
 app.get('/api/game-history/:timerType', async (req, res) => {
     try {
         const { timerType } = req.params;
@@ -527,6 +531,47 @@ app.get('/api/game-history/:timerType', async (req, res) => {
         const history = await GameResult.find({ timerType }).sort({ _id: -1 }).skip(skip).limit(limit);
         
         res.json({ success: true, history, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/user-bets/:userId/:timerType', async (req, res) => {
+    try {
+        const { userId, timerType } = req.params;
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10;
+        const skip = (page - 1) * limit;
+
+        const total = await Bet.countDocuments({ userId, timerType });
+        const bets = await Bet.find({ userId, timerType }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+        res.json({ success: true, bets, totalPages: Math.ceil(total / limit) });
+    } catch (err) {
+        res.status(500).json({ success: false, message: err.message });
+    }
+});
+
+app.get('/api/user-round-result', async (req, res) => {
+    try {
+        const { userId, period, timerType } = req.query;
+        const bet = await Bet.findOne({ userId, period, timerType });
+        if (!bet) return res.json({ success: true, hasBet: false });
+
+        const gameRes = await GameResult.findOne({ period });
+        res.json({ 
+            success: true, 
+            hasBet: true, 
+            betData: {
+                status: bet.status,
+                amount: bet.amount,
+                payout: bet.payout,
+                betValue: bet.betValue,
+                number: gameRes ? gameRes.number : '?',
+                color: gameRes ? gameRes.color : '?',
+                size: gameRes ? gameRes.size : '?'
+            } 
+        });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -705,7 +750,7 @@ mongoose.connect(MONGO_URI).then(async () => {
     });
 
 }).catch(err => {
-    console.log("MongoDB connection error:", err);
+    console.error("MongoDB connection error:", err);
 });
 
 io.on('connection', (socket) => {
