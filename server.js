@@ -336,7 +336,23 @@ app.get('/api/transactions/:userId', async (req, res) => {
         const { userId } = req.params;
         const deposits = await Deposit.find({ userId }).sort({ createdAt: -1 });
         const withdrawals = await Withdrawal.find({ userId }).sort({ createdAt: -1 });
-        const bets = await Bet.find({ userId }).sort({ createdAt: -1 }).limit(50);
+        const rawBets = await Bet.find({ userId }).sort({ createdAt: -1 }).limit(50);
+        
+        const bets = await Promise.all(rawBets.map(async (b) => {
+            let betObj = b.toObject();
+            if (b.period) {
+                let resDoc = await GameResult.findOne({ period: b.period });
+                if (resDoc) {
+                    betObj.gameResult = {
+                        number: resDoc.number,
+                        color: resDoc.color,
+                        size: resDoc.size
+                    };
+                }
+            }
+            return betObj;
+        }));
+
         res.json({ success: true, deposits, withdrawals, bets });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
