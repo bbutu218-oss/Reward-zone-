@@ -84,7 +84,7 @@
 </head>
 <body>
 
-<!-- 5 Seconds Splash Screen -->
+<!-- 3 Seconds Splash Screen -->
 <div id="splashScreen">
     <div class="splash-logo">
         <img src="logo.svg" alt="Rewards Zone Logo">
@@ -145,6 +145,10 @@
                 <input type="number" id="regOtpInput" placeholder="SMS verification code">
                 <button type="button" class="otp-btn" id="sendOtpBtn" onclick="sendOtp('reg')">OTP</button>
             </div>
+        </div>
+        <div class="form-group">
+            <label>Referral Code (Optional)</label>
+            <div class="input-wrapper"><input type="text" id="regRefCode" placeholder="Referral code (auto-filled if via link)"></div>
         </div>
         <div class="form-group">
             <label>Set password</label>
@@ -209,7 +213,7 @@
 </div>
 
 <script>
-    // 5 seconds ke baad splash screen hide karke login section active karna
+    // 3 seconds ke baad splash screen hide karke login section active karna
     setTimeout(() => {
         let splash = document.getElementById('splashScreen');
         splash.style.opacity = '0';
@@ -218,11 +222,21 @@
             document.body.style.overflow = 'auto';
             document.getElementById('loginSection').classList.add('active');
         }, 500);
-    }, 5000);
+    }, 3000);
 
     let generatedOtp = '';
     const urlParams = new URLSearchParams(window.location.search);
     const refUid = urlParams.get('ref');
+
+    // Automatically fill referral code if present in URL
+    window.addEventListener('DOMContentLoaded', () => {
+        if (refUid) {
+            let refInput = document.getElementById('regRefCode');
+            if (refInput) {
+                refInput.value = refUid;
+            }
+        }
+    });
 
     function switchSection(sectionId) {
         document.querySelectorAll('.auth-section').forEach(s => s.classList.remove('active'));
@@ -289,6 +303,7 @@
     async function handleRegister() {
         let mobile = document.getElementById('regMobile').value.trim();
         let otp = document.getElementById('regOtpInput').value.trim();
+        let enteredRefUid = document.getElementById('regRefCode').value.trim() || refUid;
         let password = document.getElementById('regPassword').value.trim();
         let confirmPassword = document.getElementById('regConfirmPassword').value.trim();
 
@@ -313,7 +328,7 @@
             let res = await fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: mobile, password, refUid })
+                body: JSON.stringify({ phone: mobile, password, refUid: enteredRefUid })
             }).then(r => r.json());
 
             if (res.success) {
