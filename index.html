@@ -136,7 +136,6 @@
         <h2 style="font-size: 18px; margin-bottom: 5px; color: #fff;">🎮 Games Arena</h2>
         <p style="font-size: 12px; color: #a7f3d0; margin-bottom: 15px;">Choose your favorite game and start winning!</p>
         
-        <!-- Updated WinGo Color Trading Card style matching photo reference -->
         <div class="card" onclick="window.location.href='color-game.html'" style="cursor: pointer; background: linear-gradient(135deg, #3b82f6, #1d4ed8); display: flex; align-items: center; gap: 15px; padding: 12px 15px; border-radius: 14px;">
             <div style="width: 55px; height: 55px; background: radial-gradient(circle, #f472b6, #db2777); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #fff; border: 2px solid #fef08a; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">1</div>
             <div style="flex: 1;">
@@ -221,7 +220,7 @@
         </div>
 
         <div class="notice-box">
-            <b>🛡️️ Safe Deposit Notice:</b> Scan the QR Code below to pay. Then enter your 12-digit UTR/Txn ID.
+            <b>🛡 Safe Deposit Notice:</b> Scan the QR Code below to pay. Then enter your 12-digit UTR/Txn ID.
         </div>
 
         <div class="card" style="margin-bottom: 15px; text-align: center; display: none;" id="qrUploadSection">
@@ -419,7 +418,6 @@
 </div>
 
 <script>
-    // Splash screen handler: hide after 3 seconds
     window.addEventListener('load', () => {
         setTimeout(() => {
             let splash = document.getElementById('splashScreen');
@@ -727,7 +725,7 @@
         }
     }
 
-    // Updated History view matching reference layout (ARLottery style view)
+    // Dynamic Game Activity View with actual WinGo Results
     function loadGameActivityView() {
         if(!globalHistoryData) return;
         let html = '<h4 style="color:#facc15; margin-bottom:8px;">Game Betting Winnings & Losses</h4>';
@@ -739,27 +737,44 @@
                 let winningsVal = b.status === 'win' ? (b.payout || (b.amount * 2)).toFixed(2) : '0.00';
                 let profitLossVal = b.status === 'win' ? `+₹${(b.amount).toFixed(2)}` : `-₹${(b.amount).toFixed(2)}`;
 
+                // Dynamic Result mapping from backend
+                let resNum = b.gameResult ? b.gameResult.number : '?';
+                let resColor = b.gameResult ? b.gameResult.color : 'red';
+                let resSize = b.gameResult ? b.gameResult.size : 'big';
+
+                let colorBg = '#64748b';
+                if(resColor === 'red') colorBg = '#ef4444';
+                else if(resColor === 'green') colorBg = '#22c55e';
+                else if(resColor === 'violet') colorBg = '#a855f7';
+
+                let sizeBg = '#3b82f6';
+                if(resSize === 'big') sizeBg = '#f59e0b';
+                else if(resSize === 'small') sizeBg = '#06b6d4';
+
+                let colorCapital = resColor.charAt(0).toUpperCase() + resColor.slice(1);
+                let sizeCapital = resSize.charAt(0).toUpperCase() + resSize.slice(1);
+
                 html += `<div class="card" style="background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 12px; padding: 12px; margin-bottom: 12px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 8px;">
                         <div>
                             <span style="font-weight: bold; color: #f8fafc; font-size: 13px;">Rewards Zone</span>
-                            <div style="font-size: 10px; color: #94a3b8;">${b.createdAt ? new Date(b.createdAt).toLocaleString() : '2026-09-14 10:40:20'}</div>
+                            <div style="font-size: 10px; color: #94a3b8;">${b.createdAt ? new Date(b.createdAt).toLocaleString() : ''}</div>
                         </div>
                         <span style="color: ${statusColor}; font-weight: bold; font-size: 13px; text-transform: uppercase;">${b.status}</span>
                     </div>
                     <div style="font-size: 12px; color: #cbd5e1; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;">
                         <div style="display: flex; justify-content: space-between;"><span>⊙ Type</span><span>${b.betType || 'WinGo 30sec'}</span></div>
-                        <div style="display: flex; justify-content: space-between;"><span>⊙ Period</span><span>${b.period || '20260914100050621'}</span></div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;"><span>⊙ Order number</span><span style="font-size: 10px; color: #94a3b8;">${b.orderId || 'WG2026...'}</span></div>
+                        <div style="display: flex; justify-content: space-between;"><span>⊙ Period</span><span>${b.period || ''}</span></div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;"><span>⊙ Order number</span><span style="font-size: 10px; color: #94a3b8;">${b._id || ''}</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>⊙ Select</span><span>Num : ${b.betValue}</span></div>
                         <div style="display: flex; justify-content: space-between;"><span>⊙ Total bet</span><span>₹${(b.amount || 0).toFixed(2)}</span></div>
                     </div>
                     <div style="border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 8px;">
                         <div style="font-size: 11px; color: #e2e8f0; margin-bottom: 6px;">⊙ Lottery results</div>
                         <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-                            <span style="background: #ef4444; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">8</span>
-                            <span style="background: #f59e0b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Big</span>
-                            <span style="background: #ef4444; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">Red</span>
+                            <span style="background: ${colorBg}; color: #fff; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold;">${resNum}</span>
+                            <span style="background: ${sizeBg}; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">${sizeCapital}</span>
+                            <span style="background: ${colorBg}; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold;">${colorCapital}</span>
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; background: rgba(15, 23, 42, 0.6); padding: 8px; border-radius: 8px; text-align: center;">
                             <div>
