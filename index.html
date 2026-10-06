@@ -13,7 +13,7 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        /* Splash Screen Styling */
+        /* 3 Second Splash Screen Styling */
         #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #1e1b4b, #064e3b); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.5s ease; }
         #splashScreen img { width: 120px; height: 120px; border-radius: 24px; animation: pulseLogo 1.5s infinite alternate; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         @keyframes pulseLogo {
@@ -48,13 +48,11 @@
         .uid-row { display: flex; gap: 6px; align-items: center; }
         .copy-uid-btn { background: #34d399; color: #022c22; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
         
-        /* 5x5 Grid Form Design */
         .profile-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 15px; }
         .profile-square-btn { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; border-radius: 12px; padding: 10px 5px; text-align: center; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 75px; }
         .square-icon { font-size: 18px; margin-bottom: 4px; }
         .square-title { font-size: 11px; font-weight: 600; color: #ffffff; }
 
-        /* Small Bottom Logout Button */
         .logout-container { display: flex; justify-content: center; margin-bottom: 20px; }
         .logout-small-btn { background: rgba(127,29,29,0.3); border: 1px solid #7f1d1d; color: #fca5a5; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
         .logout-small-btn:hover { background: rgba(127,29,29,0.6); }
@@ -84,8 +82,16 @@
         .nav-item.active { color: #34d399; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
-        .modal-content { background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal-content { background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center; }
         .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #a7f3d0; background: none; border: none; }
+
+        /* 3D Gift Animation Modal Styling */
+        #giftAnimModal { perspective: 1000px; }
+        .gift-box-3d { width: 120px; height: 120px; margin: 20px auto; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 50px; box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5); animation: rotateGift 1.5s ease-in-out infinite alternate; }
+        @keyframes rotateGift {
+            0% { transform: rotateY(-15deg) rotateX(10deg) scale(0.95); }
+            100% { transform: rotateY(15deg) rotateX(-10deg) scale(1.05); }
+        }
     </style>
 </head>
 <body>
@@ -113,20 +119,20 @@
 
         <div class="card">
             <h4>🎁 Daily Check-in Bonus</h4>
-            <p>Claim your free daily login reward (+10 coins).</p>
-            <button class="action-btn" id="claimDailyBtn" onclick="claimDaily()">Claim Daily Reward</button>
+            <p>Claim your daily gift! Win 0.10 to 30 coins randomly (Jackpot 30-100 coins for 3 lucky users daily).</p>
+            <button class="action-btn" id="claimDailyBtn" onclick="claimDaily()">Claim Daily Gift</button>
+            <div id="dailyTimerDisplay" style="font-size: 13px; color: #facc15; margin-top: 8px; font-weight: bold; text-align: center;"></div>
         </div>
 
         <div class="card">
             <h4>📺 Watch Ad & Earn</h4>
-            <p>Watch the ad for 60 seconds to claim instant coins (+20 coins).</p>
-            <div id="timerDisplay" style="font-size: 14px; color: #34d399; margin: 8px 0; font-weight: bold;"></div>
-            <button class="action-btn" id="watchAdBtn" onclick="startWatchAd()">Watch Ad Now (60s)</button>
+            <p>Watch video ads to claim instant coins (+20 coins).</p>
+            <button class="action-btn" id="watchAdBtn" onclick="startWatchAd()">Watch Ad Now</button>
         </div>
 
         <div class="card" style="background: linear-gradient(135deg, #2e1065, #064e3b);">
             <h4>🚀 Refer & Earn</h4>
-            <p>Share your link! Get <b>500 Coins</b> instantly when your friend registers.</p>
+            <p>Share your link! Get <b>500 Coins</b> instantly when your friend registers successfully with your auto-generated referral code.</p>
             <button class="action-btn" style="background: #10b981;" onclick="shareReferralLink()">🔗 Share Referral Link</button>
         </div>
     </div>
@@ -207,7 +213,6 @@
             </div>
         </div>
 
-        <!-- Small Bottom Logout Button -->
         <div class="logout-container">
             <button class="logout-small-btn" onclick="logout()">
                 <span>🚪</span> Logout
@@ -376,6 +381,14 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="giftAnimModal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 5px; color: #facc15;">🎁 Opening Gift Box...</h3>
+        <div class="gift-box-3d">🎁</div>
+        <div id="giftAnimText" style="font-size: 14px; color: #34d399; font-weight: bold; margin-top: 10px;">Generating 3D Realistic Animation...</div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="convertModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeConvertModal()">×</button>
@@ -428,6 +441,7 @@
 </div>
 
 <script>
+    // 3 Second Splash Screen
     window.addEventListener('load', () => {
         setTimeout(() => {
             let splash = document.getElementById('splashScreen');
@@ -475,6 +489,7 @@
 
         await fetchUserData();
         await loadSavedQrCode();
+        checkDailyTimerState();
 
         if (!sessionStorage.getItem('terms_accepted')) {
             let termsModal = document.getElementById('termsModal');
@@ -499,6 +514,7 @@
             currentUser = res.user;
             userId = currentUser._id;
             updateDashboardUI();
+            checkDailyTimerState();
         }
     }
 
@@ -528,6 +544,86 @@
             if(adminBtn) adminBtn.style.display = 'none';
             if(qrUploadSec) qrUploadSec.style.display = 'none';
         }
+    }
+
+    function checkDailyTimerState() {
+        if (!currentUser) return;
+        let lastClaim = currentUser.lastDailyClaim || 0;
+        let now = Date.now();
+        let startOfToday = new Date(new Date(now).setHours(0,0,0,0)).getTime();
+        
+        let claimBtn = document.getElementById('claimDailyBtn');
+        let timerDisplay = document.getElementById('dailyTimerDisplay');
+
+        if (lastClaim >= startOfToday) {
+            // Already claimed today, calculate time until midnight 12 AM
+            let nextMidnight = startOfToday + 86400000;
+            let diff = nextMidnight - now;
+            
+            if (diff > 0) {
+                if(claimBtn) { claimBtn.disabled = true; claimBtn.style.opacity = '0.6'; claimBtn.innerText = 'Claimed Today'; }
+                updateCountdownDisplay(diff);
+            }
+        } else {
+            if(claimBtn) { claimBtn.disabled = false; claimBtn.style.opacity = '1'; claimBtn.innerText = 'Claim Daily Gift'; }
+            if(timerDisplay) timerDisplay.innerText = '';
+        }
+    }
+
+    function updateCountdownDisplay(diffMs) {
+        let timerDisplay = document.getElementById('dailyTimerDisplay');
+        if(!timerDisplay) return;
+
+        let hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+        timerDisplay.innerText = `⏳ Next claim in: ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')} (Until 12 AM)`;
+
+        if (diffMs > 1000) {
+            setTimeout(() => updateCountdownDisplay(diffMs - 1000), 1000);
+        } else {
+            fetchUserData();
+        }
+    }
+
+    // Daily Check-in Bonus with 3D Realistic Animation Modal
+    async function claimDaily() {
+        if(!currentUser) return;
+        
+        let modal = document.getElementById('giftAnimModal');
+        let animText = document.getElementById('giftAnimText');
+        if(modal) modal.style.display = 'flex';
+        if(animText) animText.innerText = 'Opening 3D Realistic Gift Box...';
+
+        setTimeout(async () => {
+            let res = await fetch('/api/claim-daily', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ userId: currentUser._id })
+            }).then(r => r.json()).catch(() => ({ success: false, message: 'Server connection error!' }));
+            
+            if(modal) modal.style.display = 'none';
+            showToast(res.message);
+            if(res.success) {
+                fetchUserData();
+            }
+        }, 1800);
+    }
+
+    // Watch Ads without 60s limit
+    async function startWatchAd() {
+        if(!currentUser) return;
+        showToast('Processing Ad Reward...');
+        
+        let res = await fetch('/api/watch-ad', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId: currentUser._id })
+        }).then(r => r.json()).catch(() => ({ success: true, message: 'Ad reward added successfully (+20 coins)!' }));
+        
+        showToast(res.message || '✅ Coins added successfully!');
+        if(res.success) fetchUserData();
     }
 
     function copyUidText() {
@@ -735,7 +831,6 @@
         }
     }
 
-    // Dynamic Game Activity View with actual WinGo Results
     function loadGameActivityView() {
         if(!globalHistoryData) return;
         let html = '<h4 style="color:#facc15; margin-bottom:8px;">Game Betting Winnings & Losses</h4>';
@@ -747,7 +842,6 @@
                 let winningsVal = b.status === 'win' ? (b.payout || (b.amount * 2)).toFixed(2) : '0.00';
                 let profitLossVal = b.status === 'win' ? `+₹${(b.amount).toFixed(2)}` : `-₹${(b.amount).toFixed(2)}`;
 
-                // Dynamic Result mapping from backend
                 let resNum = b.gameResult ? b.gameResult.number : '?';
                 let resColor = b.gameResult ? b.gameResult.color : 'red';
                 let resSize = b.gameResult ? b.gameResult.size : 'big';
@@ -920,44 +1014,6 @@
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = 'auth.html';
-    }
-
-    async function claimDaily() {
-        if(!currentUser) return;
-        let res = await fetch('/api/claim-daily', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ userId: currentUser._id })
-        }).then(r => r.json()).catch(() => ({ success: true, message: 'Daily reward claimed successfully (+10 coins)!' }));
-        
-        showToast(res.message || '✅ Daily bonus collected successfully!');
-        if(res.success) fetchUserData();
-    }
-
-    async function startWatchAd() {
-        if(!currentUser) return;
-        showToast('Watching ad for 60 seconds...');
-        let timerDisplay = document.getElementById('timerDisplay');
-        let secondsLeft = 60;
-        if(timerDisplay) timerDisplay.innerText = `Ad playing: ${secondsLeft}s remaining...`;
-        
-        let interval = setInterval(async () => {
-            secondsLeft--;
-            if(secondsLeft > 0) {
-                if(timerDisplay) timerDisplay.innerText = `Ad playing: ${secondsLeft}s remaining...`;
-            } else {
-                clearInterval(interval);
-                if(timerDisplay) timerDisplay.innerText = '';
-                let res = await fetch('/api/watch-ad', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ userId: currentUser._id })
-                }).then(r => r.json()).catch(() => ({ success: page => true, message: 'Ad reward added successfully (+20 coins)!' }));
-                
-                showToast(res.message || '✅ Coins added from ad watch!');
-                if(res.success) fetchUserData();
-            }
-        }, 1000);
     }
 </script>
 </body>
