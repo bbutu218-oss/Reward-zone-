@@ -6,7 +6,7 @@
     <title>Rewards Zone - Authentication</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; overflow: hidden; }
+        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 0; overflow: hidden; touch-action: manipulation; }
         
         /* Splash Screen Styles */
         #splashScreen {
@@ -213,6 +213,11 @@
 </div>
 
 <script>
+    // Completely block pinch to zoom via JS
+    document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+    document.addEventListener('touchmove', function (e) { if (e.scale !== 1) { e.preventDefault(); } }, { passive: false });
+
+    // 3 seconds ke baad splash screen hide karke login section active karna
     setTimeout(() => {
         let splash = document.getElementById('splashScreen');
         splash.style.opacity = '0';
@@ -227,6 +232,7 @@
     const urlParams = new URLSearchParams(window.location.search);
     const refUid = urlParams.get('ref');
 
+    // Automatically fill referral code if present in URL
     window.addEventListener('DOMContentLoaded', () => {
         if (refUid) {
             let refInput = document.getElementById('regRefCode');
