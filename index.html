@@ -39,6 +39,7 @@
         
         .action-btn { background: linear-gradient(135deg, #a855f7, #10b981); color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4); }
         .action-btn:hover { opacity: 0.95; }
+        .action-btn:disabled { opacity: 0.6; cursor: not-allowed; background: #475569; box-shadow: none; }
         
         .profile-top-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: rgba(30, 27, 75, 0.85); padding: 15px; border-radius: 16px; border: 1px solid #7c3aed; }
         .avatar-box { width: 80px; height: 80px; background: linear-gradient(135deg, #a855f7, #10b981); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 38px; border: 2px solid #34d399; }
@@ -85,7 +86,6 @@
         .modal-content { background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #a7f3d0; background: none; border: none; }
         
-        /* 3D Gift Animation Modal Styles */
         #giftAnimModal .modal-content { text-align: center; }
         .gift-box-3d { font-size: 80px; animation: bounceGift 1s infinite alternate; margin: 20px 0; cursor: pointer; filter: drop-shadow(0 10px 15px rgba(168,85,247,0.5)); }
         @keyframes bounceGift {
@@ -139,7 +139,6 @@
         <!-- Banner Ad Section for Owner Earning (No Coins to User) -->
         <div class="card" style="text-align: center; background: rgba(15, 23, 42, 0.6); border: 1px dashed #7c3aed; padding: 12px;">
             <p style="font-size: 11px; color: #94a3b8; margin-bottom: 6px;">Sponsored Advertisement</p>
-            <!-- Adsterra Banner Ad Script -->
             <div id="banner-ad-container" style="min-height: 250px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <script type="text/javascript">
                     atOptions = {
@@ -462,7 +461,6 @@
 </div>
 
 <script>
-    // Completely block pinch to zoom via JS
     document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
     document.addEventListener('touchmove', function (e) { if (e.scale !== 1) { e.preventDefault(); } }, { passive: false });
 
@@ -681,17 +679,62 @@
         }
     }
 
+    /* Adsterra Popunder Ad Integration + 30 Sec Timer */
+    let isAdTimerRunning = false;
+
     async function startWatchAd() {
-        if(!currentUser) return;
-        showToast('Processing ad reward (+20 coins)...');
-        let res = await fetch('/api/watch-ad', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ userId: currentUser._id })
-        }).then(r => r.json());
-        
-        showToast(res.message);
-        if(res.success) fetchUserData();
+        if (!currentUser) return;
+        if (isAdTimerRunning) return;
+
+        let watchBtn = document.getElementById('watchAdBtn');
+        isAdTimerRunning = true;
+        watchBtn.disabled = true;
+
+        // Adsterra Popunder Ad Script Injection
+        try {
+            let adScript = document.createElement('script');
+            adScript.setAttribute('data-cfasync', 'false');
+            adScript.src = 'https://abscloud.org/1/a3e1e19cef1c79613ec4cdea32bd84c6';
+            document.body.appendChild(adScript);
+        } catch (err) {
+            console.error("Adsterra Script load error:", err);
+        }
+
+        let timeLeft = 30;
+        watchBtn.innerText = `Please wait (${timeLeft}s)...`;
+
+        showToast('Ad started! Please wait 30 seconds to claim reward.');
+
+        let adTimerInterval = setInterval(async () => {
+            timeLeft--;
+            if (timeLeft > 0) {
+                watchBtn.innerText = `Please wait (${timeLeft}s)...`;
+            } else {
+                clearInterval(adTimerInterval);
+                watchBtn.innerText = 'Processing Reward...';
+
+                try {
+                    let res = await fetch('/api/watch-ad', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: currentUser._id })
+                    }).then(r => r.json());
+
+                    if (res.success) {
+                        showToast(res.message);
+                        await fetchUserData();
+                    } else {
+                        showToast(res.message || 'Failed to claim reward.');
+                    }
+                } catch (e) {
+                    showToast('Error claiming reward. Please try again!');
+                }
+
+                watchBtn.innerText = 'Watch Ad Now';
+                watchBtn.disabled = false;
+                isAdTimerRunning = false;
+            }
+        }, 1000);
     }
 
     function openConvertModal() { document.getElementById('convertModal').style.display = 'flex'; }
