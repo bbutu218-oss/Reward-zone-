@@ -679,7 +679,7 @@
         }
     }
 
-    /* Adsterra Popunder Ad Integration + 30 Sec Timer */
+    /* Adsterra Smart Link Integration + 30 Sec Timer */
     let isAdTimerRunning = false;
 
     async function startWatchAd() {
@@ -690,20 +690,14 @@
         isAdTimerRunning = true;
         watchBtn.disabled = true;
 
-        // Adsterra Popunder Ad Script Injection
-        try {
-            let adScript = document.createElement('script');
-            adScript.setAttribute('data-cfasync', 'false');
-            adScript.src = 'https://abscloud.org/1/a3e1e19cef1c79613ec4cdea32bd84c6';
-            document.body.appendChild(adScript);
-        } catch (err) {
-            console.error("Adsterra Script load error:", err);
-        }
+        // Open Adsterra Smart Link in a new tab/window
+        let adSmartLink = 'https://araplhn.org/4/7fbc5fffc3b02497b87a99a07e100a1b';
+        window.open(adSmartLink, '_blank');
 
         let timeLeft = 30;
         watchBtn.innerText = `Please wait (${timeLeft}s)...`;
 
-        showToast('Ad started! Please wait 30 seconds to claim reward.');
+        showToast('Ad opened! Please watch for 30 seconds to claim coins.');
 
         let adTimerInterval = setInterval(async () => {
             timeLeft--;
