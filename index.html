@@ -10,7 +10,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; touch-action: manipulation; }
-        .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: hidden; }
+        .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 90px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: hidden; }
         .page { display: none; }
         .page.active { display: block; }
         
@@ -55,8 +55,8 @@
         .square-icon { font-size: 18px; margin-bottom: 4px; }
         .square-title { font-size: 11px; font-weight: 600; color: #ffffff; }
 
-        .logout-container { display: flex; justify-content: center; margin-bottom: 20px; }
-        .logout-small-btn { background: rgba(127,29,29,0.3); border: 1px solid #7f1d1d; color: #fca5a5; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .logout-container { display: flex; justify-content: center; margin-top: 15px; margin-bottom: 25px; }
+        .logout-small-btn { background: rgba(127,29,29,0.3); border: 1px solid #7f1d1d; color: #fca5a5; padding: 8px 20px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
         .logout-small-btn:hover { background: rgba(127,29,29,0.6); }
         
         .deposit-card { background: rgba(30, 27, 75, 0.85); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 15px; }
@@ -79,8 +79,8 @@
         #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #1e1b4b; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #34d399; }
         #toastNotification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: rgba(30, 27, 75, 0.95); display: flex; justify-around; border-top: 1px solid #7c3aed; padding: 12px 0; z-index: 100; backdrop-filter: blur(10px); }
-        .nav-item { text-align: center; color: #a7f3d0; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
+        .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: rgba(30, 27, 75, 0.95); display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #7c3aed; padding: 12px 0; z-index: 100; backdrop-filter: blur(10px); }
+        .nav-item { text-align: center; color: #a7f3d0; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .nav-item.active { color: #34d399; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
@@ -231,6 +231,7 @@
             </div>
         </div>
 
+        <!-- Blue Box: Logout Button -->
         <div class="logout-container">
             <button class="logout-small-btn" onclick="logout()">
                 <span>🚪</span> Logout
@@ -376,11 +377,17 @@
         <div id="adminRequestsContainer" style="font-size: 12px; color: #d1fae5;">Loading requests...</div>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Red Box: Bottom Navigation Bar with Home, Games, Profile -->
     <div class="nav-bar" id="bottomNavBar">
-        <button class="nav-item active" onclick="switchPage('homePage')">🏠 Home</button>
-        <button class="nav-item" onclick="switchPage('gamesHubPage')">🎮 Games</button>
-        <button class="nav-item" onclick="switchPage('profilePage')">👤 Profile</button>
+        <button class="nav-item active" id="navHomeBtn" onclick="switchPage('homePage')">
+            <span>🏠</span> Home
+        </button>
+        <button class="nav-item" id="navGamesBtn" onclick="switchPage('gamesHubPage')">
+            <span>🎮</span> Games
+        </button>
+        <button class="nav-item" id="navProfileBtn" onclick="switchPage('profilePage')">
+            <span>👤</span> Profile
+        </button>
     </div>
 </div>
 
@@ -579,6 +586,13 @@
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         let targetPage = document.getElementById(pageId);
         if(targetPage) targetPage.classList.add('active');
+
+        // Update Bottom Nav Active State
+        document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+        if (pageId === 'homePage') document.getElementById('navHomeBtn')?.classList.add('active');
+        if (pageId === 'gamesHubPage') document.getElementById('navGamesBtn')?.classList.add('active');
+        if (pageId === 'profilePage') document.getElementById('navProfileBtn')?.classList.add('active');
+
         if (pageId === 'historyPage') loadHistoryData();
         if (pageId === 'adminPanelPage') loadAdminPanelData();
         if (pageId === 'depositPage') loadSavedQrCode();
@@ -680,7 +694,6 @@
         }
     }
 
-    /* Adsterra Smart Link Integration + 30 Sec Timer */
     let isAdTimerRunning = false;
 
     async function startWatchAd() {
@@ -691,7 +704,6 @@
         isAdTimerRunning = true;
         watchBtn.disabled = true;
 
-        // Open Adsterra Smart Link in a new tab/window
         let adSmartLink = 'https://araplhn.org/4/7fbc5fffc3b02497b87a99a07e100a1b';
         window.open(adSmartLink, '_blank');
 
