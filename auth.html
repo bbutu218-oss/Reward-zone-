@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rewards Zone - Authentication</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -213,7 +213,6 @@
 </div>
 
 <script>
-    // 3 seconds ke baad splash screen hide karke login section active karna
     setTimeout(() => {
         let splash = document.getElementById('splashScreen');
         splash.style.opacity = '0';
@@ -228,7 +227,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const refUid = urlParams.get('ref');
 
-    // Automatically fill referral code if present in URL
     window.addEventListener('DOMContentLoaded', () => {
         if (refUid) {
             let refInput = document.getElementById('regRefCode');
