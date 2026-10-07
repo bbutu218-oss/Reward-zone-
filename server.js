@@ -37,16 +37,10 @@ const userSchema = new mongoose.Schema({
     winningsBalance: { type: Number, default: 0 }, 
     rewardCoins: { type: Number, default: 0 }, 
     referredBy: { type: String, default: null },
-    lastDailyClaim: { type: String, default: '' },
+    lastDailyClaim: { type: Date, default: null },
     createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
-
-const dailyJackpotLogSchema = new mongoose.Schema({
-    dateStr: { type: String, required: true },
-    jackpotUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
-});
-const DailyJackpotLog = mongoose.model('DailyJackpotLog', dailyJackpotLogSchema);
 
 const gameResultSchema = new mongoose.Schema({
     timerType: { type: String, default: '30s' }, 
@@ -167,6 +161,11 @@ app.post('/api/register', async (req, res) => {
         const existingUser = await User.findOne({ phone });
         if (existingUser) return res.status(400).json({ success: false, message: "User already exists!" });
 
+        let referrer = null;
+        if (refUid) {
+            referrer = await User.findOne({ uid: refUid });
+        }
+
         const newUser = new User({ 
             phone, 
             password, 
@@ -178,12 +177,9 @@ app.post('/api/register', async (req, res) => {
 
         await newUser.save();
 
-        if (refUid) {
-            const referrer = await User.findOne({ uid: refUid });
-            if (referrer) {
-                referrer.rewardCoins += 500; // Old/Referrer user gets 500 coins
-                await referrer.save();
-            }
+        if (referrer) {
+            referrer.rewardCoins += 500; // Old user gets 500 coins referral bonus
+            await referrer.save();
         }
 
         res.json({ success: true, message: "Registration successful!" });
@@ -229,46 +225,41 @@ app.post('/api/claim-daily', async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ success: false, message: "User not found!" });
 
-        const todayStr = new Date().toDateString();
-        if (user.lastDailyClaim === todayStr) {
+        const now = new Date();
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        if (user.lastDailyClaim && new Date(user.lastDailyClaim) >= startOfToday) {
             return res.status(400).json({ success: false, message: "You have already claimed your daily bonus today! Come back after 12 AM." });
         }
 
-        let log = await DailyJackpotLog.findOne({ dateStr: todayStr });
-        if (!log) {
-            log = new DailyJackpotLog({ dateStr: todayStr, jackpotUsers: [] });
-        }
+        // Check daily lucky jackpot count (max 3 users per day)
+        const todayStart = startOfToday;
+        const luckyCountToday = await User.countDocuments({
+            lastDailyClaim: { $gte: todayStart },
+            rewardCoins: { $gte: 30 }
+        });
 
         let earnedReward = 0;
         let isJackpot = false;
 
-        // Check if today already has 3 jackpot winners
-        if (log.jackpotUsers.length < 3 && !log.jackpotUsers.includes(user._id)) {
-            // 3% chance or random selection for jackpot among daily users, let's make it so first few or random
-            let roll = Math.random();
-            if (roll < 0.25) { // 25% chance to hit jackpot if under 3 winners
-                isJackpot = true;
-            }
-        }
-
-        if (isJackpot) {
-            earnedReward = Math.floor(Math.random() * (100 - 30 + 1)) + 30; // 30 to 100 coins
-            log.jackpotUsers.push(user._id);
-            await log.save();
+        if (luckyCountToday < 3 && Math.random() < 0.15) {
+            // Jackpot between 30 to 100 coins
+            earnedReward = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
+            isJackpot = true;
         } else {
-            // Random normal reward between 0.10 and 30 coins (let's use float rounded to 2 decimals)
+            // Random between 0.10 to 30 coins
             earnedReward = parseFloat((Math.random() * (30 - 0.10) + 0.10).toFixed(2));
         }
 
         user.rewardCoins += earnedReward;
-        user.lastDailyClaim = todayStr;
+        user.lastDailyClaim = now;
         await user.save();
 
         res.json({ 
             success: true, 
             reward: earnedReward, 
             isJackpot: isJackpot,
-            message: isJackpot ? `🎉 JACKPOT! You won ${earnedReward} Coins!` : `🎁 You won ${earnedReward} Coins!` 
+            message: `Successfully claimed ${earnedReward} coins!` 
         });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
@@ -279,12 +270,12 @@ app.post('/api/watch-ad', async (req, res) => {
     try {
         const { userId } = req.body;
         const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ success: false, message: "User not found" });
+        if (!user) return res.status(404).json({ success: false, message: "User not found!" });
 
-        user.rewardCoins += 20; // Reward for watching ad
+        user.rewardCoins += 20;
         await user.save();
 
-        res.json({ success: true, rewardCoins: user.rewardCoins, message: "Successfully earned 20 coins from ad!" });
+        res.json({ success: true, message: "Ad watched successfully! +20 coins added.", rewardCoins: user.rewardCoins });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -310,7 +301,7 @@ app.get('/api/user/:userId', async (req, res) => {
         const user = await User.findById(req.params.userId);
         if (!user) return res.status(404).json({ success: false, message: "User not found" });
         const isAdmin = ADMIN_NUMBERS.includes(user.phone);
-        res.json({ success: true, balance: user.balance, winningsBalance: user.winningsBalance, rewardCoins: user.rewardCoins, isAdmin, user });
+        res.json({ success: true, balance: user.balance, winningsBalance: user.winningsBalance, rewardCoins: user.rewardCoins, lastDailyClaim: user.lastDailyClaim, isAdmin, user });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
@@ -604,7 +595,7 @@ app.post('/api/bet', async (req, res) => {
         const newBet = new Bet({ userId, timerType, period, betType, betValue, amount });
         await newBet.save();
 
-        res.json({ success: true, message: "Bet successfully added!", newBalance: user.balance, newWinnings: user.winningsBalance });
+        res.json({ success: true, message: "Bet successfully added!", newBalance: user.balance, newWinnings: user.winningsBalance, rewardCoins: user.rewardCoins });
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
