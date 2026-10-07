@@ -171,14 +171,14 @@ app.post('/api/register', async (req, res) => {
             password, 
             balance: 5, 
             winningsBalance: 0,
-            rewardCoins: 100, // New user gets 100 coins
+            rewardCoins: 100,
             referredBy: refUid || null 
         });
 
         await newUser.save();
 
         if (referrer) {
-            referrer.rewardCoins += 500; // Old user gets 500 coins referral bonus
+            referrer.rewardCoins += 500;
             await referrer.save();
         }
 
@@ -232,7 +232,6 @@ app.post('/api/claim-daily', async (req, res) => {
             return res.status(400).json({ success: false, message: "You have already claimed your daily bonus today! Come back after 12 AM." });
         }
 
-        // Check daily lucky jackpot count (max 3 users per day)
         const todayStart = startOfToday;
         const luckyCountToday = await User.countDocuments({
             lastDailyClaim: { $gte: todayStart },
@@ -243,11 +242,9 @@ app.post('/api/claim-daily', async (req, res) => {
         let isJackpot = false;
 
         if (luckyCountToday < 3 && Math.random() < 0.15) {
-            // Jackpot between 30 to 100 coins
             earnedReward = Math.floor(Math.random() * (100 - 30 + 1)) + 30;
             isJackpot = true;
         } else {
-            // Random between 0.10 to 30 coins
             earnedReward = parseFloat((Math.random() * (30 - 0.10) + 0.10).toFixed(2));
         }
 
