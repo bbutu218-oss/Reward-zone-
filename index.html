@@ -13,7 +13,7 @@
         .page { display: none; }
         .page.active { display: block; }
         
-        /* 3 Second Splash Screen Styling */
+        /* 3 Second Splash Screen */
         #splashScreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(135deg, #1e1b4b, #064e3b); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 99999; transition: opacity 0.5s ease; }
         #splashScreen img { width: 120px; height: 120px; border-radius: 24px; animation: pulseLogo 1.5s infinite alternate; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
         @keyframes pulseLogo {
@@ -77,21 +77,6 @@
         #toastNotification { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #1e1b4b; color: #fff; padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: bold; z-index: 9999; transition: transform 0.4s ease, opacity 0.4s ease; opacity: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.3); border: 1px solid #34d399; }
         #toastNotification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        /* 3D Realistic Gift Box Animation Overlay */
-        #giftAnimModal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 20000; flex-direction: column; perspective: 1000px; }
-        .gift-box-3d { width: 120px; height: 120px; background: linear-gradient(135deg, #ef4444, #b91c1c); border-radius: 15px; position: relative; transform-style: preserve-3d; animation: bounceGift 1.2s infinite alternate ease-in-out; box-shadow: 0 20px 40px rgba(239, 68, 68, 0.5); display: flex; align-items: center; justify-content: center; font-size: 50px; }
-        .gift-box-3d::before { content: ''; position: absolute; width: 20px; height: 100%; background: #facc15; top: 0; }
-        .gift-box-3d::after { content: ''; position: absolute; width: 100%; height: 20px; background: #facc15; top: 50%; transform: translateY(-50%); }
-        @keyframes bounceGift {
-            0% { transform: translateY(0) rotateX(10deg) rotateY(-10deg); }
-            100% { transform: translateY(-20px) rotateX(-10deg) rotateY(10deg); }
-        }
-        .reward-result-popup { margin-top: 25px; font-size: 24px; font-weight: bold; color: #34d399; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.8); animation: popUpScale 0.3s ease; }
-        @keyframes popUpScale {
-            0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
         .nav-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 450px; background: rgba(30, 27, 75, 0.95); display: flex; justify-content: space-around; border-top: 1px solid #7c3aed; padding: 12px 0; z-index: 100; backdrop-filter: blur(10px); }
         .nav-item { text-align: center; color: #a7f3d0; font-size: 12px; font-weight: bold; cursor: pointer; background: none; border: none; }
         .nav-item.active { color: #34d399; }
@@ -99,6 +84,14 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
         .modal-content { background: rgba(30, 27, 75, 0.95); border: 1px solid #7c3aed; border-radius: 16px; padding: 20px; width: 100%; max-width: 380px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .close-modal-btn { position: absolute; top: 12px; right: 15px; font-size: 20px; cursor: pointer; color: #a7f3d0; background: none; border: none; }
+        
+        /* 3D Gift Animation Modal Styles */
+        #giftAnimModal .modal-content { text-align: center; }
+        .gift-box-3d { font-size: 80px; animation: bounceGift 1s infinite alternate; margin: 20px 0; cursor: pointer; filter: drop-shadow(0 10px 15px rgba(168,85,247,0.5)); }
+        @keyframes bounceGift {
+            0% { transform: translateY(0) scale(1) rotate(0deg); }
+            100% { transform: translateY(-15px) scale(1.1) rotate(5deg); }
+        }
     </style>
 </head>
 <body>
@@ -109,12 +102,6 @@
 </div>
 
 <div id="toastNotification">Notification message</div>
-
-<!-- 3D Realistic Animation Modal for Daily Check-in -->
-<div id="giftAnimModal">
-    <div class="gift-box-3d">🎁</div>
-    <div id="giftResultText" class="reward-result-popup" style="display: none;"></div>
-</div>
 
 <div class="container">
     <!-- Home Page -->
@@ -133,8 +120,8 @@
         <div class="card">
             <h4>🎁 Daily Check-in Bonus</h4>
             <p>Claim your free daily reward (0.10 to 30 coins, 3 lucky users get 30-100 jackpot coins!).</p>
-            <div id="dailyTimerDisplay" style="font-size: 13px; color: #facc15; margin-bottom: 8px; font-weight: bold;"></div>
-            <button class="action-btn" id="claimDailyBtn" onclick="claimDailyBonus()">Open Daily Gift</button>
+            <div id="dailyTimerDisplay" style="font-size: 13px; color: #34d399; margin-bottom: 8px; font-weight: bold;"></div>
+            <button class="action-btn" id="claimDailyBtn" onclick="openDailyGiftAnimation()">Open Daily Gift</button>
         </div>
 
         <div class="card">
@@ -394,6 +381,17 @@
     </div>
 </div>
 
+<!-- Daily Gift Animation Modal -->
+<div class="modal-overlay" id="giftAnimModal">
+    <div class="modal-content">
+        <button class="close-modal-btn" onclick="closeGiftModal()">×</button>
+        <h3 style="color: #34d399; margin-bottom: 5px;" id="giftModalTitle">🎁 Daily Check-in Gift</h3>
+        <p style="font-size: 12px; color: #a7f3d0;" id="giftModalSub">Click the gift box below to open!</p>
+        <div class="gift-box-3d" id="giftBoxIcon" onclick="claimDailyRewardAnimation()">🎁</div>
+        <div id="giftRewardResult" style="font-size: 18px; font-weight: bold; color: #facc15; margin-top: 10px; display: none;"></div>
+    </div>
+</div>
+
 <div class="modal-overlay" id="convertModal">
     <div class="modal-content">
         <button class="close-modal-btn" onclick="closeConvertModal()">×</button>
@@ -494,7 +492,7 @@
 
         await fetchUserData();
         await loadSavedQrCode();
-        checkDailyTimerStatus();
+        startDailyCountdownTimer();
 
         if (!sessionStorage.getItem('terms_accepted')) {
             let termsModal = document.getElementById('termsModal');
@@ -550,95 +548,6 @@
         }
     }
 
-    // Check if today's bonus is already claimed to manage 12 AM timer
-    function checkDailyTimerStatus() {
-        if(!currentUser) return;
-        let todayStr = new Date().toDateString();
-        let claimBtn = document.getElementById('claimDailyBtn');
-        let timerDisplay = document.getElementById('dailyTimerDisplay');
-
-        if (currentUser.lastDailyClaim === todayStr) {
-            if(claimBtn) {
-                claimBtn.disabled = true;
-                claimBtn.style.opacity = '0.6';
-                claimBtn.innerText = 'Already Claimed Today';
-            }
-            if(timerDisplay) {
-                // Calculate time remaining until 12 AM
-                updateCountdownToMidnight(timerDisplay);
-                setInterval(() => updateCountdownToMidnight(timerDisplay), 1000);
-            }
-        } else {
-            if(claimBtn) {
-                claimBtn.disabled = false;
-                claimBtn.style.opacity = '1';
-                claimBtn.innerText = 'Open Daily Gift';
-            }
-            if(timerDisplay) timerDisplay.innerText = '';
-        }
-    }
-
-    function updateCountdownToMidnight(displayEl) {
-        let now = new Date();
-        let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-        let diff = midnight - now;
-        
-        let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        let seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        displayEl.innerText = `⏳ Next claim available in: ${hours}h ${minutes}m ${seconds}s (Resets at 12 AM)`;
-    }
-
-    // Daily Check-in with 3D Realistic Gift Animation & 2sec result display
-    async function claimDailyBonus() {
-        if(!currentUser) return;
-        
-        let animModal = document.getElementById('giftAnimModal');
-        let resultText = document.getElementById('giftResultText');
-        animModal.style.display = 'flex';
-        resultText.style.display = 'none';
-
-        let res = await fetch('/api/claim-daily', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ userId: currentUser._id })
-        }).then(r => r.json()).catch(() => ({ success: false, message: 'Server error!' }));
-
-        setTimeout(async () => {
-            if(res.success) {
-                resultText.innerText = res.message;
-                resultText.style.display = 'block';
-                await fetchUserData();
-                checkDailyTimerStatus();
-
-                // Hide result and modal after exactly 2 seconds
-                setTimeout(() => {
-                    animModal.style.display = 'none';
-                    resultText.style.display = 'none';
-                }, 2000);
-            } else {
-                animModal.style.display = 'none';
-                showToast(res.message);
-            }
-        }, 1500); // 1.5s box opening animation duration
-    }
-
-    // Watch Ad without 60s limit restriction
-    async function startWatchAd() {
-        if(!currentUser) return;
-        showToast('Playing video ad...');
-        
-        let res = await fetch('/api/watch-ad', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ userId: currentUser._id })
-        }).then(r => r.json()).catch(() => ({ success: true, message: 'Ad reward added successfully (+20 coins)!' }));
-        
-        showToast(res.message || '✅ Coins added from ad watch!');
-        if(res.success) fetchUserData();
-    }
-
     function copyUidText() {
         let uidVal = document.getElementById('profileUidDisplay').value;
         navigator.clipboard.writeText(uidVal);
@@ -663,6 +572,106 @@
             navigator.clipboard.writeText(shareUrl);
             showToast('Referral link copied to clipboard!');
         }
+    }
+
+    // Daily Check-in & 3D Gift Animation
+    function openDailyGiftAnimation() {
+        if (!currentUser) return;
+        document.getElementById('giftRewardResult').style.display = 'none';
+        document.getElementById('giftRewardResult').innerText = '';
+        document.getElementById('giftBoxIcon').style.display = 'block';
+        document.getElementById('giftModalSub').innerText = 'Click the gift box below to open!';
+        document.getElementById('giftAnimModal').style.display = 'flex';
+    }
+
+    function closeGiftModal() {
+        document.getElementById('giftAnimModal').style.display = 'none';
+    }
+
+    async function claimDailyRewardAnimation() {
+        let res = await fetch('/api/claim-daily', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId: currentUser._id })
+        }).then(r => r.json());
+
+        if(!res.success) {
+            showToast(res.message);
+            closeGiftModal();
+            return;
+        }
+
+        let reward = res.reward;
+        let isJackpot = res.isJackpot;
+
+        let boxEl = document.getElementById('giftBoxIcon');
+        let resEl = document.getElementById('giftRewardResult');
+        let subEl = document.getElementById('giftModalSub');
+
+        boxEl.style.display = 'none';
+        subEl.innerText = isJackpot ? '🎉 JACKPOT WINNER! 🎉' : '✨ Reward Unlocked! ✨';
+        
+        resEl.innerText = `+${reward} Coins`;
+        resEl.style.display = 'block';
+
+        fetchUserData();
+        startDailyCountdownTimer();
+
+        // Hide result screen after 2 seconds
+        setTimeout(() => {
+            closeGiftModal();
+            showToast(`✅ Claimed ${reward} coins successfully!`);
+        }, 2000);
+    }
+
+    function startDailyCountdownTimer() {
+        let timerEl = document.getElementById('dailyTimerDisplay');
+        let claimBtn = document.getElementById('claimDailyBtn');
+        if(!currentUser) return;
+
+        if (currentUser.lastDailyClaim) {
+            let lastClaimTime = new Date(currentUser.lastDailyClaim).getTime();
+            let now = new Date().getTime();
+            let nextMidnight = new Date(currentUser.lastDailyClaim);
+            nextMidnight.setHours(24, 0, 0, 0);
+            
+            let timeLeft = nextMidnight.getTime() - now;
+
+            if (timeLeft > 0) {
+                claimBtn.disabled = true;
+                claimBtn.style.opacity = '0.6';
+                
+                let interval = setInterval(() => {
+                    let nowInterval = new Date().getTime();
+                    let diff = nextMidnight.getTime() - nowInterval;
+
+                    if (diff <= 0) {
+                        clearInterval(interval);
+                        if(timerEl) timerEl.innerText = '';
+                        claimBtn.disabled = false;
+                        claimBtn.style.opacity = '1';
+                    } else {
+                        let hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        let minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        let seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                        if(timerEl) timerEl.innerText = `Next claim available in: ${hours}h ${minutes}m ${seconds}s`;
+                    }
+                }, 1000);
+            }
+        }
+    }
+
+    async function startWatchAd() {
+        if(!currentUser) return;
+        showToast('Processing ad reward (+20 coins)...');
+        let res = await fetch('/api/watch-ad', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ userId: currentUser._id })
+        }).then(r => r.json());
+        
+        showToast(res.message);
+        if(res.success) fetchUserData();
     }
 
     function openConvertModal() { document.getElementById('convertModal').style.display = 'flex'; }
