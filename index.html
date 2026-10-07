@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rewards Zone</title>
     <meta name="monetag" content="461f12f4999caa17cb8e670a67481109">
     <script>(function(s){s.dataset.zone='11824344',s.src='https://n6wxm.com/vignette.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; }
+        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; touch-action: manipulation; }
         .container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 20px; padding-bottom: 70px; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); overflow-x: hidden; }
         .page { display: none; }
         .page.active { display: block; }
@@ -444,6 +444,10 @@
 </div>
 
 <script>
+    // Completely block pinch to zoom via JS
+    document.addEventListener('gesturestart', function (e) { e.preventDefault(); });
+    document.addEventListener('touchmove', function (e) { if (e.scale !== 1) { e.preventDefault(); } }, { passive: false });
+
     // 3 Second Splash Screen
     window.addEventListener('load', () => {
         setTimeout(() => {
@@ -574,7 +578,6 @@
         }
     }
 
-    // Daily Check-in & 3D Gift Animation
     function openDailyGiftAnimation() {
         if (!currentUser) return;
         document.getElementById('giftRewardResult').style.display = 'none';
@@ -617,7 +620,6 @@
         fetchUserData();
         startDailyCountdownTimer();
 
-        // Hide result screen after 2 seconds
         setTimeout(() => {
             closeGiftModal();
             showToast(`✅ Claimed ${reward} coins successfully!`);
