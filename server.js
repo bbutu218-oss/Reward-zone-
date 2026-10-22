@@ -23,7 +23,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(cors());
 app.use(express.static(__dirname));
 
-const MONGO_URI = "mongodb+srv://bbutu218_db_user:9RnyfbrEBzNaZlYX@cluster0.gq1rmfz.mongodb.net/?appName=Cluster0";
+const MONGO_URI = "mongodb+srv://bbutu218_db_user:3YbFSJR0HEjpZaTq@cluster1.vpshgsu.mongodb.net/?retryWrites=true&w=majority";
 
 function generateUID() {
     return Math.floor(100000 + Math.random() * 900000).toString();
