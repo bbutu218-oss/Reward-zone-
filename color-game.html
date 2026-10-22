@@ -1,642 +1,867 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rewards Zone - WinGo 3D Trading</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; padding: 10px; display: flex; justify-content: center; min-height: 100vh; align-items: center; }
-        .app-container { width: 100%; max-width: 450px; background: linear-gradient(135deg, #1e1b4b, #064e3b); border-radius: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #34d399; backdrop-filter: blur(10px); position: relative; overflow: hidden; }
-        
-        /* Updated Header Styles */
-        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .logo-ticker-container { width: 100%; overflow: hidden; white-space: nowrap; border-top: 1px solid rgba(52, 211, 153, 0.3); border-bottom: 1px solid rgba(52, 211, 153, 0.3); padding: 6px 0; margin-bottom: 12px; background: rgba(15, 23, 42, 0.4); }
-        .logo-ticker { display: inline-block; font-size: 16px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; animation: marquee 8s linear infinite; }
-        @keyframes marquee {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(450px); }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: linear-gradient(135deg, #2e1065, #022c22); color: #fff; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; touch-action: manipulation; }
+        .container { width: 100%; max-width: 500px; background: linear-gradient(135deg, #1e1b4b, #064e3b); min-height: 100vh; padding: 60px 12px 12px 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; overflow-x: hidden; }
 
-        .back-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: bold; }
-        .back-btn:hover { border-color: #34d399; }
-        .wallet-badge-container { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
-        .wallet-badge { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; padding: 6px 14px; border-radius: 20px; font-weight: bold; color: #34d399; font-size: 13px; box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2); }
-        
-        .timer-tabs { display: flex; gap: 8px; margin: 15px 0; }
-        .tab-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 10px 5px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
-        .tab-btn.active { background: linear-gradient(135deg, #a855f7, #10b981); color: #fff; border-color: #34d399; box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4); }
-        
-        .timer-board { background: linear-gradient(135deg, #064e3b, #022c22); border-radius: 14px; padding: 15px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border: 1px solid #34d399; }
-        .board-left p { font-size: 11px; color: #a7f3d0; text-transform: uppercase; font-weight: bold; }
-        .period-no { font-size: 12px; font-weight: bold; margin-top: 5px; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 8px; display: inline-block; color: #34d399; border: 1px solid rgba(52,211,153,0.3); }
-        .timer-clock { background: rgba(15, 23, 42, 0.9); color: #34d399; padding: 6px 12px; border-radius: 10px; font-weight: 900; font-size: 22px; font-family: monospace; letter-spacing: 2px; border: 1px solid #7c3aed; }
-        
-        .betting-area-wrapper { position: relative; }
-        .lock-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99; backdrop-filter: blur(4px); border-radius: 14px; }
-        .count-card { font-size: 50px; font-weight: 900; color: #34d399; background: rgba(30,27,75,0.9); width: 180px; height: 100px; display: flex; justify-content: center; align-items: center; border-radius: 20px; border: 2px solid #34d399; box-shadow: 0 0 20px rgba(52,211,153,0.4); font-family: monospace; letter-spacing: 2px; }
+        .header { position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 10px 12px; z-index: 1000; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(124, 58, 237, 0.4); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .header-left { justify-self: start; }
+        .header-center { justify-self: center; }
+        .header-right { justify-self: end; }
+        .header h2 { font-style: italic; font-weight: 800; background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 1px; font-size: 20px; }
+        .header a, .mute-header-btn { background: rgba(30, 27, 75, 0.8); border: 1px solid #7c3aed; color: #fff; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; text-decoration: none; font-size: 16px; font-weight: bold; cursor: pointer; }
 
-        .color-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-3d { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: 800; font-size: 14px; color: #fff; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .btn-green { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 4px 12px rgba(16,185,129,0.3); border: 1px solid #34d399; }
-        .btn-violet { background: linear-gradient(135deg, #7c3aed, #a855f7); box-shadow: 0 4px 12px rgba(168,85,247,0.3); border: 1px solid #c084fc; }
-        .btn-red { background: linear-gradient(135deg, #dc2626, #ef4444); box-shadow: 0 4px 12px rgba(239,68,68,0.3); border: 1px solid #f87171; }
-        
-        .ball-container { background: rgba(15, 23, 42, 0.6); padding: 15px; border-radius: 14px; border: 1px solid #7c3aed; margin-bottom: 15px; }
-        .ball-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; justify-items: center; }
-        .ball-3d { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: #fff; cursor: pointer; border: 2px solid rgba(255,255,255,0.2); }
-        .ball-green { background: radial-gradient(circle at 30% 30%, #34d399, #059669 100%); }
-        .ball-red { background: radial-gradient(circle at 30% 30%, #f87171, #dc2626 100%); }
-        .ball-half { background: radial-gradient(circle at 30% 30%, #c084fc 0%, #7c3aed 45%, #059669 55%, #10b981 100%); }
-        .ball-half-red { background: radial-gradient(circle at 30% 30%, #c084fc 0%, #7c3aed 45%, #dc2626 55%, #ef4444 100%); }
-        
-        .size-row { display: flex; gap: 10px; margin-bottom: 15px; }
-        .btn-big { background: linear-gradient(135deg, #d97706, #fbbf24); box-shadow: 0 4px 12px rgba(251,191,36,0.3); border: 1px solid #fbbf24; color: #1e1b4b; }
-        .btn-small { background: linear-gradient(135deg, #2563eb, #3b82f6); box-shadow: 0 4px 12px rgba(59,130,246,0.3); border: 1px solid #60a5fa; }
-        
-        .controls-row { display: flex; justify-content: flex-end; margin-bottom: 10px; }
-        .mute-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid #7c3aed; color: #a7f3d0; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 6px; }
-        .mute-btn.muted { border-color: #ef4444; color: #fca5a5; }
+        .wallet-card { background: rgba(15, 23, 42, 0.7); border: 1px solid #34d399; margin-bottom: 12px; padding: 14px; border-radius: 16px; text-align: center; margin-top: 5px; }
+        .balance { font-size: 26px; font-weight: 900; margin-bottom: 4px; color: #34d399; }
+        .wallet-title { color: #a7f3d0; font-size: 12px; margin-bottom: 10px; text-transform: uppercase; font-weight: bold; }
+        .wallet-btns { display: flex; gap: 10px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; }
+        .btn-withdraw { background: linear-gradient(135deg, #dc2626, #ef4444); border: 1px solid #f87171; }
+        .btn-deposit { background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #34d399; }
 
-        .floating-admin-btn { 
-            position: fixed; bottom: 30px; right: 20px; background: #dc2626; color: #fff; border: none; width: 55px; height: 55px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 5px 20px rgba(220,38,38,0.6); display: none; align-items: center; justify-content: center; font-size: 20px; touch-action: none; 
-        }
+        .notice { background: rgba(15, 23, 42, 0.6); border: 1px solid #7c3aed; margin-bottom: 12px; padding: 10px 12px; border-radius: 10px; font-size: 12px; display: flex; align-items: center; justify-content: space-between; color: #d1fae5; }
+        .notice span { color: #34d399; font-weight: bold; cursor: pointer; }
+
+        .game-modes { display: flex; gap: 8px; margin-bottom: 12px; }
+        .mode-card { flex: 1; background: rgba(15, 23, 42, 0.7); padding: 10px 4px; border-radius: 12px; text-align: center; font-size: 12px; border: 1px solid #7c3aed; color: #a7f3d0; cursor: pointer; font-weight: bold; }
+        .mode-card.active { background: linear-gradient(135deg, #a855f7, #10b981); color: white; border-color: #34d399; box-shadow: 0 2px 10px rgba(168, 85, 247, 0.4); }
+
+        .timer-section { background: linear-gradient(135deg, #064e3b, #022c22); margin-bottom: 12px; padding: 14px; border-radius: 16px; display: flex; justify-content: space-between; align-items: flex-start; border: 1px solid #34d399; position: relative; }
+        .timer-left { display: flex; flex-direction: column; gap: 6px; }
+        .timer-left button { background: rgba(15, 23, 42, 0.7); color: #34d399; border: 1px solid #34d399; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; align-self: flex-start; }
+        .period-id-left { font-size: 13px; color: #a7f3d0; font-weight: bold; font-family: monospace; letter-spacing: 0.5px; margin-top: 4px; }
+        .mode-title-display { font-size: 12px; color: #34d399; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .recent-results-bar { display: flex; gap: 6px; align-items: center; margin-top: 4px; }
+        .mini-ball { position: relative; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: bold; color: #fff; overflow: hidden; box-shadow: inset 0 -3px 4px rgba(0,0,0,0.3), 0 3px 6px rgba(0,0,0,0.3); }
+        .mini-ball::before { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; z-index: 1; }
+        .mini-ball::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 10px; height: 4px; background: rgba(255, 255, 255, 0.7); border-radius: 50%; z-index: 3; }
+        .mini-glow-side { position: absolute; top: 50%; transform: translateY(-50%); width: 4px; height: 10px; background: rgba(255,255,255,0.5); border-radius: 50%; z-index: 3; }
+        .mini-glow-left { left: 1px; }
+        .mini-glow-right { right: 1px; }
+        .mini-glow-bottom { position: absolute; bottom: 1px; left: 50%; transform: translateX(-50%); width: 8px; height: 3px; background: rgba(255,255,255,0.5); border-radius: 50%; z-index: 3; }
+        .mini-ball span { position: relative; z-index: 2; font-weight: 900; }
+
+        .mini-ball.red { background: radial-gradient(circle, rgba(255,107,107,0.3) 30%, #e60012 80%); }
+        .mini-ball.red::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(255,107,107,0.3) 100%); }
+        .mini-ball.red span { color: #e60012; }
+
+        .mini-ball.green { background: radial-gradient(circle, rgba(92,214,133,0.3) 30%, #00b050 80%); }
+        .mini-ball.green::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(92,214,133,0.3) 100%); }
+        .mini-ball.green span { color: #00b050; }
+
+        .mini-ball.split-0 { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 45%, #b366ff 55%, #7a00cc 100%); }
+        .mini-ball.split-0::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(179,102,255,0.3) 100%); }
+        .mini-ball.split-0 span { background: linear-gradient(135deg, #cc0000, #800080); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .mini-ball.split-5 { background: linear-gradient(135deg, #00b050 0%, #008033 45%, #b366ff 55%, #7a00cc 100%); }
+        .mini-ball.split-5::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(179,102,255,0.3) 100%); }
+        .mini-ball.split-5 span { background: linear-gradient(135deg, #008033, #800080); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .timer-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+        .time-box { display: flex; gap: 4px; font-weight: bold; font-size: 20px; }
+        .time-box div { background: rgba(15, 23, 42, 0.9); color: #34d399; padding: 4px 8px; border-radius: 6px; border: 1px solid #7c3aed; }
+
+        .betting-wrapper { position: relative; margin-bottom: 14px; }
+        .lock-overlay { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; gap: 20px; z-index: 50; border-radius: 16px; border: 1px solid rgba(52, 211, 153, 0.3); }
+        .lock-box { background: linear-gradient(135deg, #1e1b4b, #064e3b); color: #34d399; width: 100px; height: 120px; border-radius: 18px; display: flex; justify-content: center; align-items: center; font-size: 75px; font-weight: 900; box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 0 15px rgba(52, 211, 153, 0.2); border: 2px solid #7c3aed; text-shadow: 0 0 10px rgba(52, 211, 153, 0.5); }
+
+        .color-btns { display: flex; gap: 10px; margin-bottom: 12px; }
+        .c-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; color: white; font-weight: 800; font-size: 15px; cursor: pointer; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+        .bg-green { background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #34d399; }
+        .bg-violet { background: linear-gradient(135deg, #7c3aed, #a855f7); border: 1px solid #c084fc; }
+        .bg-red { background: linear-gradient(135deg, #dc2626, #ef4444); border: 1px solid #f87171; }
+
+        .balls-container { background: rgba(15, 23, 42, 0.6); padding: 16px 10px; border-radius: 16px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px 10px; justify-items: center; border: 1px solid #7c3aed; margin-bottom: 12px; }
+        .ball { position: relative; width: 62px; height: 62px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: bold; overflow: hidden; box-shadow: inset 0 -6px 8px rgba(0,0,0,0.25), 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; }
+        .ball::before { content: ''; position: absolute; width: 44px; height: 44px; border-radius: 50%; z-index: 1; }
+        .ball::after { content: ''; position: absolute; top: 2px; left: 50%; transform: translateX(-50%); width: 18px; height: 7px; background: rgba(255, 255, 255, 0.6); border-radius: 50%; z-index: 3; }
+        .side-glow-left, .side-glow-right, .bottom-glow { position: absolute; background: rgba(255, 255, 255, 0.5); border-radius: 50%; z-index: 3; }
+        .side-glow-left { top: 50%; left: 2px; transform: translateY(-50%); width: 8px; height: 16px; }
+        .side-glow-right { top: 50%; right: 2px; transform: translateY(-50%); width: 8px; height: 16px; }
+        .bottom-glow { bottom: 2px; left: 50%; transform: translateX(-50%); width: 14px; height: 5px; }
+        .ball span { position: relative; z-index: 2; }
+
+        .ball.red { background: radial-gradient(circle, rgba(255,107,107,0.3) 30%, #e60012 80%); }
+        .ball.red::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(255,107,107,0.3) 100%); }
+        .ball.red span { color: #e60012; }
+
+        .ball.green { background: radial-gradient(circle, rgba(92,214,133,0.3) 30%, #00b050 80%); }
+        .ball.green::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(92,214,133,0.3) 100%); }
+        .ball.green span { color: #00b050; }
+
+        .ball.split-0 { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 45%, #b366ff 55%, #7a00cc 100%); }
+        .ball.split-0::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(179,102,255,0.3) 100%); }
+        .ball.split-0 span { background: linear-gradient(135deg, #cc0000, #800080); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .ball.split-5 { background: linear-gradient(135deg, #00b050 0%, #008033 45%, #b366ff 55%, #7a00cc 100%); }
+        .ball.split-5::before { background: radial-gradient(circle, rgba(255,255,255,0.85) 40%, rgba(179,102,255,0.3) 100%); }
+        .ball.split-5 span { background: linear-gradient(135deg, #008033, #800080); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .big-small { display: flex; gap: 10px; margin-bottom: 12px; }
+        .bs-btn { flex: 1; padding: 14px; border: none; border-radius: 12px; font-size: 16px; font-weight: 900; cursor: pointer; text-transform: uppercase; }
+        .btn-big { background: linear-gradient(135deg, #d97706, #fbbf24); border: 1px solid #fbbf24; color: #1e1b4b; }
+        .btn-small { background: linear-gradient(135deg, #2563eb, #3b82f6); border: 1px solid #60a5fa; color: #fff; }
+
+        .tabs { display: flex; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; border-radius: 12px; padding: 4px; margin-bottom: 12px; }
+        .tab { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: bold; border-radius: 8px; cursor: pointer; color: #a7f3d0; }
+        .tab.active { background: #7c3aed; color: white; border: 1px solid #34d399; }
+
+        .history-card { background: rgba(15, 23, 42, 0.6); border-radius: 16px; padding: 14px; border: 1px solid #7c3aed; }
+
+        .stat-card { background: rgba(30, 27, 75, 0.6); border: 1px solid #7c3aed; border-radius: 12px; padding: 10px; font-size: 11px; margin-bottom: 15px; }
+        .stat-row { display: grid; grid-template-columns: 95px repeat(10, 1fr); align-items: center; text-align: center; padding: 3px 0; color: #a7f3d0; }
+        .stat-header { font-weight: bold; color: #34d399; text-align: left; }
+        .num-circle { width: 18px; height: 18px; border-radius: 50%; border: 1px solid #7c3aed; display: flex; align-items: center; justify-content: center; margin: 0 auto; font-size: 10px; font-weight: bold; }
+
+        .grid-wrapper { position: relative; width: 100%; }
+        #chartCanvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        .chart-row { display: grid; grid-template-columns: 115px repeat(10, 1fr) 30px; align-items: center; text-align: center; height: 38px; border-bottom: 1px solid rgba(124, 58, 237, 0.2); font-size: 11px; }
+        .period-cell { font-family: monospace; color: #94a3b8; text-align: left; font-size: 10px; }
+        .ball-cell { display: flex; align-items: center; justify-content: center; }
+        .ball-dot { width: 22px; height: 22px; border-radius: 50%; color: #64748b; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; background: rgba(255, 255, 255, 0.05); }
+        .ball-dot.active-red { background: radial-gradient(circle, #ff6b6b, #e60012); color: #fff; box-shadow: 0 0 8px rgba(230, 0, 18, 0.8); z-index: 5; }
+        .ball-dot.active-green { background: radial-gradient(circle, #5cd685, #00b050); color: #fff; box-shadow: 0 0 8px rgba(0, 176, 80, 0.8); z-index: 5; }
+        .ball-dot.active-violet { background: linear-gradient(135deg, #cc0000 45%, #7a00cc 55%); color: #fff; box-shadow: 0 0 8px rgba(122, 0, 204, 0.8); z-index: 5; }
+        .bs-badge { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; color: #fff; margin: 0 auto; }
+        .bs-badge.big { background: #d97706; }
+        .bs-badge.small { background: #2563eb; }
+
+        .my-history-list { display: flex; flex-direction: column; gap: 10px; }
+        .my-history-item { display: flex; align-items: center; justify-content: space-between; background: rgba(15, 23, 42, 0.8); border: 1px solid #7c3aed; padding: 10px 12px; border-radius: 12px; }
+        .my-hist-left { display: flex; align-items: center; gap: 12px; }
+        .my-hist-badge { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: #fff; text-transform: capitalize; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .my-hist-badge.green { background: #00b050; }
+        .my-hist-badge.red { background: #e60012; }
+        .my-hist-badge.violet { background: #7a00cc; }
+        .my-hist-badge.big { background: #d97706; }
+        .my-hist-badge.small { background: #2563eb; }
+        .my-hist-badge.num { background: linear-gradient(135deg, #7c3aed, #10b981); }
+
+        .my-hist-details { display: flex; flex-direction: column; gap: 2px; }
+        .my-hist-period { font-size: 13px; font-weight: bold; color: #fff; font-family: monospace; }
+        .my-hist-time { font-size: 11px; color: #94a3b8; }
+        .my-hist-right { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .status-pill { padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: bold; border: 1px solid transparent; }
+        .status-pill.succeed { color: #34d399; border-color: #34d399; background: rgba(52, 211, 153, 0.1); }
+        .status-pill.failed { color: #f87171; border-color: #f87171; background: rgba(248, 113, 113, 0.1); }
+        .status-pill.pending { color: #fbbf24; border-color: #fbbf24; background: rgba(251, 191, 36, 0.1); }
+        .my-hist-amount { font-size: 13px; font-weight: bold; }
+        .my-hist-amount.win { color: #34d399; }
+        .my-hist-amount.loss { color: #f87171; }
+
+        .pagination-row { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 10px; border-top: 1px solid #7c3aed; }
+        .page-btn { background: rgba(15, 23, 42, 0.8); border: 1px solid #7c3aed; color: #34d399; width: 36px; height: 36px; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: 900; display: flex; align-items: center; justify-content: center; }
+        .page-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .bet-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); display: none; z-index: 10000; backdrop-filter: blur(4px); }
+        .bet-modal { position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px; background: rgba(20, 18, 55, 0.98); border-radius: 25px 25px 0 0; padding: 22px 18px; z-index: 10001; transition: bottom 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); border-top: 3px solid #34d399; box-shadow: 0 -10px 30px rgba(0,0,0,0.7); }
+        .bet-modal.active { bottom: 0; }
+
+        .bet-modal.theme-green { border-top-color: #10b981; }
+        .bet-modal.theme-green #modalTitle, .bet-modal.theme-green #totalBetCalc { color: #10b981; }
+        .bet-modal.theme-green .confirm-btn { background: linear-gradient(135deg, #059669, #10b981); }
+
+        .bet-modal.theme-red { border-top-color: #ef4444; }
+        .bet-modal.theme-red #modalTitle, .bet-modal.theme-red #totalBetCalc { color: #ef4444; }
+        .bet-modal.theme-red .confirm-btn { background: linear-gradient(135deg, #dc2626, #ef4444); }
+
+        .bet-modal.theme-violet { border-top-color: #a855f7; }
+        .bet-modal.theme-violet #modalTitle, .bet-modal.theme-violet #totalBetCalc { color: #a855f7; }
+        .bet-modal.theme-violet .confirm-btn { background: linear-gradient(135deg, #7c3aed, #a855f7); }
+
+        .bet-modal.theme-big { border-top-color: #fbbf24; }
+        .bet-modal.theme-big #modalTitle, .bet-modal.theme-big #totalBetCalc { color: #fbbf24; }
+        .bet-modal.theme-big .confirm-btn { background: linear-gradient(135deg, #d97706, #fbbf24); color: #1e1b4b; }
+
+        .bet-modal.theme-small { border-top-color: #3b82f6; }
+        .bet-modal.theme-small #modalTitle, .bet-modal.theme-small #totalBetCalc { color: #3b82f6; }
+        .bet-modal.theme-small .confirm-btn { background: linear-gradient(135deg, #2563eb, #3b82f6); }
+
+        .chip-selector, .multiplier-selector { display: flex; gap: 6px; margin-bottom: 12px; }
+        .chip-btn, .mult-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(124, 58, 237, 0.5); color: #a7f3d0; padding: 8px 2px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; }
+        .chip-btn.active, .mult-btn.active { background: #10b981; color: #fff; border-color: #34d399; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4); }
+
+        .qty-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 16px 0; }
+        .qty-btn { background: #7c3aed; color: #fff; border: none; width: 38px; height: 38px; border-radius: 10px; font-size: 20px; font-weight: bold; cursor: pointer; }
+        .qty-input { width: 80px; text-align: center; background: rgba(15, 23, 42, 0.9); border: 1.5px solid #7c3aed; color: #fff; padding: 8px; border-radius: 10px; font-size: 16px; font-weight: bold; }
+
+        .result-popup-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 30000; }
+        .result-popup-box { width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; color: #fff; }
+        .result-popup-box.win { background: linear-gradient(135deg, #1e1b4b, #064e3b); border: 2px solid #34d399; }
+        .result-popup-box.loss { background: linear-gradient(135deg, #7f8c8d, #34495e); border: 2px solid #bdc3c7; }
+
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px); background: #10b981; color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: bold; opacity: 0; pointer-events: none; transition: all 0.3s ease; z-index: 100000; }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Admin Floating Button & Popup */
+        .floating-admin-btn { position: fixed; bottom: 30px; right: 20px; background: #dc2626; color: #fff; border: none; width: 55px; height: 55px; border-radius: 50%; font-weight: bold; cursor: pointer; z-index: 9999; box-shadow: 0 5px 20px rgba(220,38,38,0.6); display: none; align-items: center; justify-content: center; font-size: 20px; touch-action: none; }
         .floating-admin-popup { position: fixed; top: 50px; left: 20px; width: 90%; max-width: 380px; background: rgba(30, 27, 75, 0.95); border: 2px solid #34d399; border-radius: 16px; z-index: 10000; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.8); overflow: hidden; backdrop-filter: blur(10px); }
         .popup-header { background: #064e3b; color: white; padding: 10px 15px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; cursor: move; border-bottom: 1px solid #34d399; }
         .popup-body { padding: 15px; max-height: 70vh; overflow-y: auto; font-size: 12px; color: #d1fae5; }
-        
-        .bet-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 999; display: none; backdrop-filter: blur(3px); }
-        .bet-modal-overlay.active { display: block; }
-
-        .bet-modal { position: fixed; bottom: -100%; left: 0; width: 100%; background: rgba(30, 27, 75, 0.98); border-radius: 25px 25px 0 0; padding: 20px; z-index: 1000; transition: bottom 0.3s; border-top: 2px solid #34d399; backdrop-filter: blur(15px); border-left: 2px solid #34d399; border-right: 2px solid #34d399; }
-        .bet-modal.active { bottom: 0; }
-        .modal-header { font-size: 16px; font-weight: bold; text-align: center; margin-bottom: 15px; color: #34d399; text-transform: uppercase; }
-        .chip-selector, .multiplier-selector { display: flex; gap: 8px; margin-bottom: 12px; }
-        .chip-btn, .mult-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 8px 0; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; text-align: center; }
-        .chip-btn.active, .mult-btn.active { background: #10b981; color: #fff; border-color: #34d399; box-shadow: 0 0 10px rgba(16,185,129,0.4); }
-        .qty-control { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; }
-        .qty-btn { background: #7c3aed; color: #fff; border: none; width: 35px; height: 35px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
-        .qty-input { width: 60px; text-align: center; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #fff; padding: 6px; border-radius: 8px; font-weight: bold; }
-        .modal-actions { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-confirm { flex: 2; background: linear-gradient(135deg, #a855f7, #10b981); border: none; padding: 12px; border-radius: 10px; color: #fff; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(168,85,247,0.4); }
-        .btn-cancel { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; padding: 12px; border-radius: 10px; color: #a7f3d0; font-weight: bold; cursor: pointer; }
-        
-        .history-card { background: rgba(15, 23, 42, 0.6); border-radius: 14px; padding: 12px; border: 1px solid #7c3aed; margin-top: 15px; }
-        .history-toggle-row { display: flex; gap: 10px; margin-bottom: 10px; }
-        .history-toggle-btn { flex: 1; background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: center; }
-        .history-toggle-btn.active { background: #7c3aed; color: #fff; border-color: #34d399; }
-        .history-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: center; }
-        .history-table th { color: #a7f3d0; padding: 8px; border-bottom: 1px solid #7c3aed; }
-        .history-table td { padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e2e8f0; }
-        .dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin: 0 2px; }
-        .pagination-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid #7c3aed; }
-        .page-btn { background: rgba(15, 23, 42, 0.7); border: 1px solid #7c3aed; color: #a7f3d0; padding: 5px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; }
-        .page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        .notification-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #10b981; color: #fff; padding: 10px 20px; border-radius: 30px; font-weight: bold; font-size: 13px; z-index: 20000; transition: transform 0.3s ease; box-shadow: 0 5px 15px rgba(16,185,129,0.4); border: 1px solid #34d399; }
-        .notification-toast.show { transform: translateX(-50%) translateY(0); }
-
-        .result-popup-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 30000; backdrop-filter: blur(5px); }
-        .result-popup-box { width: 85%; max-width: 320px; border-radius: 20px; padding: 25px; text-align: center; color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: popScale 0.3s ease; }
-        .result-popup-box.win { background: linear-gradient(135deg, #1e1b4b, #064e3b); border: 2px solid #34d399; box-shadow: 0 0 25px rgba(52,211,153,0.5); }
-        .result-popup-box.loss { background: linear-gradient(135deg, #7f8c8d, #34495e); border: 2px solid #bdc3c7; }
-        @keyframes popScale { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-        .result-title { font-size: 26px; font-weight: 900; text-transform: uppercase; margin-bottom: 15px; letter-spacing: 1px; }
-        .win .result-title { background: linear-gradient(135deg, #c084fc, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .result-details { background: rgba(15, 23, 42, 0.7); border-radius: 12px; padding: 12px; font-size: 13px; text-align: left; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; border: 1px solid rgba(124, 58, 237, 0.5); }
-        .result-row-item { display: flex; justify-content: space-between; align-items: center; color: #a7f3d0; }
-        .result-close-btn { background: linear-gradient(135deg, #a855f7, #10b981); color: #fff; border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 14px; width: 100%; box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
     </style>
 </head>
 <body>
 
-<div id="notificationToast" class="notification-toast">Bet placed successfully!</div>
+    <div id="toast">Action performed!</div>
 
-<div id="resultPopupOverlay" class="result-popup-overlay">
-    <div id="resultPopupBox" class="result-popup-box">
-        <div class="result-title" id="resPopupTitle">WIN</div>
-        <div class="result-details" id="resPopupDetails">
-            <div class="result-row-item"><span>Period:</span> <strong id="resPeriod">---</strong></div>
-            <div class="result-row-item"><span>Size:</span> <strong id="resSize" style="text-transform: uppercase;">---</strong></div>
-            <div class="result-row-item"><span>Color / Number:</span> <strong id="resColorNum">---</strong></div>
-            <div class="result-row-item"><span id="resAmountLabel">Winning Amount:</span> <strong id="resAmount" style="color: #34d399;">₹0.00</strong></div>
-        </div>
-        <button class="result-close-btn" onclick="closeResultPopup()">OK</button>
-    </div>
-</div>
-
-<button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡</button>
-
-<div class="floating-admin-popup" id="floatingAdminPopup">
-    <div class="popup-header" id="popupHeader">
-        <span>🛡 Admin Winnings Control</span>
-        <span onclick="toggleAdminPopup()" style="cursor: pointer; font-size: 16px;">✖</span>
-    </div>
-    <div class="popup-body">
-        <div id="adminBetsOverview" style="margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
-        <div style="margin-bottom: 10px;">
-            <label style="font-size: 11px; display: block; margin-bottom: 5px;">Force Winning Number (0-9):</label>
-            <select id="rigNumberSelect" style="width: 100%; padding: 8px; background: rgba(15,23,42,0.8); border: 1px solid #7c3aed; color: #fff; border-radius: 6px; margin-bottom: 8px;">
-                <option value="0">Number 0 (Violet)</option>
-                <option value="1">Number 1 (Green)</option>
-                <option value="2">Number 2 (Red)</option>
-                <option value="3">Number 3 (Green)</option>
-                <option value="4">Number 4 (Red)</option>
-                <option value="5">Number 5 (Violet)</option>
-                <option value="6">Number 6 (Red)</option>
-                <option value="7">Number 7 (Green)</option>
-                <option value="8">Number 8 (Red)</option>
-                <option value="9">Number 9 (Green)</option>
-            </select>
-        </div>
-        <button onclick="submitRiggedResult()" style="width:100%; background:linear-gradient(135deg, #a855f7, #10b981); border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer; color:#fff;">Set Rigged Result</button>
-    </div>
-</div>
-
-<div class="app-container">
-    <div class="header-top">
-        <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
-        <div class="wallet-badge-container">
-            <div class="wallet-badge" id="userWallet">Total: ₹ 0.00</div>
+    <div id="resultPopupOverlay" class="result-popup-overlay">
+        <div id="resultPopupBox" class="result-popup-box win">
+            <div id="resPopupTitle" style="font-size: 24px; font-weight: 900; margin-bottom: 15px;">WIN</div>
+            <div style="background: rgba(15,23,42,0.7); padding: 12px; border-radius: 10px; text-align: left; font-size: 13px; margin-bottom: 15px;">
+                <p>Period: <strong id="resPeriod">---</strong></p>
+                <p>Result Number: <strong id="resNum">---</strong></p>
+                <p>Size / Color: <strong id="resSizeColor">---</strong></p>
+                <p id="resAmountLabel">Amount: <strong id="resAmount" style="color: #34d399;">₹0.00</strong></p>
+            </div>
+            <button onclick="closeResultPopup()" style="width:100%; background:#10b981; color:#fff; border:none; padding:10px; border-radius:20px; font-weight:bold; cursor:pointer;">OK</button>
         </div>
     </div>
-    
-    <div class="logo-ticker-container">
-        <div class="logo-ticker">Rewards Zone</div>
-    </div>
 
-    <div class="controls-row" style="margin-top: 12px;">
-        <button class="mute-btn" id="muteToggleBtn" onclick="toggleMute()"><i class="fa-solid fa-volume-high" id="muteIcon"></i> <span id="muteText">Sound On</span></button>
-    </div>
-
-    <div class="timer-tabs">
-        <div class="tab-btn active" id="tab-30s" onclick="switchTimer('30s', 30)">WinGo 30s</div>
-        <div class="tab-btn" id="tab-60s" onclick="switchTimer('60s', 60)">WinGo 1M</div>
-        <div class="tab-btn" id="tab-3m" onclick="switchTimer('3m', 180)">WinGo 3M</div>
-        <div class="tab-btn" id="tab-5m" onclick="switchTimer('5m', 300)">WinGo 5M</div>
-    </div>
-
-    <div class="timer-board">
-        <div class="board-left">
-            <p>Time Remaining</p>
-            <div class="period-no" id="periodId">Loading...</div>
+    <!-- Admin Floating Button & Rigging Panel -->
+    <button class="floating-admin-btn" id="floatingAdminBtn" onclick="toggleAdminPopup()">🛡</button>
+    <div class="floating-admin-popup" id="floatingAdminPopup">
+        <div class="popup-header" id="popupHeader">
+            <span>🛡 Admin Winnings Control</span>
+            <span onclick="toggleAdminPopup()" style="cursor: pointer; font-size: 16px;">✖</span>
         </div>
-        <div class="timer-clock" id="countdown">00:30</div>
+        <div class="popup-body">
+            <div id="adminBetsOverview" style="margin-bottom: 15px; color: #cbd5e1;">Loading bets summary...</div>
+            <div style="margin-bottom: 10px;">
+                <label style="font-size: 11px; display: block; margin-bottom: 5px;">Force Winning Number (0-9):</label>
+                <select id="rigNumberSelect" style="width: 100%; padding: 8px; background: rgba(15,23,42,0.8); border: 1px solid #7c3aed; color: #fff; border-radius: 6px; margin-bottom: 8px;">
+                    <option value="0">Number 0 (Violet)</option>
+                    <option value="1">Number 1 (Green)</option>
+                    <option value="2">Number 2 (Red)</option>
+                    <option value="3">Number 3 (Green)</option>
+                    <option value="4">Number 4 (Red)</option>
+                    <option value="5">Number 5 (Violet)</option>
+                    <option value="6">Number 6 (Red)</option>
+                    <option value="7">Number 7 (Green)</option>
+                    <option value="8">Number 8 (Red)</option>
+                    <option value="9">Number 9 (Green)</option>
+                </select>
+            </div>
+            <button onclick="submitRiggedResult()" style="width:100%; background:linear-gradient(135deg, #a855f7, #10b981); border:none; padding:10px; font-weight:bold; border-radius:6px; cursor:pointer; color:#fff;">Set Rigged Result</button>
+        </div>
     </div>
 
-    <div class="betting-area-wrapper">
-        <div id="lockOverlay" class="lock-overlay">
-            <div class="count-card" id="lockNum">00:05</div>
+    <div id="betModalOverlay" class="bet-modal-overlay" onclick="closeBetModal()"></div>
+    <div id="betModal" class="bet-modal">
+        <div id="modalTitle" style="font-size: 18px; font-weight: 900; text-align: center; margin-bottom: 15px;">Select Bet</div>
+        
+        <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px; font-weight: bold;">Base Amount</p>
+        <div class="chip-selector">
+            <div class="chip-btn active" onclick="selectBase(1, this)">₹1</div>
+            <div class="chip-btn" onclick="selectBase(10, this)">₹10</div>
+            <div class="chip-btn" onclick="selectBase(50, this)">₹50</div>
+            <div class="chip-btn" onclick="selectBase(100, this)">₹100</div>
+            <div class="chip-btn" onclick="selectBase(1000, this)">₹1000</div>
         </div>
 
-        <div class="color-row">
-            <button class="btn-3d btn-green" onclick="openBetModal('color', 'green')">Green</button>
-            <button class="btn-3d btn-violet" onclick="openBetModal('color', 'violet')">Violet</button>
-            <button class="btn-3d btn-red" onclick="openBetModal('color', 'red')">Red</button>
+        <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px; font-weight: bold;">Multiplier</p>
+        <div class="multiplier-selector">
+            <div class="mult-btn active" onclick="selectMult(1, this)">X1</div>
+            <div class="mult-btn" onclick="selectMult(5, this)">X5</div>
+            <div class="mult-btn" onclick="selectMult(10, this)">X10</div>
+            <div class="mult-btn" onclick="selectMult(20, this)">X20</div>
+            <div class="mult-btn" onclick="selectMult(50, this)">X50</div>
+            <div class="mult-btn" onclick="selectMult(100, this)">X100</div>
         </div>
 
-        <div class="ball-container">
-            <div class="ball-grid">
-                <button class="ball-3d ball-half" onclick="openBetModal('number', '0')">0</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '1')">1</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '2')">2</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '3')">3</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '4')">4</button>
-                <button class="ball-3d ball-half-red" onclick="openBetModal('number', '5')">5</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '6')">6</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '7')">7</button>
-                <button class="ball-3d ball-red" onclick="openBetModal('number', '8')">8</button>
-                <button class="ball-3d ball-green" onclick="openBetModal('number', '9')">9</button>
+        <div class="qty-control">
+            <button class="qty-btn" onclick="changeQty(-1)">-</button>
+            <input type="number" inputmode="numeric" pattern="[0-9]*" class="qty-input" id="betQty" value="1" oninput="onQtyInput(this)">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+
+        <div style="text-align: center; font-weight: bold; margin-bottom: 15px; color: #a7f3d0; font-size: 15px;">
+            Total Amount: <span id="totalBetCalc" style="font-weight: 900;">₹ 1.00</span>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button onclick="closeBetModal()" style="flex:1; background:rgba(15,23,42,0.8); border:1px solid #7c3aed; padding:12px; border-radius:12px; color:#fff; font-weight:bold; cursor:pointer;">Cancel</button>
+            <button class="confirm-btn" onclick="submitBet()" style="flex:2; border:none; padding:12px; border-radius:12px; color:#fff; font-weight:bold; cursor:pointer; font-size:15px;">Confirm Bet</button>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="header-left"><a href="index.html">&lt;</a></div>
+        <div class="header-center"><h2>SBWIN</h2></div>
+        <div class="header-right">
+            <button class="mute-header-btn" id="muteToggleBtn" onclick="toggleMute()"><i class="fa-solid fa-volume-high" id="muteIcon"></i></button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="wallet-card">
+            <div class="wallet-title">Wallet balance</div>
+            <div class="balance" id="userWallet">₹0.00</div>
+            <div class="wallet-btns" style="margin-top: 12px;">
+                <button class="btn btn-withdraw" onclick="window.location.href='withdraw.html'">Withdraw</button>
+                <a href="deposit.html" class="btn btn-deposit">Deposit</a>
             </div>
         </div>
 
-        <div class="size-row">
-            <button class="btn-3d btn-big" onclick="openBetModal('size', 'big')">Big</button>
-            <button class="btn-3d btn-small" onclick="openBetModal('size', 'small')">Small</button>
+        <div class="notice">
+            <p>Welcome to Rewards Zone / SBWIN!</p>
+            <span onclick="showToast('Secure platform active')">Detail</span>
+        </div>
+
+        <div class="game-modes">
+            <div class="mode-card active" id="tab-30s" onclick="switchTimer('30s', 30)">
+                <p>🕧 30sec</p><p style="font-size: 10px; opacity: 0.8;">WinGo</p>
+            </div>
+            <div class="mode-card" id="tab-60s" onclick="switchTimer('60s', 60)">
+                <p>🕛 1 Min</p><p style="font-size: 10px; opacity: 0.8;">WinGo</p>
+            </div>
+            <div class="mode-card" id="tab-3m" onclick="switchTimer('3m', 180)">
+                <p>🕒 3 Min</p><p style="font-size: 10px; opacity: 0.8;">WinGo</p>
+            </div>
+            <div class="mode-card" id="tab-5m" onclick="switchTimer('5m', 300)">
+                <p>🕔 5 Min</p><p style="font-size: 10px; opacity: 0.8;">WinGo</p>
+            </div>
+        </div>
+
+        <div class="timer-section">
+            <div class="timer-left">
+                <button onclick="showToast('Opening Rules...')">📖 How to play</button>
+                <div class="mode-title-display" id="modeTitleDisplay">WinGo 30Sec</div>
+                <div class="recent-results-bar" id="recentResultsBar"></div>
+            </div>
+            <div class="timer-right">
+                <p style="font-size: 11px; color: #a7f3d0; font-weight: bold;">Time remaining</p>
+                <div class="time-box" id="countdownBox">
+                    <div>0</div><div>0</div><span>:</span><div>3</div><div>0</div>
+                </div>
+                <div class="period-id-left" id="periodId">Loading...</div>
+            </div>
+        </div>
+
+        <div class="betting-wrapper">
+            <div class="lock-overlay" id="lockOverlay">
+                <div class="lock-box" id="lockBoxTens">0</div>
+                <div class="lock-box" id="lockBoxSingles">5</div>
+            </div>
+
+            <div class="color-btns">
+                <button class="c-btn bg-green" onclick="openBetModal('color', 'green')">Green</button>
+                <button class="c-btn bg-violet" onclick="openBetModal('color', 'violet')">Violet</button>
+                <button class="c-btn bg-red" onclick="openBetModal('color', 'red')">Red</button>
+            </div>
+
+            <div class="balls-container">
+                <div class="ball split-0" onclick="openBetModal('number', '0')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>0</span></div>
+                <div class="ball green" onclick="openBetModal('number', '1')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>1</span></div>
+                <div class="ball red" onclick="openBetModal('number', '2')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>2</span></div>
+                <div class="ball green" onclick="openBetModal('number', '3')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>3</span></div>
+                <div class="ball red" onclick="openBetModal('number', '4')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>4</span></div>
+                <div class="ball split-5" onclick="openBetModal('number', '5')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>5</span></div>
+                <div class="ball red" onclick="openBetModal('number', '6')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>6</span></div>
+                <div class="ball green" onclick="openBetModal('number', '7')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>7</span></div>
+                <div class="ball red" onclick="openBetModal('number', '8')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>8</span></div>
+                <div class="ball green" onclick="openBetModal('number', '9')"><div class="side-glow-left"></div><div class="side-glow-right"></div><div class="bottom-glow"></div><span>9</span></div>
+            </div>
+
+            <div class="big-small">
+                <button class="bs-btn btn-big" onclick="openBetModal('size', 'big')">Big</button>
+                <button class="bs-btn btn-small" onclick="openBetModal('size', 'small')">Small</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" id="tabHist" onclick="switchHistoryTab('history')">Game history</div>
+            <div class="tab" id="tabChart" onclick="switchHistoryTab('chart')">Chart</div>
+            <div class="tab" id="tabMyHist" onclick="switchHistoryTab('myhistory')">My history</div>
+        </div>
+
+        <div class="history-card" id="historyCardContainer">
+            <div id="gameHistoryView">
+                <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:center;">
+                    <thead>
+                        <tr>
+                            <th style="color:#a7f3d0; padding:10px 4px; border-bottom:1px solid #7c3aed;">Period</th>
+                            <th style="color:#a7f3d0; padding:10px 4px; border-bottom:1px solid #7c3aed;">Number</th>
+                            <th style="color:#a7f3d0; padding:10px 4px; border-bottom:1px solid #7c3aed;">Big Small</th>
+                            <th style="color:#a7f3d0; padding:10px 4px; border-bottom:1px solid #7c3aed;">Color</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+
+            <div id="chartView" style="display: none;">
+                <div class="stat-card">
+                    <div class="stat-row">
+                        <span class="stat-header">Winning Numbers</span>
+                        <div class="num-circle">0</div><div class="num-circle">1</div><div class="num-circle">2</div>
+                        <div class="num-circle">3</div><div class="num-circle">4</div><div class="num-circle">5</div>
+                        <div class="num-circle">6</div><div class="num-circle">7</div><div class="num-circle">8</div>
+                        <div class="num-circle">9</div>
+                    </div>
+                </div>
+                <div class="grid-wrapper">
+                    <canvas id="chartCanvas"></canvas>
+                    <div id="chartRowsContainer"></div>
+                </div>
+            </div>
+
+            <div id="myHistoryView" style="display: none;">
+                <div class="my-history-list" id="myHistoryList"></div>
+            </div>
+
+            <div class="pagination-row">
+                <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">&lt;</button>
+                <span id="pageIndicator" style="font-size: 12px; color: #a7f3d0;">Page 1</span>
+                <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">&gt;</button>
+            </div>
         </div>
     </div>
 
-    <div class="history-card">
-        <div class="history-toggle-row">
-            <div class="history-toggle-btn active" id="toggleHistBtn" onclick="switchHistoryTab('history')">History</div>
-            <div class="history-toggle-btn" id="toggleMyHistBtn" onclick="switchHistoryTab('myhistory')">My History</div>
-        </div>
-        <table class="history-table">
-            <thead>
-                <tr id="historyTableHeader">
-                    <th>Period</th>
-                    <th>Number</th>
-                    <th>Big/Small</th>
-                    <th>Color</th>
-                </tr>
-            </thead>
-            <tbody id="historyBody"></tbody>
-        </table>
-        <div class="pagination-row">
-            <button class="page-btn" id="prevPageBtn" onclick="changePage(-1)">Previous</button>
-            <span id="pageIndicator" style="font-size: 11px; color: #a7f3d0;">Page 1</span>
-            <button class="page-btn" id="nextPageBtn" onclick="changePage(1)">Next</button>
-        </div>
-    </div>
-</div>
+    <audio id="beepAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let loggedInMobile = localStorage.getItem('rewards_loggedMobile') || sessionStorage.getItem('rewards_loggedMobile');
+        let userId = localStorage.getItem('rewards_userId') || sessionStorage.getItem('rewards_userId');
 
-<div id="betModalOverlay" class="bet-modal-overlay" onclick="closeBetModal()"></div>
+        let depositBal = 0;
+        let winningsBal = 0;
+        let currentHistoryTab = 'history'; 
+        let currentPage = 1;
+        let totalPages = 1;
+        let isSoundMuted = false;
+        let currentTimerType = '30s';
+        let timeLeft = 30;
+        let activeBetType = '';
+        let activeBetValue = '';
+        let baseAmount = 1;
+        let multiplier = 1;
+        let quantity = 1;
 
-<div id="betModal" class="bet-modal">
-    <div class="modal-header" id="modalTitle">Select Bet</div>
-    <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px;">Base Amount</p>
-    <div class="chip-selector">
-        <div class="chip-btn active" onclick="selectBase(1)">₹1</div>
-        <div class="chip-btn" onclick="selectBase(10)">₹10</div>
-        <div class="chip-btn" onclick="selectBase(100)">₹100</div>
-        <div class="chip-btn" onclick="selectBase(1000)">₹1000</div>
-    </div>
-    <p style="font-size: 11px; color: #a7f3d0; margin-bottom: 5px;">Multiplier</p>
-    <div class="multiplier-selector">
-        <div class="mult-btn active" onclick="selectMult(1)">X1</div>
-        <div class="mult-btn" onclick="selectMult(5)">X5</div>
-        <div class="mult-btn" onclick="selectMult(10)">X10</div>
-        <div class="mult-btn" onclick="selectMult(20)">X20</div>
-        <div class="mult-btn" onclick="selectMult(50)">X50</div>
-    </div>
-    <div class="qty-control">
-        <button class="qty-btn" onclick="changeQty(-1)">-</button>
-        <input type="number" class="qty-input" id="betQty" value="1" readonly>
-        <button class="qty-btn" onclick="changeQty(1)">+</button>
-    </div>
-    <div style="text-align: center; font-weight: bold; margin-bottom: 10px; color: #a7f3d0;">
-        Total Amount: <span id="totalBetCalc" style="color: #34d399;">₹ 1.00</span>
-    </div>
-    <div class="modal-actions">
-        <button class="btn-cancel" onclick="closeBetModal()">Cancel</button>
-        <button class="btn-confirm" onclick="submitBet()">Confirm Bet</button>
-    </div>
-</div>
-
-<audio id="beepAudio" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
-    let loggedInMobile = localStorage.getItem('rewards_loggedMobile') || sessionStorage.getItem('rewards_loggedMobile');
-    let userId = localStorage.getItem('rewards_userId') || sessionStorage.getItem('rewards_userId');
-
-    let depositBal = 0;
-    let winningsBal = 0;
-    let currentHistoryTab = 'history'; 
-    let currentPage = 1;
-    let totalPages = 1;
-    let isSoundMuted = false;
-
-    function toggleMute() {
-        isSoundMuted = !isSoundMuted;
-        let btn = document.getElementById('muteToggleBtn');
-        let icon = document.getElementById('muteIcon');
-        let text = document.getElementById('muteText');
-        if (isSoundMuted) {
-            btn.classList.add('muted');
-            icon.className = 'fa-solid fa-volume-xmark';
-            text.innerText = 'Sound Off';
-        } else {
-            btn.classList.remove('muted');
-            icon.className = 'fa-solid fa-volume-high';
-            text.innerText = 'Sound On';
-        }
-    }
-
-    async function fetchUserData() {
-        if (!loggedInMobile && !userId) return;
-        let url = userId ? `/api/user/${userId}` : `/api/user/mobile/${loggedInMobile}`;
-        let res = await fetch(url).then(r => r.json());
-        if (res.success) {
-            let u = res.user;
-            userId = u._id;
-            depositBal = u.balance || 0;
-            winningsBal = u.winningsBalance || 0;
-            let total = depositBal + winningsBal;
-            document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
-            
-            if (u.phone === "8093361993" || res.isAdmin) {
-                document.getElementById('floatingAdminBtn').style.display = 'flex';
+        function toggleMute() {
+            isSoundMuted = !isSoundMuted;
+            let icon = document.getElementById('muteIcon');
+            if (isSoundMuted) {
+                icon.className = 'fa-solid fa-volume-xmark';
+                showToast('Sound Off');
+            } else {
+                icon.className = 'fa-solid fa-volume-high';
+                showToast('Sound On');
             }
         }
-    }
 
-    fetchUserData();
-
-    let currentTimerType = '30s';
-    let timeLeft = 30;
-    let activeBetType = '';
-    let activeBetValue = '';
-    let baseAmount = 1;
-    let multiplier = 1;
-    let quantity = 1;
-
-    function switchTimer(type, seconds) {
-        currentTimerType = type;
-        timeLeft = seconds;
-        currentPage = 1;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(`tab-${type}`).classList.add('active');
-        loadHistoryData();
-        if(document.getElementById('floatingAdminPopup').style.display === 'block') {
-            loadAdminBetsSummary();
-        }
-    }
-
-    ['30s', '60s', '3m', '5m'].forEach(type => {
-        socket.on(`timerTick_${type}`, (data) => {
-            if (currentTimerType === type) {
-                timeLeft = data.countdown;
-                let min = Math.floor(timeLeft / 60);
-                let sec = timeLeft % 60;
-                document.getElementById('countdown').innerText = `${min < 10 ? '0'+min : min}:${sec < 10 ? '0'+sec : sec}`;
-                document.getElementById('periodId').innerText = data.period;
-
-                const lockOverlay = document.getElementById('lockOverlay');
-                if (timeLeft <= 5) {
-                    lockOverlay.style.display = 'flex';
-                    document.getElementById('lockNum').innerText = `00:0${timeLeft}`;
-                    closeBetModal();
-                    if (timeLeft > 0 && !isSoundMuted) {
-                        let beep = document.getElementById('beepAudio');
-                        beep.currentTime = 0;
-                        beep.play().catch(e => {});
-                    }
-                } else {
-                    lockOverlay.style.display = 'none';
+        async function fetchUserData() {
+            if (!loggedInMobile && !userId) return;
+            let url = userId ? `/api/user/${userId}` : `/api/user/mobile/${loggedInMobile}`;
+            let res = await fetch(url).then(r => r.json());
+            if (res.success) {
+                let u = res.user;
+                userId = u._id;
+                depositBal = u.balance || 0;
+                winningsBal = u.winningsBalance || 0;
+                let total = depositBal + winningsBal;
+                document.getElementById('userWallet').innerText = `₹ ${total.toFixed(2)}`;
+                
+                if (u.phone === "8093361993" || res.isAdmin) {
+                    document.getElementById('floatingAdminBtn').style.display = 'flex';
                 }
             }
-        });
-
-        socket.on(`gameResult_${type}`, (resultData) => {
-            if (currentTimerType === type) {
-                currentPage = 1; 
-                loadHistoryData();
-                fetchUserData();
-                checkUserRoundResult(resultData.period);
-            }
-        });
-    });
-
-    function showNotification(msg) {
-        const toast = document.getElementById('notificationToast');
-        toast.innerText = msg;
-        toast.classList.add('show');
-        setTimeout(() => {
-            toast.classList.remove('show');
-        }, 3000);
-    }
-
-    async function checkUserRoundResult(period) {
-        if (!userId) return;
-        let res = await fetch(`/api/user-round-result?userId=${userId}&period=${period}&timerType=${currentTimerType}`).then(r => r.json());
-        if (res.success && res.hasBet) {
-            let data = res.betData;
-            const popupOverlay = document.getElementById('resultPopupOverlay');
-            const popupBox = document.getElementById('resultPopupBox');
-            
-            document.getElementById('resPeriod').innerText = period.slice(-6);
-            document.getElementById('resSize').innerText = data.size || '---';
-            document.getElementById('resColorNum').innerText = `Num: ${data.number} (${data.color})`;
-
-            if (data.status === 'win') {
-                popupBox.className = 'result-popup-box win';
-                document.getElementById('resPopupTitle').innerText = 'WIN';
-                document.getElementById('resAmountLabel').innerText = 'Winning Amount:';
-                document.getElementById('resAmount').innerText = `₹ ${data.payout.toFixed(2)}`;
-                document.getElementById('resAmount').style.color = '#34d399';
-            } else {
-                popupBox.className = 'result-popup-box loss';
-                document.getElementById('resPopupTitle').innerText = 'LOSS';
-                document.getElementById('resAmountLabel').innerText = 'Loss Amount:';
-                document.getElementById('resAmount').innerText = `₹ ${data.amount.toFixed(2)}`;
-                document.getElementById('resAmount').style.color = '#ff4d4d';
-            }
-            popupOverlay.style.display = 'flex';
         }
-    }
+        fetchUserData();
 
-    function closeResultPopup() {
-        document.getElementById('resultPopupOverlay').style.display = 'none';
-    }
+        function switchTimer(type, seconds) {
+            currentTimerType = type;
+            timeLeft = seconds;
+            currentPage = 1;
+            document.querySelectorAll('.mode-card').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${type}`).classList.add('active');
 
-    function openBetModal(type, val) {
-        if (timeLeft <= 5) return alert('Betting closed for this round!');
-        activeBetType = type;
-        activeBetValue = val;
-        document.getElementById('modalTitle').innerText = `Select ${val.toUpperCase()}`;
-        document.getElementById('betModal').classList.add('active');
-        document.getElementById('betModalOverlay').classList.add('active');
-        calcTotal();
-    }
+            let modeTitleText = 'WinGo 30Sec';
+            if (type === '60s') modeTitleText = 'WinGo 1Min';
+            else if (type === '3m') modeTitleText = 'WinGo 3Min';
+            else if (type === '5m') modeTitleText = 'WinGo 5Min';
+            document.getElementById('modeTitleDisplay').innerText = modeTitleText;
 
-    function closeBetModal() { 
-        document.getElementById('betModal').classList.remove('active'); 
-        document.getElementById('betModalOverlay').classList.remove('active');
-    }
+            loadHistoryData();
+            if(document.getElementById('floatingAdminPopup').style.display === 'block') {
+                loadAdminBetsSummary();
+            }
+        }
 
-    function selectBase(amt) { baseAmount = amt; document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
-    function selectMult(m) { multiplier = m; document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active')); event.target.classList.add('active'); calcTotal(); }
-    function changeQty(val) { quantity = Math.max(1, quantity + val); document.getElementById('betQty').value = quantity; calcTotal(); }
-    function calcTotal() { let total = baseAmount * multiplier * quantity; document.getElementById('totalBetCalc').innerText = `₹ ${total.toFixed(2)}`; }
+        ['30s', '60s', '3m', '5m'].forEach(type => {
+            socket.on(`timerTick_${type}`, (data) => {
+                if (currentTimerType === type) {
+                    timeLeft = data.countdown;
+                    let min = Math.floor(timeLeft / 60);
+                    let sec = timeLeft % 60;
+                    document.getElementById('countdownBox').innerHTML = `
+                        <div>${Math.floor(min/10)}</div><div>${min%10}</div><span>:</span><div>${Math.floor(sec/10)}</div><div>${sec%10}</div>
+                    `;
+                    document.getElementById('periodId').innerText = data.period;
 
-    async function submitBet() {
-        let finalAmount = baseAmount * multiplier * quantity;
-        const period = document.getElementById('periodId').innerText;
-        const response = await fetch('/api/bet', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId, timerType: currentTimerType, period, betType: activeBetType, betValue: activeBetValue, amount: finalAmount })
+                    const lockOverlay = document.getElementById('lockOverlay');
+                    if (timeLeft <= 5 && timeLeft >= 0) {
+                        lockOverlay.style.display = 'flex';
+                        let sStr = String(timeLeft).padStart(2, '0');
+                        document.getElementById('lockBoxTens').innerText = sStr[0];
+                        document.getElementById('lockBoxSingles').innerText = sStr[1];
+                        closeBetModal();
+                        if (timeLeft > 0 && !isSoundMuted) {
+                            let beep = document.getElementById('beepAudio');
+                            beep.currentTime = 0;
+                            beep.play().catch(e => {});
+                        }
+                    } else {
+                        lockOverlay.style.display = 'none';
+                    }
+                }
+            });
+
+            socket.on(`gameResult_${type}`, (resultData) => {
+                if (currentTimerType === type) {
+                    currentPage = 1; 
+                    loadHistoryData();
+                    fetchUserData();
+                    checkUserRoundResult(resultData.period);
+                }
+            });
         });
-        const data = await response.json();
-        if (data.success) {
-            depositBal = data.newBalance;
-            winningsBal = data.newWinnings;
-            let total = depositBal + winningsBal;
-            document.getElementById('userWallet').innerText = `Total: ₹ ${total.toFixed(2)}`;
-            closeBetModal();
-            showNotification('Bet successfully added!');
-            if (currentHistoryTab === 'myhistory') loadHistoryData();
-        } else { alert(data.message); }
-    }
 
-    function switchHistoryTab(tab) {
-        currentHistoryTab = tab;
-        currentPage = 1;
-        document.getElementById('toggleHistBtn').classList.toggle('active', tab === 'history');
-        document.getElementById('toggleMyHistBtn').classList.toggle('active', tab === 'myhistory');
-        loadHistoryData();
-    }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2000);
+        }
 
-    function changePage(direction) {
-        currentPage += direction;
-        if (currentPage < 1) currentPage = 1;
-        if (currentPage > totalPages) currentPage = totalPages;
-        loadHistoryData();
-    }
+        async function checkUserRoundResult(period) {
+            if (!userId) return;
+            let res = await fetch(`/api/user-round-result?userId=${userId}&period=${period}&timerType=${currentTimerType}`).then(r => r.json());
+            if (res.success && res.hasBet) {
+                let data = res.betData;
+                const popupOverlay = document.getElementById('resultPopupOverlay');
+                const popupBox = document.getElementById('resultPopupBox');
+                
+                document.getElementById('resPeriod').innerText = period;
+                document.getElementById('resNum').innerText = data.number;
+                document.getElementById('resSizeColor').innerText = `${data.size.toUpperCase()} / ${data.color}`;
 
-    function loadHistoryData() {
-        if (currentHistoryTab === 'history') {
-            document.getElementById('historyTableHeader').innerHTML = `
-                <th>Period</th>
-                <th>Number</th>
-                <th>Big/Small</th>
-                <th>Color</th>
-            `;
-            fetch(`/api/game-history/${currentTimerType}?page=${currentPage}`)
+                if (data.status === 'win') {
+                    popupBox.className = 'result-popup-box win';
+                    document.getElementById('resPopupTitle').innerText = 'WIN';
+                    document.getElementById('resAmountLabel').innerText = 'Winning Amount:';
+                    document.getElementById('resAmount').innerText = `₹ ${data.payout.toFixed(2)}`;
+                    document.getElementById('resAmount').style.color = '#34d399';
+                } else {
+                    popupBox.className = 'result-popup-box loss';
+                    document.getElementById('resPopupTitle').innerText = 'LOSS';
+                    document.getElementById('resAmountLabel').innerText = 'Loss Amount:';
+                    document.getElementById('resAmount').innerText = `₹ ${data.amount.toFixed(2)}`;
+                    document.getElementById('resAmount').style.color = '#ff4d4d';
+                }
+                popupOverlay.style.display = 'flex';
+            }
+        }
+
+        function closeResultPopup() {
+            document.getElementById('resultPopupOverlay').style.display = 'none';
+        }
+
+        function openBetModal(type, val) {
+            if (timeLeft <= 5) return showToast('Betting closed for this round!');
+            activeBetType = type;
+            activeBetValue = val;
+
+            const modal = document.getElementById('betModal');
+            modal.className = 'bet-modal';
+            let v = String(val).toLowerCase();
+            if (['green', '1', '3', '7', '9'].includes(v)) modal.classList.add('theme-green');
+            else if (['red', '2', '4', '6', '8'].includes(v)) modal.classList.add('theme-red');
+            else if (['violet', '0', '5'].includes(v)) modal.classList.add('theme-violet');
+            else if (v === 'big') modal.classList.add('theme-big');
+            else if (v === 'small') modal.classList.add('theme-small');
+
+            document.getElementById('modalTitle').innerText = `Select ${val.toUpperCase()}`;
+            modal.classList.add('active');
+            document.getElementById('betModalOverlay').style.display = 'block';
+            calcTotal();
+        }
+
+        function closeBetModal() { 
+            const modal = document.getElementById('betModal');
+            modal.classList.remove('active'); 
+            document.getElementById('betModalOverlay').style.display = 'none';
+        }
+
+        function selectBase(amt, el) { baseAmount = amt; document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); calcTotal(); }
+        function selectMult(m, el) { multiplier = m; document.querySelectorAll('.mult-btn').forEach(b => b.classList.remove('active')); el.classList.add('active'); calcTotal(); }
+        function changeQty(val) { quantity = Math.max(1, quantity + val); document.getElementById('betQty').value = quantity; calcTotal(); }
+        function onQtyInput(el) { let val = parseInt(el.value); quantity = (isNaN(val) || val < 1) ? 1 : val; calcTotal(); }
+        function calcTotal() { let total = baseAmount * multiplier * quantity; document.getElementById('totalBetCalc').innerText = `₹ ${total.toFixed(2)}`; }
+
+        async function submitBet() {
+            let finalAmount = baseAmount * multiplier * quantity;
+            const period = document.getElementById('periodId').innerText;
+            if (!userId) { showToast('Please login first!'); return; }
+            const response = await fetch('/api/bet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, timerType: currentTimerType, period, betType: activeBetType, betValue: activeBetValue, amount: finalAmount })
+            });
+            const data = await response.json();
+            if (data.success) {
+                depositBal = data.newBalance;
+                winningsBal = data.newWinnings;
+                let total = depositBal + winningsBal;
+                document.getElementById('userWallet').innerText = `₹ ${total.toFixed(2)}`;
+                closeBetModal();
+                showToast('Bet placed successfully!');
+                if (currentHistoryTab === 'myhistory') loadHistoryData();
+            } else { showToast(data.message); }
+        }
+
+        function switchHistoryTab(tab) {
+            currentHistoryTab = tab;
+            currentPage = 1;
+            document.getElementById('tabHist').classList.toggle('active', tab === 'history');
+            document.getElementById('tabChart').classList.toggle('active', tab === 'chart');
+            document.getElementById('tabMyHist').classList.toggle('active', tab === 'myhistory');
+
+            document.getElementById('gameHistoryView').style.display = (tab === 'history') ? 'block' : 'none';
+            document.getElementById('chartView').style.display = (tab === 'chart') ? 'block' : 'none';
+            document.getElementById('myHistoryView').style.display = (tab === 'myhistory') ? 'block' : 'none';
+
+            loadHistoryData();
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            loadHistoryData();
+        }
+
+        function loadHistoryData() {
+            fetch(`/api/game-history/${currentTimerType}?page=1&limit=5`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.history) {
-                        totalPages = data.totalPages || 1;
-                        document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
-                        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
-                        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+                        const bar = document.getElementById('recentResultsBar');
+                        bar.innerHTML = '';
+                        data.history.slice(0, 5).forEach(item => {
+                            let bClass = 'mini-ball ';
+                            if (item.number === 0) bClass += 'split-0';
+                            else if (item.number === 5) bClass += 'split-5';
+                            else if (item.color === 'green') bClass += 'green';
+                            else bClass += 'red';
 
-                        const tbody = document.getElementById('historyBody');
-                        tbody.innerHTML = '';
-                        data.history.forEach(item => {
-                            let dotColor = item.color === 'green' ? '#34d399' : (item.color === 'red' ? '#f87171' : '#c084fc');
-                            tbody.innerHTML += `<tr>
-                                <td>${item.period.slice(-6)}</td>
-                                <td style="font-weight:bold; color:${dotColor};">${item.number}</td>
-                                <td style="text-transform:uppercase;">${item.size}</td>
-                                <td><span class="dot" style="background:${dotColor}"></span></td>
-                            </tr>`;
+                            bar.innerHTML += `<div class="${bClass}">
+                                <div class="mini-glow-side mini-glow-left"></div>
+                                <div class="mini-glow-side mini-glow-right"></div>
+                                <div class="mini-glow-bottom"></div>
+                                <span>${item.number}</span>
+                            </div>`;
                         });
                     }
                 });
-        } else {
-            document.getElementById('historyTableHeader').innerHTML = `
-                <th>Period</th>
-                <th>Bet</th>
-                <th>Amount</th>
-                <th>Result</th>
-            `;
-            if (!userId) return;
-            fetch(`/api/user-bets/${userId}/${currentTimerType}?page=${currentPage}`)
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success && data.bets) {
-                        totalPages = data.totalPages || 1;
-                        document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
-                        document.getElementById('prevPageBtn').disabled = currentPage <= 1;
-                        document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
 
-                        const tbody = document.getElementById('historyBody');
-                        tbody.innerHTML = '';
-                        data.bets.forEach(bet => {
-                            let statusColor = bet.status === 'win' ? '#34d399' : (bet.status === 'loss' ? '#ef4444' : '#fbbf24');
-                            let statusText = bet.status === 'win' ? `+₹${bet.payout}` : (bet.status === 'loss' ? `-₹${bet.amount}` : 'Pending');
-                            tbody.innerHTML += `<tr>
-                                <td>${bet.period.slice(-6)}</td>
-                                <td style="text-transform:uppercase;">${bet.betValue}</td>
-                                <td>₹${bet.amount}</td>
-                                <td style="font-weight:bold; color:${statusColor}; text-transform:uppercase;">${statusText}</td>
-                            </tr>`;
-                        });
-                    }
-                });
-        }
-    }
+            if (currentHistoryTab === 'history') {
+                fetch(`/api/game-history/${currentTimerType}?page=${currentPage}&limit=10`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.history) {
+                            totalPages = data.totalPages || 1;
+                            document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+                            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
 
-    function toggleAdminPopup() {
-        let popup = document.getElementById('floatingAdminPopup');
-        if (popup.style.display === 'block') {
-            popup.style.display = 'none';
-        } else {
-            popup.style.display = 'block';
-            loadAdminBetsSummary();
-        }
-    }
+                            const tbody = document.getElementById('historyBody');
+                            tbody.innerHTML = '';
+                            data.history.forEach(item => {
+                                let dotColor = item.color === 'green' ? '#34d399' : (item.color === 'red' ? '#f87171' : '#c084fc');
+                                tbody.innerHTML += `<tr>
+                                    <td style="padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.05); color:#e2e8f0; font-family:monospace;">${item.period}</td>
+                                    <td style="padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.05); font-weight:bold; color:${dotColor};">${item.number}</td>
+                                    <td style="padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.05); text-transform:uppercase; color:#e2e8f0;">${item.size}</td>
+                                    <td style="padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.05);"><span style="height:10px; width:10px; border-radius:50%; display:inline-block; background:${dotColor}"></span></td>
+                                </tr>`;
+                            });
+                        }
+                    });
+            } else if (currentHistoryTab === 'chart') {
+                fetch(`/api/game-history/${currentTimerType}?page=${currentPage}&limit=10`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.history) {
+                            totalPages = data.totalPages || 1;
+                            document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+                            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
+                            renderChartGrid(data.history);
+                        }
+                    });
+            } else {
+                if (!userId) return;
+                fetch(`/api/user-bets/${userId}/${currentTimerType}?page=${currentPage}&limit=10`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.bets) {
+                            totalPages = data.totalPages || 1;
+                            document.getElementById('pageIndicator').innerText = `Page ${currentPage} of ${totalPages}`;
+                            document.getElementById('prevPageBtn').disabled = currentPage <= 1;
+                            document.getElementById('nextPageBtn').disabled = currentPage >= totalPages;
 
-    async function loadAdminBetsSummary() {
-        let period = document.getElementById('periodId').innerText;
-        let res = await fetch(`/api/admin/bets-summary/${period}`).then(r => r.json());
-        if(res.success) {
-            let html = `<b>Period:</b> ${period} (${currentTimerType})<br><b>Total Bets Amount:</b> ₹${res.totalAmount}<br><br>`;
-            html += `<b>Size Bets:</b> Big(₹${res.breakdown.big || 0}) | Small(₹${res.breakdown.small || 0})<br>`;
-            html += `<b>Color Bets:</b> Green(₹${res.breakdown.green || 0}) | Red(₹${res.breakdown.red || 0}) | Violet(₹${res.breakdown.violet || 0})<br><br>`;
-            html += `<b>Numbers Sum:</b><br>`;
-            for(let i=0; i<=9; i++) {
-                html += `Num ${i}: ₹${res.breakdown['num_' + i] || 0} &nbsp; `;
-                if(i === 4 || i === 9) html += '<br>';
+                            const list = document.getElementById('myHistoryList');
+                            list.innerHTML = '';
+                            if (data.bets.length === 0) {
+                                list.innerHTML = `<div style="text-align:center; padding:20px; color:#a7f3d0;">No betting records found</div>`;
+                                return;
+                            }
+                            data.bets.forEach(bet => {
+                                let badgeClass = 'num';
+                                let betValText = bet.betValue;
+                                if (['green', 'red', 'violet', 'big', 'small'].includes(bet.betValue.toLowerCase())) {
+                                    badgeClass = bet.betValue.toLowerCase();
+                                }
+                                
+                                let statusClass = 'pending';
+                                let statusText = 'Pending';
+                                let amtClass = '';
+                                let amtDisplay = `₹${bet.amount}`;
+
+                                if (bet.status === 'win') {
+                                    statusClass = 'succeed'; statusText = 'Succeed'; amtClass = 'win';
+                                    amtDisplay = `+₹${bet.payout.toFixed(2)}`;
+                                } else if (bet.status === 'loss') {
+                                    statusClass = 'failed'; statusText = 'Failed'; amtClass = 'loss';
+                                    amtDisplay = `-₹${bet.amount.toFixed(2)}`;
+                                }
+
+                                let betTime = bet.createdAt ? new Date(bet.createdAt).toLocaleString() : 'Recently';
+
+                                list.innerHTML += `
+                                    <div class="my-history-item">
+                                        <div class="my-hist-left">
+                                            <div class="my-hist-badge ${badgeClass}">${betValText}</div>
+                                            <div class="my-hist-details">
+                                                <div class="my-hist-period">${bet.period}</div>
+                                                <div class="my-hist-time">${betTime}</div>
+                                            </div>
+                                        </div>
+                                        <div class="my-hist-right">
+                                            <span class="status-pill ${statusClass}">${statusText}</span>
+                                            <span class="my-hist-amount ${amtClass}">${amtDisplay}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                    });
             }
-            document.getElementById('adminBetsOverview').innerHTML = html;
         }
-    }
 
-    async function submitRiggedResult() {
-        let period = document.getElementById('periodId').innerText;
-        let number = document.getElementById('rigNumberSelect').value;
-        let res = await fetch('/api/admin/set-result', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ period, number })
-        }).then(r => r.json());
-        alert(res.message);
-        toggleAdminPopup();
-    }
+        function renderChartGrid(historyData) {
+            const container = document.getElementById('chartRowsContainer');
+            container.innerHTML = '';
 
-    const floatBtn = document.getElementById('floatingAdminBtn');
-    const popup = document.getElementById('floatingAdminPopup');
-    const header = document.getElementById('popupHeader');
+            historyData.forEach((row, rowIndex) => {
+                let rowHTML = `<div class="chart-row" data-row="${rowIndex}">`;
+                rowHTML += `<div class="period-cell">${row.period}</div>`;
 
-    let isDragging = false, startX, startY, initialX, initialY;
+                for (let i = 0; i <= 9; i++) {
+                    if (i === row.number) {
+                        let activeClass = row.color === 'green' ? 'active-green' : (row.color === 'red' ? 'active-red' : 'active-violet');
+                        rowHTML += `<div class="ball-cell"><div class="ball-dot ${activeClass}" id="point-${rowIndex}">${i}</div></div>`;
+                    } else {
+                        rowHTML += `<div class="ball-cell"><div class="ball-dot">${i}</div></div>`;
+                    }
+                }
 
-    floatBtn.addEventListener('mousedown', dragStartBtn);
-    document.addEventListener('mousemove', dragBtn);
-    document.addEventListener('mouseup', dragEndBtn);
-    floatBtn.addEventListener('touchstart', dragStartBtn, {passive: true});
-    document.addEventListener('touchmove', dragBtn, {passive: true});
-    document.addEventListener('touchend', dragEndBtn);
+                let sizeChar = row.size ? row.size.charAt(0).toUpperCase() : (row.number >= 5 ? 'B' : 'S');
+                let bsClass = sizeChar === 'B' ? 'big' : 'small';
+                rowHTML += `<div class="bs-badge ${bsClass}">${sizeChar}</div></div>`;
+                container.innerHTML += rowHTML;
+            });
 
-    function dragStartBtn(e) {
-        initialX = e.clientX || e.touches[0].clientX;
-        initialY = e.clientY || e.touches[0].clientY;
-        isDragging = true;
-    }
-    function dragBtn(e) {
-        if (!isDragging) return;
-        let currentX = e.clientX || e.touches[0].clientX;
-        let currentY = e.clientY || e.touches[0].clientY;
-        let dx = currentX - initialX;
-        let dy = currentY - initialY;
-        initialX = currentX;
-        initialY = currentY;
-        floatBtn.style.top = (floatBtn.offsetTop + dy) + "px";
-        floatBtn.style.left = (floatBtn.offsetLeft + dx) + "px";
-        floatBtn.style.bottom = 'auto';
-        floatBtn.style.right = 'auto';
-    }
-    function dragEndBtn() { isDragging = false; }
+            setTimeout(() => drawTrendLines(historyData.length), 50);
+        }
 
-    header.addEventListener('mousedown', dragStartPopup);
-    document.addEventListener('mousemove', dragPopup);
-    document.addEventListener('mouseup', dragEndPopup);
-    header.addEventListener('touchstart', dragStartPopup, {passive: true});
-    document.addEventListener('touchmove', dragPopup, {passive: true});
-    document.addEventListener('touchend', dragEndPopup);
+        function drawTrendLines(length) {
+            const canvas = document.getElementById('chartCanvas');
+            const container = document.querySelector('.grid-wrapper');
+            if (!canvas || !container) return;
 
-    function dragStartPopup(e) {
-        initialX = e.clientX || e.touches[0].clientX;
-        initialY = e.clientY || e.touches[0].clientY;
-        isDragging = true;
-    }
-    function dragPopup(e) {
-        if (!isDragging) return;
-        let currentX = e.clientX || e.touches[0].clientX;
-        let currentY = e.clientY || e.touches[0].clientY;
-        let dx = currentX - initialX;
-        let dy = currentY - initialY;
-        initialX = currentX;
-        initialY = currentY;
-        popup.style.top = (popup.offsetTop + dy) + "px";
-        popup.style.left = (popup.offsetLeft + dx) + "px";
-    }
-    function dragEndPopup() { isDragging = false; }
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
 
-    loadHistoryData();
-</script>
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2;
+
+            const points = [];
+            for (let index = 0; index < length; index++) {
+                const elem = document.getElementById(`point-${index}`);
+                if (elem) {
+                    const rect = elem.getBoundingClientRect();
+                    const containerRect = container.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2 - containerRect.left;
+                    const y = rect.top + rect.height / 2 - containerRect.top;
+                    points.push({ x, y });
+                }
+            }
+
+            if (points.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(points[0].x, points[0].y);
+                for (let i = 1; i < points.length; i++) {
+                    ctx.lineTo(points[i].x, points[i].y);
+                }
+                ctx.stroke();
+            }
+        }
+
+        function toggleAdminPopup() {
+            let popup = document.getElementById('floatingAdminPopup');
+            if (popup.style.display === 'block') {
+                popup.style.display = 'none';
+            } else {
+                popup.style.display = 'block';
+                loadAdminBetsSummary();
+            }
+        }
+
+        async function loadAdminBetsSummary() {
+            let period = document.getElementById('periodId').innerText;
+            let res = await fetch(`/api/admin/bets-summary/${period}`).then(r => r.json());
+            if(res.success) {
+                let html = `<b>Period:</b> ${period} (${currentTimerType})<br><b>Total Bets:</b> ₹${res.totalAmount}<br><br>`;
+                html += `<b>Size:</b> Big(₹${res.breakdown.big || 0}) | Small(₹${res.breakdown.small || 0})<br>`;
+                html += `<b>Color:</b> Green(₹${res.breakdown.green || 0}) | Red(₹${res.breakdown.red || 0}) | Violet(₹${res.breakdown.violet || 0})<br>`;
+                document.getElementById('adminBetsOverview').innerHTML = html;
+            }
+        }
+
+        async function submitRiggedResult() {
+            let period = document.getElementById('periodId').innerText;
+            let number = document.getElementById('rigNumberSelect').value;
+            let res = await fetch('/api/admin/set-result', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ period, number })
+            }).then(r => r.json());
+            showToast(res.message);
+            toggleAdminPopup();
+        }
+
+        loadHistoryData();
+    </script>
 </body>
 </html>
